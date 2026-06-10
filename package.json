@@ -1,0 +1,42 @@
+{
+	"name": "dynamic-pricing-calendar",
+	"version": "1.0.0",
+	"main": "index.js",
+	"scripts": {
+		"dev": "vinxi dev"
+	},
+	"author": "Christian Torrealba",
+	"license": "ISC",
+	"description": "RoomPriceGenie SaaS Revenue Management System Pricing Calendar simulation with React, TypeScript, and TanStack Query.",
+	"dependencies": {
+		"@date-fns/tz": "^1.2.0",
+		"@mantine/core": "^7.13.4",
+		"@mantine/hooks": "^7.13.4",
+		"@tabler/icons-react": "^3.21.0",
+		"@tanstack/react-query": "^5.59.16",
+		"@tanstack/react-query-devtools": "^5.59.16",
+		"@vinxi/react": "^0.2.5",
+		"@vitejs/plugin-react": "^4.3.3",
+		"date-fns": "^4.1.0",
+		"react": "^18.3.1",
+		"react-dom": "^18.3.1",
+		"vinxi": "^0.4.3"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "1.9.4",
+		"@types/react": "^18.3.12",
+		"@types/react-dom": "^18.3.1",
+		"autoprefixer": "^10.4.20",
+		"postcss": "^8.4.47",
+		"postcss-preset-mantine": "^1.17.0",
+		"postcss-simple-vars": "^7.0.1",
+		"tailwindcss": "^3.4.14"
+	},
+	"pnpm": {
+		"overrides": {
+			"h3": "^1.15.9",
+			"esbuild": "^0.25.0",
+			"vite": "^6.4.2"
+		}
+	}
+}
