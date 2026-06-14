@@ -1,0 +1,53 @@
+import { useQuery } from "@tanstack/react-query";
+import { getPrices } from "../../services/hotel-api/prices";
+import type { DayPriceItem, PriceData } from "../../types/Pricing";
+import { getDateMetadata, isSameMonthAndYear } from "../../utils/date";
+
+interface UsePricesFilters {
+	locale: string;
+	selectedRoomId: string | null;
+	currentMonthDate: Date;
+}
+
+export const usePrices = (filters: UsePricesFilters) => {
+	const { locale, selectedRoomId, currentMonthDate } = filters;
+
+	return useQuery<PriceData | null, Error, DayPriceItem[] | null>({
+		queryKey: [
+			"prices",
+			locale,
+			selectedRoomId,
+			currentMonthDate.getFullYear(),
+			currentMonthDate.getMonth(),
+		],
+		queryFn: ({ signal }) => getPrices(signal),
+		retry: 1,
+		refetchOnWindowFocus: false,
+		enabled: !!selectedRoomId,
+		select: (rawData) => {
+			if (!rawData || !selectedRoomId) return null;
+
+			const dataEntries = Object.entries(rawData.prices.data);
+			const currencySymbol = rawData.currency.symbol;
+
+			return dataEntries
+				.filter(([dateKey]) => isSameMonthAndYear(dateKey, currentMonthDate))
+				.filter(([_, roomsMap]) => !!roomsMap[selectedRoomId])
+				.map(([dateKey, roomsMap]) => {
+					const roomInfo = roomsMap[selectedRoomId];
+					const { dayNumber } = getDateMetadata(dateKey);
+
+					return {
+						dateKey,
+						dayNumber,
+						currencySymbol,
+						price: roomInfo?.price ?? null,
+						priceInPms: roomInfo?.priceInPms ?? null,
+						error: !!roomInfo?.error,
+						errorReason: roomInfo?.errorReason,
+					};
+				})
+				.sort((a, b) => a.dayNumber - b.dayNumber);
+		},
+	});
+};
