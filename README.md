@@ -63,6 +63,14 @@ flowchart TD
     <img src="https://github.com/christianjtr/dynamic-pricing-calendar/blob/main/samples/demo.gif" alt="gif-demo"/>
 </p>
 
+### Test Suite Blueprint (Sample Showcase)
+
+*Note: These tests serve as a structural sample to demonstrate the testing patterns and architectural compatibility implemented across the workspace.*
+
+- **Hooks Isolation (`useCalendar.test.ts`)** — A sample showcasing how to validate time-dependent state management mechanics, time-locked calculations, and calendar navigation boundaries using `vi.useFakeTimers()` to prevent date-overflow glitches.
+- **Component UI Nodes (`BaseCalendar.test.tsx`)** — A sample demonstrating how presentational component integration mapping, interface parameters, and element layouts render while fully bound to the layout context layer inside a `<MantineProvider>`.
+- **Network API Clients (`settings.test.ts`)** — A sample verifying serialization, asynchronous data fetcher logic, and mock response validation parameters.
+
 ## Possible Improvements
 
 - Add `staleTime` and `gcTime` defaults to `QueryClient` for better cache control.
