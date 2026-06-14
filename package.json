@@ -1,14 +1,12 @@
 {
 	"name": "dynamic-pricing-calendar",
 	"version": "1.0.0",
-	"main": "index.js",
 	"scripts": {
 		"dev": "vinxi dev",
 		"lint": "biome check .",
 		"lint:fix": "biome check --write .",
 		"typecheck": "tsc --noEmit",
-		"test": "vitest",
-		"test:ui": "vitest --ui"
+		"test": "vitest"
 	},
 	"author": "Christian Torrealba",
 	"license": "MIT",
