@@ -1,6 +1,6 @@
+import type { HotelSettings, PriceData } from "@shared/types";
 import { format } from "date-fns";
 import { eventHandler, getRequestURL } from "vinxi/http";
-import type { PriceData, SettingsData } from "../types";
 
 export default eventHandler(async (event) => {
 	const info = getRequestURL(event);
@@ -53,7 +53,7 @@ export default eventHandler(async (event) => {
 	}
 
 	if (info.pathname.startsWith("/api/settings")) {
-		const data: SettingsData = {
+		const data: HotelSettings = {
 			hotel: {
 				timezone: "Pacific/Auckland",
 				locale: "en-NZ",
