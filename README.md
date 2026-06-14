@@ -100,7 +100,8 @@ pnpm dev
 | `pnpm lint` | Run Biome checks |
 | `pnpm lint:fix` | Auto-fix formatting and imports |
 | `pnpm typecheck` | Run TypeScript type checking |
-
+| `pnpm test` | Run Tests |
+  
 ## License
 
 MIT — Christian Torrealba
