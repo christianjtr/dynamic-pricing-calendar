@@ -17,7 +17,8 @@
 		"noUncheckedIndexedAccess": true,
 		"paths": {
 			"@shared/types": ["./shared/types"],
-			"@shared/types/*": ["./shared/types/*"]
+			"@shared/types/*": ["./shared/types/*"],
+			"@/*": ["./client/src/*"]
 		}
 	}
 }

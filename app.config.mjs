@@ -1,5 +1,6 @@
 import reactRefresh from "@vitejs/plugin-react";
 import { createApp } from "vinxi";
+import tsconfigPaths from "vite-tsconfig-paths";
 
 export default createApp({
 	routers: [
@@ -9,17 +10,8 @@ export default createApp({
 			handler: "./index.html",
 			target: "browser",
 			plugins: () => [
+				tsconfigPaths(),
 				reactRefresh(),
-				{
-					name: "custom-vite-aliases",
-					vite: {
-						resolve: {
-							alias: {
-								"@": "/client",
-							},
-						},
-					},
-				}
 			],
 		},
 		{
