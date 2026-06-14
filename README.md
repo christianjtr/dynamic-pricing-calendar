@@ -57,6 +57,12 @@ flowchart TD
 - **Developer Experience** — Biome formatting, React Query Devtools, clear error messages.
 - **Performance** — `useMemo` for derived values, `query.select` for filtered price data, stable keys.
 
+## Sample
+
+<p align="center">
+    <img src="https://github.com/christianjtr/dynamic-pricing-calendar/blob/main/samples/demo.gif" alt="gif-demo"/>
+</p>
+
 ## Possible Improvements
 
 - Add `staleTime` and `gcTime` defaults to `QueryClient` for better cache control.
