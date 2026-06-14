@@ -10,6 +10,14 @@
 		"checkJs": true,
 		"noEmit": true,
 		"types": ["vinxi/client"],
-		"isolatedModules": true
+		"isolatedModules": true,
+		"strict": true,
+		"strictNullChecks": true,
+		"noImplicitAny": true,
+		"noUncheckedIndexedAccess": true,
+		"paths": {
+			"@shared/types": ["./shared/types"],
+			"@shared/types/*": ["./shared/types/*"]
+		}
 	}
 }
