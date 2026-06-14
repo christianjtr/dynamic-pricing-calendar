@@ -15,13 +15,14 @@ RoomPriceGenie SaaS Revenue Management System — Pricing Calendar simulation bu
 
 ```
 client/           # React frontend application
-  components/     # Reusable UI components (BaseCalendar, Layout, ErrorBoundary)
-  context/        # HotelSettingsContext (UI state only)
-  features/       # Feature modules (OptimizedRates)
-  hooks/          # Custom hooks (queries, useCalendar, etc.)
-  services/       # API clients (hotel-api)
-  types/          # Client-specific Zod schemas and types
-  utils/          # Pure utility functions
+  src/
+    components/     # Reusable UI components (BaseCalendar, Layout, ErrorBoundary)
+    context/        # HotelSettingsContext (UI state only)
+    features/       # Feature modules (OptimizedRates)
+    hooks/          # Custom hooks (queries, useCalendar, etc.)
+    services/       # API clients (hotel-api)
+    types/          # Client-specific Zod schemas and types
+    utils/          # Pure utility functions
 api/              # Server handlers (Vinxi)
 shared/types/     # Shared TypeScript types between client and server
 ```
