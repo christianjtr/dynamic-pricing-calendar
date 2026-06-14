@@ -2,31 +2,56 @@
 import ReactDOM from "react-dom/client";
 
 import "@mantine/core/styles.css";
-import "./index.css";
 
-import { Box, MantineProvider } from "@mantine/core";
+import { MantineProvider } from "@mantine/core";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-import { RoomPriceGenieLogo } from "./roompricegenie-logo";
+import { Suspense, lazy } from "react";
+import { ErrorBoundary } from "./components/ErrorBoundary";
+import { AppLayout } from "./components/Layout/AppLayout";
+import { AppLoader } from "./components/Layout/AppLoader";
+import { HotelSettingsProvider } from "./context/HotelSettingsContext";
+import { OptimizedRatesDashboard } from "./features/OptimizedRates";
+import { useHotelSettings } from "./hooks/queries/useHotelSettings";
+
+const ReactQueryDevtools = lazy(() =>
+	import("@tanstack/react-query-devtools").then((m) => ({
+		default: m.ReactQueryDevtools,
+	})),
+);
 
 const queryClient = new QueryClient();
 
 function App() {
+	const { data: settings, isLoading } = useHotelSettings();
+
+	if (isLoading || !settings) {
+		return <AppLoader />;
+	}
+
 	return (
-		<QueryClientProvider client={queryClient}>
-			<MantineProvider>
-				<Box p="sm">
-					<RoomPriceGenieLogo />
-				</Box>
-				{/* TODO: This is where you do your genie magic */}
-			</MantineProvider>
-			<ReactQueryDevtools initialIsOpen={false} />
-		</QueryClientProvider>
+		<HotelSettingsProvider initialSettings={settings}>
+			<AppLayout>
+				<OptimizedRatesDashboard />
+			</AppLayout>
+		</HotelSettingsProvider>
 	);
 }
 
 const rootElement = document.getElementById("root");
 
 if (rootElement) {
-	ReactDOM.createRoot(rootElement).render(<App />);
+	ReactDOM.createRoot(rootElement).render(
+		<QueryClientProvider client={queryClient}>
+			<MantineProvider>
+				<ErrorBoundary>
+					<App />
+				</ErrorBoundary>
+			</MantineProvider>
+			{import.meta.env.DEV && (
+				<Suspense fallback={null}>
+					<ReactQueryDevtools initialIsOpen={false} />
+				</Suspense>
+			)}
+		</QueryClientProvider>,
+	);
 }
