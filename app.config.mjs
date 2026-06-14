@@ -9,10 +9,7 @@ export default createApp({
 			type: "spa",
 			handler: "./index.html",
 			target: "browser",
-			plugins: () => [
-				tsconfigPaths(),
-				reactRefresh(),
-			],
+			plugins: () => [tsconfigPaths(), reactRefresh()],
 		},
 		{
 			name: "api",
