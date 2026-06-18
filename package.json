@@ -12,7 +12,6 @@
 	"license": "MIT",
 	"description": "RoomPriceGenie SaaS Revenue Management System Pricing Calendar simulation with React, TypeScript, and TanStack Query.",
 	"dependencies": {
-		"@date-fns/tz": "^1.2.0",
 		"@mantine/core": "^7.13.4",
 		"@mantine/hooks": "^7.13.4",
 		"@tabler/icons-react": "^3.21.0",
@@ -21,6 +20,7 @@
 		"@vinxi/react": "^0.2.5",
 		"@vitejs/plugin-react": "^4.3.3",
 		"date-fns": "^4.1.0",
+		"date-fns-tz": "^3.2.0",
 		"es-toolkit": "^1.47.1",
 		"react": "^18.3.1",
 		"react-dom": "^18.3.1",
@@ -41,6 +41,7 @@
 		"postcss-preset-mantine": "^1.17.0",
 		"postcss-simple-vars": "^7.0.1",
 		"tailwindcss": "^3.4.14",
+		"typescript": "^6.0.3",
 		"vite-tsconfig-paths": "^6.1.1",
 		"vitest": "^4.1.8"
 	},
