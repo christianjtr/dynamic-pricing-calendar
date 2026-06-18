@@ -8,7 +8,7 @@ RoomPriceGenie SaaS Revenue Management System — Pricing Calendar simulation bu
 - TanStack Query v5
 - Mantine UI v7
 - Vinxi (Vite + Nitro)
-- Zod + date-fns + es-toolkit
+- Zod + date-fns + date-fns-tz + es-toolkit
 - pnpm as package manager
 
 ## Project Structure
@@ -31,7 +31,7 @@ shared/types/     # Shared TypeScript types between client and server
 
 **Single Source of Truth**: TanStack Query (`useHotelSettings`, `usePrices`) is the only source of server data.
 
-**UI State**: `HotelSettingsContext` holds only ephemeral UI state (`selectedRoomId`, `locale`, `timezone`).
+**UI State**: `HotelSettingsContext` holds ephemeral UI state (`selectedRoomId`, `locale`, `displayTimezone`).
 
 **Derived Values**: Computed via `useMemo` inside the Context Provider (`activeRoomName`, `roomSelectOptions`, `currencySymbol`).
 
@@ -44,7 +44,7 @@ flowchart TD
     B -->|HotelSettings| E[HotelSettingsProvider Context]
     E -->|UI State + Derived| F[useHotelSettingsContext]
     D -->|PriceData + select filter| G[PricingCalendar]
-    F -->|selectedRoomId, locale| G
+    F -->|selectedRoomId, locale, displayTimezone| G
     G -->|renderDay + priceList| H[BaseCalendar]
     H -->|CalendarCell| I[CalendarDayRates]
 ```
@@ -54,8 +54,9 @@ flowchart TD
 - **Single Source of Truth** — TanStack Query owns all server data. Context never duplicates it.
 - **Clean Separation** — Context only manages ephemeral UI state (`selectedRoomId`, `locale`).
 - **Strong Type Safety** — Zod schemas + shared types + strict TypeScript.
-- **Error Resilience** — `ErrorBoundary` + Query error handling + graceful fallbacks.
-- **Developer Experience** — Biome formatting, React Query Devtools, clear error messages.
+- **Timezone Awareness** — Full user-selectable "Display Timezone" using `date-fns-tz` (`toZonedTime`, `formatInTimeZone`).
+- **Error Resilience** — Comprehensive error handling with visible UI feedback, retry mechanisms, and no silent failures.
+- **Developer Experience** — Biome formatting, React Query Devtools, descriptive error messages and global error handler.
 - **Performance** — `useMemo` for derived values, `query.select` for filtered price data, stable keys.
 
 ## Sample
@@ -68,21 +69,25 @@ flowchart TD
 
 *Note: These tests serve as a structural sample to demonstrate the testing patterns and architectural compatibility implemented across the workspace.*
 
-- **Hooks Isolation (`useCalendar.test.ts`)** — A sample showcasing how to validate time-dependent state management mechanics, time-locked calculations, and calendar navigation boundaries using `vi.useFakeTimers()` to prevent date-overflow glitches.
-- **Component UI Nodes (`BaseCalendar.test.tsx`)** — A sample demonstrating how presentational component integration mapping, interface parameters, and element layouts render while fully bound to the layout context layer inside a `<MantineProvider>`.
-- **Network API Clients (`settings.test.ts`)** — A sample verifying serialization, asynchronous data fetcher logic, and mock response validation parameters.
+- **Hooks Isolation (`useCalendar.test.ts`)** — Validates timezone-aware date calculations, `displayTimezone` propagation, and calendar navigation using `vi.useFakeTimers()`.
+- **Component UI Nodes (`BaseCalendar.test.tsx`)** — Tests presentational components with timezone context and error states inside `<MantineProvider>`.
+- **Network API Clients (`settings.test.ts`)** — Verifies error handling, serialization, and proper error propagation from API layer.
+
+## Implemented Improvements (Post Take-home Feedback)
+
+- Full **Display Timezone** support using `date-fns-tz` (user can choose their preferred timezone)
+- Comprehensive **error handling**: No more silent failures. Clear UI messages, retry buttons, and global error handler.
+- `QueryClient` configured with `staleTime`, retry logic, and global `onError`
+- Replaced generic "ERR" with descriptive messages ("NO MARKET DATA", "PRICING ERROR")
+- Improved API layer to throw meaningful errors instead of returning `null`
 
 ## Possible Improvements
 
-- Add `staleTime` and `gcTime` defaults to `QueryClient` for better cache control.
-- Extract `usePrices` filter object into a memoized value or custom hook.
-- Add `useCallback` to `handleLocaleChange` if passed deep in the tree.
-- Persist `selectedRoomId` and `locale` in `localStorage` or URL for better refresh UX.
-- Replace static currency map in `getCurrencyFromLocale` with a more robust `Intl` solution.
-- Add unit tests for pure functions (`getRoomSelectOptions`, `getCurrencyFromLocale`).
-- Document the `renderDay` prop contract in `BaseCalendar`.
-- Extract `PricingCalendar` state (`activeDate`) into a custom hook (`useCalendarDate`).
-- Add global `QueryClient` error handler via `queryCache` for consistent logging.
+- Persist `selectedRoomId`, `locale`, and `displayTimezone` in URL or localStorage
+- Add unit tests for pure functions (`getRoomSelectOptions`, `getCurrencyFromLocale`)
+- Document the `renderDay` prop contract in `BaseCalendar`
+- Extract `PricingCalendar` state into a dedicated `useCalendarDate` hook
+- Add visual indicator when user timezone differs from hotel timezone
 
 ## Getting Started
 
