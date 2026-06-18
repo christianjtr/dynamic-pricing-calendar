@@ -7,10 +7,16 @@ interface UsePricesFilters {
 	locale: string;
 	selectedRoomId: string | null;
 	currentMonthDate: Date;
+	timezone?: string;
 }
 
 export const usePrices = (filters: UsePricesFilters) => {
-	const { locale, selectedRoomId, currentMonthDate } = filters;
+	const {
+		locale,
+		selectedRoomId,
+		currentMonthDate,
+		timezone = undefined,
+	} = filters;
 
 	return useQuery<PriceData | null, Error, DayPriceItem[] | null>({
 		queryKey: [
@@ -19,6 +25,7 @@ export const usePrices = (filters: UsePricesFilters) => {
 			selectedRoomId,
 			currentMonthDate.getFullYear(),
 			currentMonthDate.getMonth(),
+			timezone,
 		],
 		queryFn: ({ signal }) => getPrices(signal),
 		retry: 1,
@@ -31,11 +38,13 @@ export const usePrices = (filters: UsePricesFilters) => {
 			const currencySymbol = rawData.currency.symbol;
 
 			return dataEntries
-				.filter(([dateKey]) => isSameMonthAndYear(dateKey, currentMonthDate))
+				.filter(([dateKey]) =>
+					isSameMonthAndYear(dateKey, currentMonthDate, timezone),
+				)
 				.filter(([_, roomsMap]) => !!roomsMap[selectedRoomId])
 				.map(([dateKey, roomsMap]) => {
 					const roomInfo = roomsMap[selectedRoomId];
-					const { dayNumber } = getDateMetadata(dateKey);
+					const { dayNumber } = getDateMetadata(dateKey, timezone);
 
 					return {
 						dateKey,

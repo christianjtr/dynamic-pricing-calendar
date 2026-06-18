@@ -19,6 +19,7 @@ import { CalendarLoadingOverlay } from "./components/CalendarLoadingOverlay";
 
 interface BaseCalendarProps {
 	isLoading?: boolean;
+	todayKey?: string;
 	onChangeMonthDate?: (date: Date) => void;
 	renderDay?: (
 		dateKey: string,
@@ -69,19 +70,30 @@ const MobileDayRow: React.FC<MobileDayRowProps> = ({
 };
 
 export const BaseCalendar: React.FC<BaseCalendarProps> = (props) => {
-	const { isLoading = false, renderDay, onChangeMonthDate } = props;
-	const { locale } = useHotelSettingsContext();
+	const {
+		isLoading = false,
+		todayKey: todayKeyProp,
+		renderDay,
+		onChangeMonthDate,
+	} = props;
+	const { locale, timezone } = useHotelSettingsContext();
 
 	const {
 		currentMonthDate,
 		monthLabel,
 		dateKeys,
-		todayKey,
+		todayKey: todayKeyFromHook,
 		weekDays,
 		handlePreviousMonth,
 		handleNextMonth,
 		handleTodayMonth,
-	} = useCalendar({ locale, onChangeMonthDate });
+	} = useCalendar({
+		locale,
+		timezone: timezone || undefined,
+		onChangeMonthDate,
+	});
+
+	const todayKey = todayKeyProp || todayKeyFromHook;
 
 	const activeMonth = currentMonthDate.getMonth();
 
@@ -152,6 +164,7 @@ export const BaseCalendar: React.FC<BaseCalendarProps> = (props) => {
 							dateKey={dateKey}
 							activeMonth={activeMonth}
 							todayKey={todayKey}
+							timezone={timezone}
 							renderDay={renderDay}
 						/>
 					))}

@@ -1,5 +1,6 @@
 import { useHotelSettingsContext } from "@/context/HotelSettingsContext";
 import { BRAND_COLORS } from "@/theme";
+import { getBrowserTimezone } from "@/utils/browserAPI";
 import { SUPPORTED_LOCALES } from "@/utils/browserAPI";
 import { Button, Divider, Popover, Select, Stack, Text } from "@mantine/core";
 import { IconBuildingCog } from "@tabler/icons-react";
@@ -27,7 +28,7 @@ export const SettingsPanel: React.FC = () => {
 
 		handleLocaleChange(value);
 		setTimezones(zones);
-		setTimezone(null);
+		setTimezone(getBrowserTimezone());
 	};
 
 	return (
@@ -71,11 +72,11 @@ export const SettingsPanel: React.FC = () => {
 					/>
 
 					<Select
-						label="Property Timezone"
+						label="Display Timezone"
 						size="xs"
 						data={timezones}
 						value={timezone}
-						onChange={(val) => setTimezone(val)}
+						onChange={(val) => val && setTimezone(val)}
 						comboboxProps={{ withinPortal: false }}
 						disabled={timezones.length === 0}
 						placeholder={

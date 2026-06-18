@@ -3,7 +3,6 @@ import {
 	eachDayOfInterval,
 	endOfMonth,
 	endOfWeek,
-	format,
 	getDate,
 	getMonth,
 	getYear,
@@ -11,6 +10,7 @@ import {
 	startOfMonth,
 	startOfWeek,
 } from "date-fns";
+import { formatInTimeZone, fromZonedTime } from "date-fns-tz";
 
 interface DateMetadata {
 	dayNumber: number;
@@ -20,29 +20,43 @@ interface DateMetadata {
 
 export function generateGridKeysWithStartOffset(
 	date: Date,
+	timezone: string = getBrowserTimezone(),
 	dateFormat = "yyyy-MM-dd",
 ): string[] {
-	const firstDay = startOfMonth(date);
-	const lastDay = endOfMonth(date);
+	const zonedDate = fromZonedTime(date, timezone);
+	const firstDay = startOfMonth(zonedDate);
+	const lastDay = endOfMonth(zonedDate);
 	const gridStart = startOfWeek(firstDay, { weekStartsOn: 1 });
 	const gridEnd = endOfWeek(lastDay, { weekStartsOn: 1 });
 	const allDaysInGrid = eachDayOfInterval({ start: gridStart, end: gridEnd });
 
-	return allDaysInGrid.map((day) => format(day, dateFormat));
+	return allDaysInGrid.map((day) =>
+		formatInTimeZone(day, timezone, dateFormat),
+	);
 }
 
-export function getMonthLabel(date: Date, localeStr?: string): string {
+export function getMonthLabel(
+	date: Date,
+	timezone: string = getBrowserTimezone(),
+	localeStr?: string,
+): string {
+	const zonedDate = fromZonedTime(date, timezone);
 	const formatter = new Intl.DateTimeFormat(localeStr || "en-US", {
 		month: "long",
 		year: "numeric",
+		timeZone: timezone,
 	});
-	return formatter.format(date);
+	return formatter.format(zonedDate);
 }
 
-export function getWeekDaysLabels(localeStr?: string): string[] {
-	const baseMonday = startOfWeek(new Date(), { weekStartsOn: 1 });
+export function getWeekDaysLabels(
+	timezone: string = getBrowserTimezone(),
+	localeStr?: string,
+): string[] {
+	const baseMonday = fromZonedTime(new Date(), timezone);
 	const formatter = new Intl.DateTimeFormat(localeStr || "en-US", {
 		weekday: "short",
+		timeZone: timezone,
 	});
 
 	return Array.from({ length: 7 }).map((_, index) => {
@@ -51,17 +65,25 @@ export function getWeekDaysLabels(localeStr?: string): string[] {
 	});
 }
 
-export function getTodayKey(dateFormat = "yyyy-MM-dd"): string {
-	return format(new Date(), dateFormat);
+export function getTodayKey(
+	timezone: string = getBrowserTimezone(),
+	dateFormat = "yyyy-MM-dd",
+): string {
+	const today = fromZonedTime(new Date(), timezone);
+	return formatInTimeZone(today, timezone, dateFormat);
 }
 
-export function getDateMetadata(dateKey: string): DateMetadata {
+export function getDateMetadata(
+	dateKey: string,
+	timezone: string = getBrowserTimezone(),
+): DateMetadata {
 	const parsedDate = parseISO(dateKey);
+	const zonedDate = fromZonedTime(parsedDate, timezone);
 
 	return {
-		dayNumber: getDate(parsedDate),
-		monthIndex: getMonth(parsedDate),
-		yearNumber: getYear(parsedDate),
+		dayNumber: getDate(zonedDate),
+		monthIndex: getMonth(zonedDate),
+		yearNumber: getYear(zonedDate),
 	};
 }
 
@@ -74,8 +96,13 @@ export const getBrowserTimezone = (): string => {
 	return browserTimezone;
 };
 
-export function getYearMonthKey(date: Date, dateFormat = "yyyy-MM"): string {
-	return format(date, dateFormat);
+export function getYearMonthKey(
+	date: Date,
+	timezone: string = getBrowserTimezone(),
+	dateFormat = "yyyy-MM",
+): string {
+	const zonedDate = fromZonedTime(date, timezone);
+	return formatInTimeZone(zonedDate, timezone, dateFormat);
 }
 
 export function validateAndGetDate(date: unknown): Date {
@@ -83,11 +110,16 @@ export function validateAndGetDate(date: unknown): Date {
 	return isValid ? date : new Date();
 }
 
-export function isSameMonthAndYear(dateKey: string, targetDate: Date): boolean {
-	const { monthIndex, yearNumber } = getDateMetadata(dateKey);
+export function isSameMonthAndYear(
+	dateKey: string,
+	targetDate: Date,
+	timezone: string = getBrowserTimezone(),
+): boolean {
+	const { monthIndex, yearNumber } = getDateMetadata(dateKey, timezone);
 
-	const isMatchingMonth = monthIndex === targetDate.getMonth();
-	const isMatchingYear = yearNumber === targetDate.getFullYear();
+	const zonedTarget = fromZonedTime(targetDate, timezone);
+	const isMatchingMonth = monthIndex === getMonth(zonedTarget);
+	const isMatchingYear = yearNumber === getYear(zonedTarget);
 
 	return isMatchingMonth && isMatchingYear;
 }

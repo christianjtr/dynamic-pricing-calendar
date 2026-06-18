@@ -1,21 +1,27 @@
 import { BaseCalendar } from "@/components/BaseCalendar";
 import { useHotelSettingsContext } from "@/context/HotelSettingsContext";
 import { usePrices } from "@/hooks/queries/usePrices";
+import { useCalendar } from "@/hooks/useCalendar";
 import { validateAndGetDate } from "@/utils/date";
 import { Paper } from "@mantine/core";
 import { useMemo, useState } from "react";
 import { CalendarDayRates } from "./CalendarDayRates";
 
 export const PricingCalendar: React.FC = () => {
-	const { locale, selectedRoomId } = useHotelSettingsContext();
-	const [activeDate, setActiveDate] = useState<Date>(() => new Date());
+	const { locale, selectedRoomId, timezone } = useHotelSettingsContext();
+	const [_activeDate, setActiveDate] = useState<Date>(() => new Date());
 
-	const validatedDate = validateAndGetDate(activeDate);
+	const { currentMonthDate, todayKey, onChangeMonthDate } = useCalendar({
+		locale,
+		timezone: timezone || undefined,
+		onChangeMonthDate: (date) => setActiveDate(validateAndGetDate(date)),
+	});
 
 	const { data: priceList, isLoading } = usePrices({
 		locale,
 		selectedRoomId,
-		currentMonthDate: validatedDate,
+		currentMonthDate,
+		timezone: timezone || undefined,
 	});
 
 	const dayDataMap = useMemo(
@@ -30,9 +36,8 @@ export const PricingCalendar: React.FC = () => {
 		<Paper radius="md" p="md" withBorder={true}>
 			<BaseCalendar
 				isLoading={isLoading}
-				onChangeMonthDate={(newDate) =>
-					setActiveDate(validateAndGetDate(newDate))
-				}
+				todayKey={todayKey}
+				onChangeMonthDate={onChangeMonthDate}
 				renderDay={(_, dayNumber, isCurrentMonth, isToday) => {
 					const dayData = isCurrentMonth ? dayDataMap[dayNumber] || null : null;
 

@@ -9,6 +9,7 @@ import { useState } from "react";
 interface UseCalendarOptions {
 	dateFormat?: string;
 	locale?: string;
+	timezone?: string;
 	onChangeMonthDate?: (date: Date) => void;
 }
 
@@ -18,13 +19,14 @@ interface UseCalendarResult {
 	dateKeys: string[];
 	todayKey: string;
 	weekDays: string[];
+	onChangeMonthDate?: (date: Date) => void;
 	handlePreviousMonth: () => void;
 	handleNextMonth: () => void;
 	handleTodayMonth: () => void;
 }
 
 export const useCalendar = (opts?: UseCalendarOptions): UseCalendarResult => {
-	const { locale, onChangeMonthDate } = opts || {};
+	const { locale, timezone, onChangeMonthDate } = opts || {};
 
 	const [currentDate, setCurrentDate] = useState(() => new Date());
 
@@ -56,10 +58,11 @@ export const useCalendar = (opts?: UseCalendarOptions): UseCalendarResult => {
 
 	return {
 		currentMonthDate: currentDate,
-		monthLabel: getMonthLabel(currentDate, locale),
-		dateKeys: generateGridKeysWithStartOffset(currentDate),
-		todayKey: getTodayKey(),
-		weekDays: getWeekDaysLabels(locale),
+		monthLabel: getMonthLabel(currentDate, timezone, locale),
+		dateKeys: generateGridKeysWithStartOffset(currentDate, timezone),
+		todayKey: getTodayKey(timezone),
+		weekDays: getWeekDaysLabels(timezone, locale),
+		onChangeMonthDate,
 		handlePreviousMonth,
 		handleNextMonth,
 		handleTodayMonth,

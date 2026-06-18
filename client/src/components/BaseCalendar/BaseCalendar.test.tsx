@@ -1,5 +1,5 @@
-import { render, screen } from "@testing-library/react";
 import { MantineProvider } from "@mantine/core";
+import { render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { BaseCalendar } from "./index";
 
@@ -32,21 +32,21 @@ vi.mock("@/hooks/useCalendar", () => ({
 }));
 
 describe("BaseCalendar", () => {
-  const renderWithMantine = (ui: React.ReactNode) =>
-    render(<MantineProvider>{ui}</MantineProvider>);
+	const renderWithMantine = (ui: React.ReactNode) =>
+		render(<MantineProvider>{ui}</MantineProvider>);
 
-  it("renders the month label and weekday headers", () => {
-    renderWithMantine(<BaseCalendar />);
+	it("renders the month label and weekday headers", () => {
+		renderWithMantine(<BaseCalendar />);
 
-    expect(screen.getByText("January 2025")).toBeTruthy();
-    expect(screen.getByText("Mon")).toBeTruthy();
-    expect(screen.getByText("Sun")).toBeTruthy();
-  });
+		expect(screen.getByText("January 2025")).toBeTruthy();
+		expect(screen.getByText("Mon")).toBeTruthy();
+		expect(screen.getByText("Sun")).toBeTruthy();
+	});
 
-  it("renders navigation buttons", () => {
-    renderWithMantine(<BaseCalendar />);
+	it("renders navigation buttons", () => {
+		renderWithMantine(<BaseCalendar />);
 
-    expect(screen.getByText("Today")).toBeTruthy();
-    expect(screen.getAllByRole("button").length).toBeGreaterThan(2);
-  });
+		expect(screen.getByText("Today")).toBeTruthy();
+		expect(screen.getAllByRole("button").length).toBeGreaterThan(2);
+	});
 });

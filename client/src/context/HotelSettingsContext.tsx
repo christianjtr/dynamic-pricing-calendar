@@ -6,8 +6,8 @@ import { createContext, useContext, useMemo, useState } from "react";
 interface HotelSettingsContextType {
 	locale: string;
 	handleLocaleChange: (newLocale: string) => void;
-	timezone: string | null;
-	setTimezone: React.Dispatch<React.SetStateAction<string | null>>;
+	timezone: string;
+	setTimezone: React.Dispatch<React.SetStateAction<string>>;
 	selectedRoomId: string | null;
 	setSelectedRoomId: React.Dispatch<React.SetStateAction<string | null>>;
 	roomSelectOptions: { value: string; label: string }[];
@@ -32,7 +32,7 @@ export const HotelSettingsProvider: React.FC<HotelSettingsProviderProps> = ({
 	const [locale, setLocale] = useState<string>(
 		initialSettings.hotel.locale || "en-US",
 	);
-	const [timezone, setTimezone] = useState<string | null>(
+	const [timezone, setTimezone] = useState<string>(
 		initialSettings.hotel.timezone || getBrowserTimezone(),
 	);
 	const [selectedRoomId, setSelectedRoomId] = useState<string | null>(
@@ -45,6 +45,8 @@ export const HotelSettingsProvider: React.FC<HotelSettingsProviderProps> = ({
 	const handleLocaleChange = (newLocale: string) => {
 		setLocale(newLocale);
 		setCurrency(getCurrencyFromLocale(newLocale));
+		// Reset timezone when locale changes (user can reselect)
+		setTimezone(initialSettings.hotel.timezone || getBrowserTimezone());
 	};
 
 	const roomSelectOptions = useMemo(

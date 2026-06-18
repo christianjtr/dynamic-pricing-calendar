@@ -6,6 +6,7 @@ interface CalendarCellProps {
 	dateKey: string;
 	activeMonth: number;
 	todayKey: string;
+	timezone?: string;
 	renderDay?: (
 		dateKey: string,
 		dayNumber: number,
@@ -15,9 +16,9 @@ interface CalendarCellProps {
 }
 
 export const CalendarCell: React.FC<CalendarCellProps> = (props) => {
-	const { dateKey, activeMonth, todayKey, renderDay } = props;
+	const { dateKey, activeMonth, todayKey, timezone, renderDay } = props;
 
-	const { dayNumber, monthIndex } = getDateMetadata(dateKey);
+	const { dayNumber, monthIndex } = getDateMetadata(dateKey, timezone);
 	const isCurrentMonth = monthIndex === activeMonth;
 	const isToday = dateKey === todayKey;
 
