@@ -3,8 +3,14 @@ import ReactDOM from "react-dom/client";
 
 import "@mantine/core/styles.css";
 
+import { Alert, Button, Container, Text } from "@mantine/core";
 import { MantineProvider } from "@mantine/core";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { IconAlertTriangle } from "@tabler/icons-react";
+import {
+	QueryCache,
+	QueryClient,
+	QueryClientProvider,
+} from "@tanstack/react-query";
 import { Suspense, lazy } from "react";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import { AppLayout } from "./components/Layout/AppLayout";
@@ -19,12 +25,57 @@ const ReactQueryDevtools = lazy(() =>
 	})),
 );
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+	defaultOptions: {
+		queries: {
+			refetchOnWindowFocus: false,
+			retry: 2,
+			staleTime: 5 * 60 * 1000,
+		},
+	},
+	queryCache: new QueryCache({
+		onError: (error) => {
+			console.error("❌ Global Query Error:", error);
+		},
+	}),
+});
 
 function App() {
-	const { data: settings, isLoading } = useHotelSettings();
+	const {
+		data: settings,
+		isLoading,
+		isError,
+		error,
+		refetch,
+	} = useHotelSettings();
 
-	if (isLoading || !settings) {
+	if (isLoading) {
+		return <AppLoader />;
+	}
+
+	if (isError) {
+		return (
+			<Container size="sm" py="xl">
+				<Alert
+					icon={<IconAlertTriangle size={24} />}
+					color="red"
+					radius="md"
+					title="Error loading hotel settings"
+					variant="light"
+				>
+					<Text mb="md">
+						{error?.message ||
+							"Failed to load hotel configuration. Please try again."}
+					</Text>
+					<Button onClick={() => refetch()} color="red" variant="filled">
+						Retry
+					</Button>
+				</Alert>
+			</Container>
+		);
+	}
+
+	if (!settings) {
 		return <AppLoader />;
 	}
 

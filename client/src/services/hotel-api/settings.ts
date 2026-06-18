@@ -6,15 +6,14 @@ import { z } from "zod";
 
 export const getSettings = async (
 	signal?: AbortSignal,
-): Promise<HotelSettings | null> => {
+): Promise<HotelSettings> => {
 	try {
 		const response = await fetch("/api/settings", { signal });
 
 		if (!response.ok) {
-			console.error(
-				`❌ HTTP Error: Status ${response.status} fetching settings`,
+			throw new Error(
+				`HTTP ${response.status}: Failed to fetch hotel settings`,
 			);
-			return null;
 		}
 
 		const rawData = await response.json();
@@ -25,15 +24,17 @@ export const getSettings = async (
 				"❌ Hotel Settings Mapping Error:",
 				z.treeifyError(result.error),
 			);
-			return null;
+			throw new Error("Invalid hotel settings data received from server");
 		}
 
 		return result.data;
 	} catch (error: unknown) {
 		if (error instanceof DOMException && error.name === "AbortError") {
-			return null;
+			throw error;
 		}
-		console.error("❌ Fatal System Error:", error);
-		return null;
+		if (error instanceof Error) {
+			throw error;
+		}
+		throw new Error("Unknown error occurred while fetching hotel settings");
 	}
 };

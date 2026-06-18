@@ -18,7 +18,7 @@ export const usePrices = (filters: UsePricesFilters) => {
 		timezone = undefined,
 	} = filters;
 
-	return useQuery<PriceData | null, Error, DayPriceItem[] | null>({
+	return useQuery<PriceData, Error, DayPriceItem[] | null>({
 		queryKey: [
 			"prices",
 			locale,
@@ -28,7 +28,7 @@ export const usePrices = (filters: UsePricesFilters) => {
 			timezone,
 		],
 		queryFn: ({ signal }) => getPrices(signal),
-		retry: 1,
+		retry: 2,
 		refetchOnWindowFocus: false,
 		enabled: !!selectedRoomId,
 		select: (rawData) => {

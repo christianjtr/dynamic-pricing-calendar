@@ -1,4 +1,4 @@
-import { Alert, Button, Container, Stack, Text, Title } from "@mantine/core";
+import { Alert, Button, Container, Stack, Text } from "@mantine/core";
 import { IconAlertTriangle } from "@tabler/icons-react";
 
 import { BRAND_COLORS } from "@/theme";
@@ -17,17 +17,13 @@ const ErrorFallback: React.FC<FallbackProps> = ({
 		<Container size="sm" py="xl">
 			<Stack gap="md">
 				<Alert
-					icon={<IconAlertTriangle size={20} />}
+					icon={<IconAlertTriangle size={24} />}
 					color="red"
 					radius="md"
-					p="lg"
+					title="Application Error"
+					variant="light"
 				>
-					<Title order={3} fw={700}>
-						Something went wrong
-					</Title>
-					<Text size="sm" mt="xs">
-						{errorMessage || "An unexpected error occurred."}
-					</Text>
+					<Text>{errorMessage}</Text>
 				</Alert>
 
 				<Stack gap="xs" mt="xs">
@@ -44,7 +40,7 @@ const ErrorFallback: React.FC<FallbackProps> = ({
 						onClick={() => window.location.reload()}
 						fullWidth
 					>
-						Reload App
+						Reload Application
 					</Button>
 				</Stack>
 			</Stack>

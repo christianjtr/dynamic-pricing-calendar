@@ -27,12 +27,18 @@ export function computeDayRatesBusinessState(
 	}
 
 	if (dayData.error) {
+		const errorReason = dayData.errorReason || "NO_AVAILABLE_MARKET_DATA";
+		const displayText =
+			errorReason === "NO_AVAILABLE_MARKET_DATA"
+				? "NO MARKET DATA"
+				: "PRICING ERROR";
+
 		return {
 			hasData: false,
 			isError: true,
-			errorText: dayData.errorReason || "ERR",
-			rpgValue: "ERR",
-			pmsValue: "ERR",
+			errorText: displayText,
+			rpgValue: "—",
+			pmsValue: "—",
 			variancePercentage: 0,
 			hasHighDisparity: false,
 		};

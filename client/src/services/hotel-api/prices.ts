@@ -2,15 +2,12 @@ import { z } from "zod";
 
 import { type PriceData, PriceDataResponseSchema } from "@/types/Pricing";
 
-export const getPrices = async (
-	signal?: AbortSignal,
-): Promise<PriceData | null> => {
+export const getPrices = async (signal?: AbortSignal): Promise<PriceData> => {
 	try {
 		const response = await fetch("/api/prices", { signal });
 
 		if (!response.ok) {
-			console.error(`❌ HTTP Error: Status ${response.status} fetching prices`);
-			return null;
+			throw new Error(`HTTP ${response.status}: Failed to fetch pricing data`);
 		}
 
 		const rawData = await response.json();
@@ -21,15 +18,17 @@ export const getPrices = async (
 				"❌ Pricing Data Mapping Error:",
 				z.treeifyError(result.error),
 			);
-			return null;
+			throw new Error("Invalid pricing data received from server");
 		}
 
 		return result.data;
 	} catch (error: unknown) {
 		if (error instanceof DOMException && error.name === "AbortError") {
-			return null;
+			throw error;
 		}
-		console.error("❌ Fatal System Error:", error);
-		return null;
+		if (error instanceof Error) {
+			throw error;
+		}
+		throw new Error("Unknown error occurred while fetching prices");
 	}
 };

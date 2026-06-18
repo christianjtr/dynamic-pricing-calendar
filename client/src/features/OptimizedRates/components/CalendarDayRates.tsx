@@ -35,7 +35,7 @@ export const CalendarDayRates: React.FC<CalendarDayRatesProps> = (props) => {
 				style={{ height: "100%", width: "100%" }}
 			>
 				<Tooltip
-					label="Click or hover to inspect calculation fault"
+					label={businessState.errorText}
 					position="top"
 					withArrow
 					radius="xs"
