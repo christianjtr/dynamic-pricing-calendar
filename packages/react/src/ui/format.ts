@@ -26,3 +26,18 @@ const statusLabels: Record<string, string> = {
 export function formatStatus(status: string): string {
 	return statusLabels[status] ?? status;
 }
+
+const availabilityLabels: Record<string, string> = {
+	available: "Available",
+	restricted: "Restricted",
+	sold_out: "Sold out",
+	unavailable: "Unavailable",
+};
+
+export function formatAvailability(availability: string): string {
+	return availabilityLabels[availability] ?? availability;
+}
+
+export function formatPercent(value: number): string {
+	return `${Math.round(value * 100)}%`;
+}

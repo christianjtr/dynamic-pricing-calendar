@@ -84,6 +84,31 @@
 	font-size: var(--hpc-font-size-xs);
 }
 
+.hpc-indicators {
+	display: flex;
+	flex-wrap: wrap;
+	gap: var(--hpc-space-1);
+	margin-top: var(--hpc-space-1);
+}
+
+.hpc-indicator {
+	border: 1px solid var(--hpc-color-border);
+	border-radius: 999px;
+	font-size: var(--hpc-font-size-xs);
+	font-weight: 600;
+	padding: 2px 6px;
+	white-space: nowrap;
+}
+
+.hpc-indicator-accent {
+	border-color: var(--hpc-color-accent);
+}
+
+.hpc-indicator-danger {
+	border-color: var(--hpc-color-danger);
+	color: var(--hpc-color-danger);
+}
+
 .hpc-scroll {
 	overflow-x: auto;
 }

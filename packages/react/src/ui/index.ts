@@ -2,6 +2,7 @@ import "@mantine/core/styles.css";
 import "./tokens.css";
 
 export * from "./DayCell";
+export * from "./DayIndicators";
 export * from "./dateRange";
 export * from "./EditPanel";
 export * from "./format";

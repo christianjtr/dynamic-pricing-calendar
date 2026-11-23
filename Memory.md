@@ -1,6 +1,6 @@
 # Memory
 
-Last updated: Stage 6 (Mantine UI implementation in progress).
+Last updated: Stage 7 (Contextual pricing indicators in progress).
 
 ## Project goal
 
@@ -98,8 +98,8 @@ Important contract rules:
 | 3 | `feat/create-contracts-package` | Complete and merged to `main` (`c6f29a8`) | `@hpc/contracts`, ADR-0004, docs refreshed, legacy audit language removed |
 | 4 | `feat/add-fixture-api-server` | Complete and merged to `main` (`eb60557`) | Static fixtures, pure router, thin Vinxi adapter, ADR-0005 |
 | 5 | `feat/build-react-sdk-core` | Complete and merged to `main` (`25292ef`) | `@hpc/pricing-calendar` client, headless selectors/hooks, injected fetch/auth, ADR-0006 |
-| 6 | `feat/build-mantine-ui` | In progress — awaiting review | Tokens, rooms × dates matrix, contextual panel, ADR-0008 and ADR-0009 |
-| 7 | `feat/add-contextual-pricing-indicators` | Pending | Render backend restrictions, closed dates, manual price, occupancy accessibly |
+| 6 | `feat/build-mantine-ui` | Complete and merged to `main` (`881fde6`) | Tokens, rooms × dates matrix, contextual panel, ADR-0008 and ADR-0009 |
+| 7 | `feat/add-contextual-pricing-indicators` | In progress — awaiting review | Render backend restrictions, closed dates, manual price, occupancy accessibly |
 | 8 | `refactor/move-playground-to-start` | Pending | Start playground, SSR, per-request QueryClient, ADR-0007 |
 | 9 | `feat/add-headless-demo-app` | Pending | Separate Vite SPA with independent tokens |
 | 10 | `docs/finalize-guides` | Pending | English README, integration examples, complete CI, closure |
@@ -198,7 +198,7 @@ Important contract rules:
 2. Committed on `feat/build-react-sdk-core` (`25292ef`), fast-forwarded `main`, and created `feat/build-mantine-ui`.
 3. Stage 6 started from the merged SDK.
 
-## Stage 6 (current) — Mantine UI
+## Stage 6 — Mantine UI
 
 ### Implemented
 
@@ -219,8 +219,30 @@ Important contract rules:
 - 11 test files and 44 tests pass, including accessible table rendering and a PATCH write that displays the backend's canonical response.
 - No `RoomPriceGenie`, `BRAND_COLORS`, `#5B48EE`, `--rpg-*`, `vinxi`, `rateComputations`, `hasHighDisparity` or `Math.random` references exist under `packages/react/src/ui`.
 
+### Outcome
+
+1. Reviewed and approved the Stage 6 diff.
+2. Committed on `feat/build-mantine-ui` (`881fde6`), fast-forwarded `main`, and created `feat/add-contextual-pricing-indicators`.
+3. Stage 7 started from the merged Mantine UI.
+
+## Stage 7 (current) — contextual pricing indicators
+
+### Implemented
+
+- `DayIndicators.tsx` derives presentation-only indicator labels from backend fields: closed dates, manual price, non-available availability, each `restrictions` string, occupancy ratio, backend error message and backend variance label.
+- No local business thresholds or recomputation: restriction strings, error messages and variance labels are rendered verbatim; occupancy is only formatted as a percentage from the backend ratio.
+- `DayCell.tsx` includes indicator labels in the accessible name and renders visible text badges in addition to any background color.
+- `EditPanel.tsx` shows the same indicators for the selected day above the edit controls.
+- `tokens.css` adds neutral badge styles with accent/danger borders; text labels remain the primary signal.
+- Added indicator tests and calendar tests for restrictions, occupancy, closed dates and accessible names.
+
+### Verification
+
+- `pnpm lint`, `pnpm typecheck`, `pnpm test:run` and `pnpm build` pass on `feat/add-contextual-pricing-indicators`.
+- 12 test files and 50 tests pass, including backend-only indicator labels, restrictions, occupancy, closed dates and accessible day names.
+
 ### Next actions
 
-1. Review the Stage 6 diff after verification.
-2. After approval, commit on `feat/build-mantine-ui`, fast-forward `main`, and create `feat/add-contextual-pricing-indicators`.
-3. Stage 7: expand non-color indicators for restrictions, closed dates, manual price, occupancy and errors; keep all semantics backend-provided.
+1. Review the Stage 7 diff after verification.
+2. After approval, commit on `feat/add-contextual-pricing-indicators`, fast-forward `main`, and create `refactor/move-playground-to-start`.
+3. Stage 8: replace the Vinxi client app with a TanStack Start playground, per-request QueryClient and ADR-0007; remove the temporary fixture runtime.

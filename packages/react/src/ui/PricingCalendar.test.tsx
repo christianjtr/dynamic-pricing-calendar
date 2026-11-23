@@ -60,11 +60,39 @@ describe("PricingCalendar", () => {
 		);
 		expect(screen.getAllByRole("columnheader")).toHaveLength(3);
 		expect(
-			screen.getByRole("button", { name: /1001, 2026-11-23, Automated/ }),
+			screen.getByRole("button", {
+				name: /1001, 2026-11-23, Automated, NZ\$189, Restricted: min-stay:2, Occupancy: 72%, Variance: \+4\.2%/,
+			}),
 		).toBeTruthy();
 		expect(
 			screen.getByRole("button", { name: /1001, 2026-11-24, Automated/ }),
 		).toBeTruthy();
+		expect(
+			screen.getAllByText("Restricted: min-stay:2").length,
+		).toBeGreaterThan(0);
+		expect(screen.getAllByText("Occupancy: 72%").length).toBeGreaterThan(0);
+	});
+
+	it("shows closed dates with text indicators", async () => {
+		render(
+			<PricingCalendarUIProvider>
+				<PricingCalendarProvider
+					config={{
+						baseUrl: "https://be.test/backend/",
+						propertyId: "prop-1",
+						fetch: fetchMock,
+					}}
+				>
+					<PricingCalendar from="2026-11-26" to="2026-11-26" />
+				</PricingCalendarProvider>
+			</PricingCalendarUIProvider>,
+		);
+
+		const cell = await screen.findByRole("button", {
+			name: /1001, 2026-11-26, Closed, .*Closed date/,
+		});
+		expect(cell).toBeTruthy();
+		expect(screen.getAllByText("Closed date").length).toBeGreaterThan(0);
 	});
 
 	it("saves a selected day through the backend and shows the canonical response", async () => {

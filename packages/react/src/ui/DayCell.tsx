@@ -1,4 +1,5 @@
 import type { DayPrice } from "@hpc/contracts";
+import { DayIndicators, getDayIndicators } from "./DayIndicators";
 import { formatDateLabel } from "./dateRange";
 import { formatCurrency, formatStatus } from "./format";
 
@@ -17,8 +18,15 @@ export function DayCell({
 	selected,
 	onSelect,
 }: DayCellProps) {
+	const indicators = day ? getDayIndicators(day) : [];
 	const label = day
-		? `${roomId}, ${date}, ${formatStatus(day.status)}, ${formatCurrency(day.price, day.currency)}${day.variance ? `, ${day.variance.label}` : ""}`
+		? [
+				roomId,
+				date,
+				formatStatus(day.status),
+				formatCurrency(day.price, day.currency),
+				...indicators.map((indicator) => indicator.label),
+			].join(", ")
 		: `${roomId}, ${date}, no data`;
 
 	return (
@@ -39,6 +47,7 @@ export function DayCell({
 				<span className="hpc-day-status">
 					{day ? formatStatus(day.status) : "No data"}
 				</span>
+				{day ? <DayIndicators compact day={day} /> : null}
 			</button>
 		</td>
 	);

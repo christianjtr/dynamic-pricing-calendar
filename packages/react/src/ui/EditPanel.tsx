@@ -11,6 +11,7 @@ import {
 } from "@mantine/core";
 import { useState } from "react";
 import type { UpdatePriceVariables } from "../client";
+import { DayIndicators } from "./DayIndicators";
 import { formatCurrency } from "./format";
 
 export interface PriceMutation {
@@ -56,6 +57,7 @@ export function EditPanel({ day, mutation, onClose }: EditPanelProps) {
 					Close
 				</Button>
 			</Group>
+			<DayIndicators day={day} />
 			<NumberInput
 				label={`Price (${day.currency})`}
 				min={0}
