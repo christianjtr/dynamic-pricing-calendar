@@ -78,6 +78,30 @@ describe("fixture server", () => {
 		expect(body.day.status).toBe("manual");
 	});
 
+	it("keeps the canonical day after a valid price update", () => {
+		const update = handleFixtureRequest({
+			pathname: "/api/prices/1002/2026-11-23",
+			method: "PATCH",
+			searchParams: new URLSearchParams(),
+			body: { price: 999 },
+		});
+
+		expect(update.status).toBe(200);
+
+		const result = handleFixtureRequest({
+			pathname: "/api/prices",
+			method: "GET",
+			searchParams: new URLSearchParams({
+				from: "2026-11-23",
+				to: "2026-11-23",
+				room: "1002",
+			}),
+		});
+		const body = PricesResponseSchema.parse(result.body);
+		expect(body.rooms[0]?.days[0]?.price).toBe(245);
+		expect(body.rooms[0]?.days[0]?.status).toBe("manual");
+	});
+
 	it("rejects a malformed price update", () => {
 		const result = handleFixtureRequest({
 			pathname: "/api/prices/1001/2026-11-23",

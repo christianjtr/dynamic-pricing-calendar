@@ -4,11 +4,13 @@
 	"type": "module",
 	"scripts": {
 		"dev": "pnpm --filter @hpc/playground dev",
-		"build": "pnpm --filter @hpc/playground build",
+		"dev:demo": "pnpm --filter @hpc/headless-demo dev",
+		"build": "pnpm --filter \"./apps/*\" build",
 		"start": "pnpm --filter @hpc/playground start",
+		"start:demo": "pnpm --filter @hpc/headless-demo start",
 		"lint": "biome check .",
 		"lint:fix": "biome check --write .",
-		"typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p apps/playground/tsconfig.json",
+		"typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p apps/playground/tsconfig.json && tsc --noEmit -p apps/headless-demo/tsconfig.json",
 		"test": "vitest",
 		"test:run": "vitest run"
 	},

@@ -32,7 +32,7 @@ The server is split into:
 - `apps/playground/src/fixtures/router.ts` — a pure function that maps path, method, query and body to a status and contract-shaped body. It only filters by room and date range.
 - `apps/playground/src/routes/api/*.ts` — thin Start server route adapters that read the URL/body, call the router and return the response.
 
-The fixture range is seven days (`2026-11-23` to `2026-11-29`) for three rooms, including auto, manual, closed, restricted, sold-out and error days. `PATCH /prices/:roomId/:date` validates the request and returns a precomputed canonical day; the requested price is never echoed back as truth.
+The fixture range is seven days (`2026-11-23` to `2026-11-29`) for three rooms, including auto, manual, closed, restricted, sold-out and error days. `PATCH /prices/:roomId/:date` validates the request, applies the precomputed canonical day to in-memory fixture state so later reads stay consistent, and returns that canonical day; the requested price is never echoed back as truth.
 
 The contract was adjusted in this stage to allow `price: null` on closed days and an `unavailable` availability value.
 

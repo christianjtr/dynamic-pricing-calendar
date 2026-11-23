@@ -1,6 +1,6 @@
 # Memory
 
-Last updated: Stage 8 (TanStack Start playground in progress).
+Last updated: Stage 9 (headless demo app in progress).
 
 ## Project goal
 
@@ -22,7 +22,7 @@ Backend author: project owner. Product owner instruction: “toda la lógica se 
 10. Design tokens must be neutral (`--hpc-*`, not `--rpg-*`) and consumer-overridable, ADR-0008.
 11. Wallet/auth, tenant and property context are injected by the consuming app; `propertyId` identifies context but never authorizes. ADR-0009.
 12. All legacy branding references will disappear as stages progress.
-13. Fixture server serves explicit static data only; it never derives prices or computes business rules, ADR-0005.
+13. Fixture server serves explicit static data and deterministic in-memory canonical updates only; it never derives prices or computes business rules, ADR-0005.
 14. The published SDK must consume the external backend directly through TanStack Query and `@hpc/contracts`; it must never call or depend on the local fixture endpoints.
 
 ## Toolchain baseline
@@ -31,11 +31,11 @@ Backend author: project owner. Product owner instruction: “toda la lógica se 
 - pnpm: `12.9.1`. Workspace config lives in `pnpm-workspace.yaml`; the `pnpm` field in `package.json` is ignored by pnpm 12.
 - pnpm config: `allowBuilds` plus `minimumReleaseAgeExclude` entries for TanStack packages were auto-added by pnpm; keep them unless intentionally updated.
 - Versions installed: React `19.3.1`, Vite `8.3.8`, Mantine `9.8.2`, TypeScript `7.0.2`, TanStack Query `5.108.4`, Zod `4.6.7`, date-fns `4.4.0`, Biome `2.6.8`, Vitest `5.1.1`.
-- `vite: ^8.3.8` is pinned via pnpm overrides and drives the Start playground build.
+- `vite: ^8.3.8` is pinned via pnpm overrides and drives both app builds.
 - Installed Start packages: `@tanstack/react-start 1.169.7`, `@tanstack/react-router 1.170.46`, `@tanstack/react-router-ssr-query 1.167.3`.
 - TypeScript 7 checks CSS side-effect imports by default; `declare module "*.css" {}` is required in each TS project that imports stylesheets.
 - Biome 2: `organizeImports` moved under `assist`; Markdown files are excluded from Biome with `!**/*.md`.
-- Vitest 5: `@/*` alias is configured via `resolve.alias` using `fileURLToPath(new URL('./client/src', import.meta.url))`.
+- Vitest 5 uses jsdom, `vitest.setup.ts` and no path alias; build/generated directories are excluded.
 - `package.json` has `"type": "module"` and a `test:run` script (`vitest run`).
 
 ## Repository structure target
@@ -100,8 +100,8 @@ Important contract rules:
 | 5 | `feat/build-react-sdk-core` | Complete and merged to `main` (`25292ef`) | `@hpc/pricing-calendar` client, headless selectors/hooks, injected fetch/auth, ADR-0006 |
 | 6 | `feat/build-mantine-ui` | Complete and merged to `main` (`881fde6`) | Tokens, rooms × dates matrix, contextual panel, ADR-0008 and ADR-0009 |
 | 7 | `feat/add-contextual-pricing-indicators` | Complete and merged to `main` (`55b3bba`) | Backend-only indicators rendered accessibly |
-| 8 | `refactor/move-playground-to-start` | In progress — awaiting review | Start playground, SSR, per-request QueryClient, fixture routes, ADR-0007 |
-| 9 | `feat/add-headless-demo-app` | Pending | Separate Vite SPA with independent tokens |
+| 8 | `refactor/move-playground-to-start` | Complete and merged to `main` (`2fce3d6`) | Start playground, SSR, per-request QueryClient, fixture routes, ADR-0007 |
+| 9 | `feat/add-headless-demo-app` | In progress — awaiting review | Separate Vite SPA, independent tokens, injected fixture fetch, deterministic PATCH state |
 | 10 | `docs/finalize-guides` | Pending | English README, integration examples, complete CI, closure |
 
 ## ADR index
@@ -268,8 +268,34 @@ Important contract rules:
 - Smoke checks passed for SSR `/`, contract-valid `GET /api/settings`, filtered `GET /api/prices`, canonical `PATCH /api/prices/:roomId/:date`.
 - No Vinxi/Nitro imports or scripts remain in source/config files.
 
+### Outcome
+
+1. Reviewed and approved the Stage 8 diff.
+2. Committed on `refactor/move-playground-to-start` (`2fce3d6`), fast-forwarded `main`, and created `feat/add-headless-demo-app`.
+3. Stage 9 started from the merged Start playground.
+
+## Stage 9 (current) — Headless demo app
+
+### Implemented
+
+- Added `apps/headless-demo` as `@hpc/headless-demo`, a plain Vite SPA with no Mantine and no TanStack Start dependency.
+- `src/main.tsx` injects `fixtureFetch`, `baseUrl: "/api"` and `propertyId: "headless-demo-property"` into `PricingCalendarProvider`; the SDK never imports fixture data.
+- `src/fixtureFetch.ts` adapts the shared pure fixture router into `Response` objects, proving injected transport works in a browser without an extra server.
+- `src/App.tsx` consumes `usePricingCalendar` from the public SDK and renders its own room buttons, rooms × dates table, backend notes and manual-price form.
+- Presentation uses independent `--demo-*` tokens, a dark surface, accessible focus states, native table markup and horizontal scrolling for small screens.
+- No value is recalculated locally: status, variance labels, restrictions, occupancy, availability and canonical write responses come from the API.
+- Fixed the fixture router so a valid `PATCH` applies the precomputed canonical day to in-memory state; later `GET /api/prices` now returns the canonical price instead of resetting to the original fixture.
+- Root `build` now builds both apps; added `dev:demo` and `start:demo`; root `typecheck` includes the demo tsconfig.
+
+### Verification
+
+- `pnpm lint`, `pnpm typecheck`, `pnpm test:run` and `pnpm build` pass.
+- 9 test files and 40 tests pass, including deterministic persistence of canonical fixture updates.
+- Browser smoke check: the SPA renders settings, three rooms, seven days, backend labels and a manual-price form; submitting the default fixture update shows `Backend accepted $205.00 with status manual.` and the table row updates to `$205.00` / `manual`.
+- No Mantine, Start, RoomPriceGenie, local price calculation or optimistic business logic in the demo.
+
 ### Next actions
 
-1. Review the Stage 8 diff after verification.
-2. After approval, commit on `refactor/move-playground-to-start`, fast-forward `main`, and create `feat/add-headless-demo-app`.
-3. Stage 9: add the separate Vite SPA with independent presentation and tokens.
+1. Review the Stage 9 diff after verification.
+2. After approval, commit on `feat/add-headless-demo-app`, fast-forward `main`, and create `docs/finalize-guides`.
+3. Stage 10: English README/integration examples, final branding cleanup and complete CI.

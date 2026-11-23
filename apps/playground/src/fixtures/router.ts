@@ -32,6 +32,8 @@ export interface FixtureResponse {
 	body: FixtureResponseBody;
 }
 
+const currentPrices: PricesResponse = structuredClone(pricesFixture);
+
 const stripApiPrefix = (pathname: string) =>
 	pathname.replace(/^\/api(?=\/|$)/, "") || "/";
 
@@ -60,14 +62,14 @@ export function handleFixtureRequest(request: FixtureRequest): FixtureResponse {
 
 		const { from, to, rooms: selectedRooms } = parsed.data;
 		const roomIds = new Set(
-			selectedRooms ?? pricesFixture.rooms.map((room) => room.roomId),
+			selectedRooms ?? currentPrices.rooms.map((room) => room.roomId),
 		);
 
 		return {
 			status: 200,
 			body: {
-				...pricesFixture,
-				rooms: pricesFixture.rooms
+				...currentPrices,
+				rooms: currentPrices.rooms
 					.filter((room) => roomIds.has(room.roomId))
 					.map((room) => ({
 						...room,
@@ -91,12 +93,17 @@ export function handleFixtureRequest(request: FixtureRequest): FixtureResponse {
 		}
 
 		const canonical = updateFixtures[`${roomId}:${date}`];
-		if (!canonical) {
+		const room = currentPrices.rooms.find((item) => item.roomId === roomId);
+		if (!canonical || !room?.days.some((day) => day.date === date)) {
 			return {
 				status: 404,
 				body: apiError("UNKNOWN_DAY", "No canonical fixture for this day"),
 			};
 		}
+
+		room.days = room.days.map((day) =>
+			day.date === date ? canonical.day : day,
+		);
 
 		return { status: 200, body: canonical };
 	}

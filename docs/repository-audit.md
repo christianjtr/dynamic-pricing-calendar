@@ -117,7 +117,7 @@ Public exports: `.` (ready-to-use), `./headless`, `./ui`, `./contracts`. React, 
 | 6 | `feat/build-mantine-ui` | Tokens, rooms × dates matrix, contextual edit panel, base indicators, ADR-0008 and ADR-0009 |
 | 7 | `feat/add-contextual-pricing-indicators` | Render backend-provided restrictions, closed dates, manual price and occupancy accessibly |
 | 8 | `refactor/move-playground-to-start` | Start playground with SSR, per-request QueryClient, fixture server routes and ADR-0007; removes Vinxi |
-| 9 | `feat/add-headless-demo-app` | Separate Vite SPA with independent presentation and tokens |
+| 9 | `feat/add-headless-demo-app` | Separate Vite SPA with independent tokens, injected fixture transport and deterministic canonical updates |
 | 10 | `docs/finalize-guides` | English README and integration examples, complete CI, Memory.md closure |
 
 Each stage is one branch and one commit after review. Verification per stage: `pnpm lint`, `pnpm typecheck`, `pnpm test:run`, `pnpm build`; from Stage 4 onward, a contract → fixture → SDK → UI smoke check; from Stage 6 onward, responsive and accessibility checks.
