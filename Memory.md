@@ -1,6 +1,6 @@
 # Memory
 
-Last updated: Stage 5 (Public SDK implementation in progress).
+Last updated: Stage 6 (Mantine UI implementation in progress).
 
 ## Project goal
 
@@ -97,8 +97,8 @@ Important contract rules:
 | 2 | `chore/upgrade-toolchain` | Complete and merged to `main` (`65d82bc`) | Node 26, Vite 8, React 19, Mantine 9, ADR-0003 |
 | 3 | `feat/create-contracts-package` | Complete and merged to `main` (`c6f29a8`) | `@hpc/contracts`, ADR-0004, docs refreshed, legacy audit language removed |
 | 4 | `feat/add-fixture-api-server` | Complete and merged to `main` (`eb60557`) | Static fixtures, pure router, thin Vinxi adapter, ADR-0005 |
-| 5 | `feat/build-react-sdk-core` | In progress — awaiting review | `@hpc/pricing-calendar` client, headless selectors/hooks, injected fetch/auth, ADR-0006 |
-| 6 | `feat/build-mantine-ui` | Pending | Tokens, rooms × dates matrix, contextual panel, ADR-0008 and ADR-0009 |
+| 5 | `feat/build-react-sdk-core` | Complete and merged to `main` (`25292ef`) | `@hpc/pricing-calendar` client, headless selectors/hooks, injected fetch/auth, ADR-0006 |
+| 6 | `feat/build-mantine-ui` | In progress — awaiting review | Tokens, rooms × dates matrix, contextual panel, ADR-0008 and ADR-0009 |
 | 7 | `feat/add-contextual-pricing-indicators` | Pending | Render backend restrictions, closed dates, manual price, occupancy accessibly |
 | 8 | `refactor/move-playground-to-start` | Pending | Start playground, SSR, per-request QueryClient, ADR-0007 |
 | 9 | `feat/add-headless-demo-app` | Pending | Separate Vite SPA with independent tokens |
@@ -113,8 +113,8 @@ Important contract rules:
 - [ADR-0005](docs/adr/0005-fixture-server-without-business-logic.md) — Fixture server without business logic. Accepted.
 - [ADR-0006](docs/adr/0006-public-sdk-and-headless-ui-separation.md) — Public SDK and headless/UI separation. Accepted.
 - ADR-0007 — Playground Start SSR and query boundaries. Planned for Stage 8.
-- ADR-0008 — Neutral theme tokens and overrides. Planned for Stage 6.
-- ADR-0009 — Auth/property injection. Planned for Stage 6.
+- [ADR-0008](docs/adr/0008-neutral-and-overridable-ui-tokens.md) — Neutral and overridable UI tokens. Accepted.
+- [ADR-0009](docs/adr/0009-backend-and-property-context-injection.md) — Backend and property context injection. Accepted.
 
 ## Stage 4 recap — fixture server
 
@@ -175,7 +175,7 @@ Important contract rules:
 - Kept Vinxi as local fixture host only; no business logic was moved into contracts.
 - Verified with `pnpm install --frozen-lockfile`, `pnpm lint`, `pnpm typecheck`, `pnpm test:run`.
 
-## Stage 5 (current) — discoveries and pending review
+## Stage 5 — discoveries and review record
 
 ### Implemented
 
@@ -192,8 +192,35 @@ Important contract rules:
 - `pnpm lint`, `pnpm typecheck`, `pnpm test:run` and `pnpm build` pass.
 - 8 test files and 37 tests pass, covering injected headers/fetch, abort signal, contract validation, error mapping, pending writes, canonical cache replacement and headless selectors.
 
+### Outcome
+
+1. Reviewed and approved the Stage 5 diff.
+2. Committed on `feat/build-react-sdk-core` (`25292ef`), fast-forwarded `main`, and created `feat/build-mantine-ui`.
+3. Stage 6 started from the merged SDK.
+
+## Stage 6 (current) — Mantine UI
+
+### Implemented
+
+- `packages/react/src/ui/tokens.css`: neutral `--hpc-*` defaults for colors, radii, spacing, typography and grid states under `.hpc-root`.
+- `theme.ts` and `Provider.tsx`: `pricingCalendarTheme` and `PricingCalendarUIProvider` supply Mantine defaults without legacy branding.
+- `dateRange.ts` and `format.ts`: pure presentation helpers for inclusive ISO date columns, currency formatting from `day.currency`, and backend status labels.
+- `DayCell.tsx`: accessible button in a table cell with an `aria-label` containing date, backend status, price and backend variance label when present.
+- `RoomDateMatrix.tsx`: native table with `scope="col"`/`scope="row"` headers and one button cell per room/date. Uses contract data only.
+- `EditPanel.tsx`: contextual panel with price input, optional reason, pending state, backend error alert and canonical response alert. No local price calculation.
+- `PricingCalendar.tsx`: composes `usePricingCalendar`, loading/error states, active-room select, matrix and panel; resets mutation state when selection changes.
+- `src/ui/index.ts` imports Mantine core CSS plus tokens and exports the UI surface.
+- Added ADR-0008 and ADR-0009.
+- Added UI tests for rendering backend data and completing a PATCH write that displays the canonical backend response.
+
+### Verification
+
+- `pnpm lint`, `pnpm typecheck`, `pnpm test:run` and `pnpm build` pass on `feat/build-mantine-ui`.
+- 11 test files and 44 tests pass, including accessible table rendering and a PATCH write that displays the backend's canonical response.
+- No `RoomPriceGenie`, `BRAND_COLORS`, `#5B48EE`, `--rpg-*`, `vinxi`, `rateComputations`, `hasHighDisparity` or `Math.random` references exist under `packages/react/src/ui`.
+
 ### Next actions
 
-1. Review the Stage 5 diff.
-2. After approval, commit on `feat/build-react-sdk-core`, fast-forward `main`, and create `feat/build-mantine-ui`.
-3. Stage 6: implement `./ui` tokens, rooms × dates matrix and contextual edit panel using `usePricingCalendar`; add ADR-0008 and ADR-0009.
+1. Review the Stage 6 diff after verification.
+2. After approval, commit on `feat/build-mantine-ui`, fast-forward `main`, and create `feat/add-contextual-pricing-indicators`.
+3. Stage 7: expand non-color indicators for restrictions, closed dates, manual price, occupancy and errors; keep all semantics backend-provided.

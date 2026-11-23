@@ -1,5 +1,8 @@
 import "@testing-library/jest-dom/vitest";
-import { vi } from "vitest";
+import { cleanup } from "@testing-library/react";
+import { afterEach, vi } from "vitest";
+
+afterEach(() => cleanup());
 
 Object.defineProperty(window, "matchMedia", {
 	writable: true,
@@ -13,4 +16,13 @@ Object.defineProperty(window, "matchMedia", {
 		removeEventListener: vi.fn(),
 		dispatchEvent: vi.fn(),
 	})),
+});
+
+Object.defineProperty(window, "ResizeObserver", {
+	writable: true,
+	value: class {
+		observe() {}
+		unobserve() {}
+		disconnect() {}
+	},
 });
