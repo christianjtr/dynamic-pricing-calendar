@@ -2,7 +2,7 @@
 
 Living record of project decisions. Inspired by the Architecture Decision Records in [`docs/adr`](docs/adr), but intentionally shorter: this file answers "what is currently true and why" without replacing the ADRs. All project documentation is written in English.
 
-Last updated: 2026-11-23 — Stage 0 (repository audit).
+Last updated: 2026-11-23 — Stage 1 (baseline stabilization).
 
 ## Product direction
 
@@ -32,6 +32,8 @@ Node.js 26 LTS (installed locally and pinned in `engines`, `.nvmrc` and CI) · p
 
 No bulk dependency upgrade before the baseline is green. Compatibility is validated in Stage 2 and recorded in ADR-0003.
 
+Baseline note: `skipLibCheck: true` is required at TypeScript 6 because Vinxi/Nitro declarations reference optional peer types.
+
 ## ADR index
 
 | ADR | Title | Status |
@@ -52,14 +54,15 @@ No bulk dependency upgrade before the baseline is green. Compatibility is valida
 - Conventional Commits: `type(scope): imperative summary`; reference ADRs in the commit footer when applicable.
 - Tandem workflow: implement, verify, show the diff and test results, **wait for explicit approval**, then commit and merge locally to `main`. No push unless requested.
 - Every stage ends with `pnpm lint`, `pnpm typecheck`, `pnpm test:run` and `pnpm build` (where applicable).
+- pnpm 12 configuration lives in `pnpm-workspace.yaml` (`overrides`, `allowBuilds`); the `pnpm` field in `package.json` is ignored.
 - Never store secrets in the repository; credentials are injected by the consumer at runtime.
 
 ## Stage tracker
 
 | Stage | Branch | Status |
 |-------|--------|--------|
-| 0 | `docs/add-architecture-audit` | In progress — awaiting review |
-| 1 | `test/stabilize-baseline` | Pending |
+| 0 | `docs/add-architecture-audit` | Complete — merged to `main` |
+| 1 | `test/stabilize-baseline` | In progress — awaiting review |
 | 2 | `chore/upgrade-toolchain` | Pending |
 | 3 | `feat/create-contracts-package` | Pending |
 | 4 | `feat/add-fixture-api-server` | Pending |

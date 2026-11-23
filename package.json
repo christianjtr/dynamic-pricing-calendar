@@ -6,9 +6,11 @@
 		"lint": "biome check .",
 		"lint:fix": "biome check --write .",
 		"typecheck": "tsc --noEmit",
-		"test": "vitest"
+		"test": "vitest",
+		"test:run": "vitest run"
 	},
 	"author": "Christian Torrealba",
+	"packageManager": "pnpm@12.9.1",
 	"license": "MIT",
 	"description": "RoomPriceGenie SaaS Revenue Management System Pricing Calendar simulation with React, TypeScript, and TanStack Query.",
 	"dependencies": {
@@ -44,12 +46,5 @@
 		"typescript": "^6.0.3",
 		"vite-tsconfig-paths": "^6.1.1",
 		"vitest": "^4.1.8"
-	},
-	"pnpm": {
-		"overrides": {
-			"h3": "^1.15.9",
-			"esbuild": "^0.25.0",
-			"vite": "^6.4.2"
-		}
 	}
 }

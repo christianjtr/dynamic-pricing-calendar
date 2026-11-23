@@ -35,41 +35,39 @@ describe("getSettings", () => {
 		});
 	});
 
-	it("should return null on HTTP error", async () => {
-		const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+	it("should throw a descriptive error on HTTP error", async () => {
 		(global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
 			ok: false,
 			status: 500,
 		});
 
-		const result = await getSettings();
-		expect(result).toBeNull();
-		expect(consoleSpy).toHaveBeenCalled();
-		consoleSpy.mockRestore();
+		await expect(getSettings()).rejects.toThrow(
+			"HTTP 500: Failed to fetch hotel settings",
+		);
 	});
 
-	it("should return null on Zod validation error", async () => {
+	it("should throw a validation error on invalid payload", async () => {
 		const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
 		(global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
 			ok: true,
 			json: async () => ({ invalid: "data" }),
 		});
 
-		const result = await getSettings();
-		expect(result).toBeNull();
+		await expect(getSettings()).rejects.toThrow(
+			"Invalid hotel settings data received from server",
+		);
 		expect(consoleSpy).toHaveBeenCalled();
 		consoleSpy.mockRestore();
 	});
 
-	it("should return null on AbortError without logging", async () => {
+	it("should rethrow AbortError without logging", async () => {
 		const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
 		const abortError = new DOMException("Aborted", "AbortError");
 		(global.fetch as ReturnType<typeof vi.fn>).mockRejectedValueOnce(
 			abortError,
 		);
 
-		const result = await getSettings();
-		expect(result).toBeNull();
+		await expect(getSettings()).rejects.toBe(abortError);
 		expect(consoleSpy).not.toHaveBeenCalled();
 		consoleSpy.mockRestore();
 	});
