@@ -13,6 +13,7 @@ export const DayAvailabilitySchema = z.enum([
 	"available",
 	"restricted",
 	"sold_out",
+	"unavailable",
 ]);
 
 export const PriceErrorSchema = z.object({
@@ -32,7 +33,7 @@ export const DayPriceSchema = z.object({
 	date: IsoDateSchema,
 	status: PriceStatusSchema,
 	currency: CurrencyCodeSchema,
-	price: z.number().nonnegative(),
+	price: z.number().nonnegative().nullable(),
 	priceInPms: z.number().nonnegative().nullable(),
 	recommendedPrice: z.number().nonnegative().nullable(),
 	variance: DayVarianceSchema.nullable(),

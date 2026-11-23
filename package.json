@@ -4,6 +4,7 @@
 	"type": "module",
 	"scripts": {
 		"dev": "vinxi dev",
+		"build": "vinxi build",
 		"lint": "biome check .",
 		"lint:fix": "biome check --write .",
 		"typecheck": "tsc --noEmit",
@@ -19,6 +20,7 @@
 		"pnpm": ">=12.9.1 <13.0.0"
 	},
 	"dependencies": {
+		"@hpc/contracts": "workspace:*",
 		"@mantine/core": "^9.8.2",
 		"@mantine/hooks": "^9.8.2",
 		"@tabler/icons-react": "^3.52.0",

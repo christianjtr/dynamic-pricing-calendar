@@ -1,0 +1,384 @@
+import type {
+	ApiError,
+	DayPrice,
+	PricesResponse,
+	Room,
+	SettingsResponse,
+	UpdatePriceResponse,
+} from "@hpc/contracts";
+
+const currency = "NZD";
+
+const day = (
+	roomId: string,
+	date: string,
+	values: Omit<DayPrice, "roomId" | "date" | "currency">,
+): DayPrice => ({ roomId, date, currency, ...values });
+
+const singleDayOne = day("1001", "2026-11-23", {
+	status: "auto",
+	price: 189,
+	priceInPms: 182,
+	recommendedPrice: 197,
+	variance: { value: 4.2, direction: "up", severity: "high", label: "+4.2%" },
+	availability: "available",
+	occupancy: 0.72,
+	restrictions: ["min-stay:2"],
+	isClosed: false,
+	error: null,
+});
+
+const singleDays: DayPrice[] = [
+	singleDayOne,
+	day("1001", "2026-11-24", {
+		status: "auto",
+		price: 185,
+		priceInPms: 182,
+		recommendedPrice: 181,
+		variance: {
+			value: -0.5,
+			direction: "down",
+			severity: "low",
+			label: "-0.5%",
+		},
+		availability: "available",
+		occupancy: 0.64,
+		restrictions: [],
+		isClosed: false,
+		error: null,
+	}),
+	day("1001", "2026-11-25", {
+		status: "manual",
+		price: 195,
+		priceInPms: 182,
+		recommendedPrice: null,
+		variance: null,
+		availability: "restricted",
+		occupancy: 0.81,
+		restrictions: ["closed-to-arrival"],
+		isClosed: false,
+		error: null,
+	}),
+	day("1001", "2026-11-26", {
+		status: "closed",
+		price: null,
+		priceInPms: null,
+		recommendedPrice: null,
+		variance: null,
+		availability: "unavailable",
+		occupancy: null,
+		restrictions: ["closed"],
+		isClosed: true,
+		error: null,
+	}),
+	day("1001", "2026-11-27", {
+		status: "auto",
+		price: 179,
+		priceInPms: 182,
+		recommendedPrice: 187,
+		variance: {
+			value: 2.8,
+			direction: "up",
+			severity: "medium",
+			label: "+2.8%",
+		},
+		availability: "available",
+		occupancy: 0.58,
+		restrictions: [],
+		isClosed: false,
+		error: null,
+	}),
+	day("1001", "2026-11-28", {
+		status: "unavailable",
+		price: null,
+		priceInPms: null,
+		recommendedPrice: null,
+		variance: null,
+		availability: "sold_out",
+		occupancy: 0.98,
+		restrictions: [],
+		isClosed: false,
+		error: { code: "NO_INVENTORY", message: "No inventory available" },
+	}),
+	day("1001", "2026-11-29", {
+		status: "auto",
+		price: 192,
+		priceInPms: 182,
+		recommendedPrice: 198,
+		variance: {
+			value: 3.1,
+			direction: "up",
+			severity: "medium",
+			label: "+3.1%",
+		},
+		availability: "available",
+		occupancy: 0.77,
+		restrictions: ["min-stay:3"],
+		isClosed: false,
+		error: null,
+	}),
+];
+
+const doubleDayOne = day("1002", "2026-11-23", {
+	status: "auto",
+	price: 229,
+	priceInPms: 220,
+	recommendedPrice: 238,
+	variance: { value: 4.1, direction: "up", severity: "high", label: "+4.1%" },
+	availability: "available",
+	occupancy: 0.68,
+	restrictions: [],
+	isClosed: false,
+	error: null,
+});
+
+const doubleDays: DayPrice[] = [
+	doubleDayOne,
+	day("1002", "2026-11-24", {
+		status: "auto",
+		price: 225,
+		priceInPms: 220,
+		recommendedPrice: 222,
+		variance: { value: 0.9, direction: "up", severity: "low", label: "+0.9%" },
+		availability: "available",
+		occupancy: 0.61,
+		restrictions: [],
+		isClosed: false,
+		error: null,
+	}),
+	day("1002", "2026-11-25", {
+		status: "manual",
+		price: 231,
+		priceInPms: 220,
+		recommendedPrice: null,
+		variance: null,
+		availability: "restricted",
+		occupancy: 0.74,
+		restrictions: ["closed-to-arrival"],
+		isClosed: false,
+		error: null,
+	}),
+	day("1002", "2026-11-26", {
+		status: "closed",
+		price: null,
+		priceInPms: null,
+		recommendedPrice: null,
+		variance: null,
+		availability: "unavailable",
+		occupancy: null,
+		restrictions: ["closed"],
+		isClosed: true,
+		error: null,
+	}),
+	day("1002", "2026-11-27", {
+		status: "auto",
+		price: 219,
+		priceInPms: 220,
+		recommendedPrice: 213,
+		variance: {
+			value: -1.3,
+			direction: "down",
+			severity: "low",
+			label: "-1.3%",
+		},
+		availability: "available",
+		occupancy: 0.55,
+		restrictions: [],
+		isClosed: false,
+		error: null,
+	}),
+	day("1002", "2026-11-28", {
+		status: "unavailable",
+		price: null,
+		priceInPms: null,
+		recommendedPrice: null,
+		variance: null,
+		availability: "sold_out",
+		occupancy: 0.93,
+		restrictions: [],
+		isClosed: false,
+		error: { code: "NO_MARKET_DATA", message: "No market data available" },
+	}),
+	day("1002", "2026-11-29", {
+		status: "auto",
+		price: 235,
+		priceInPms: 220,
+		recommendedPrice: 243,
+		variance: {
+			value: 3.6,
+			direction: "up",
+			severity: "medium",
+			label: "+3.6%",
+		},
+		availability: "available",
+		occupancy: 0.7,
+		restrictions: [],
+		isClosed: false,
+		error: null,
+	}),
+];
+
+const familyDayOne = day("1003", "2026-11-23", {
+	status: "auto",
+	price: 289,
+	priceInPms: 275,
+	recommendedPrice: 301,
+	variance: { value: 4.5, direction: "up", severity: "high", label: "+4.5%" },
+	availability: "available",
+	occupancy: 0.83,
+	restrictions: ["min-stay:2"],
+	isClosed: false,
+	error: null,
+});
+
+const familyDays: DayPrice[] = [
+	familyDayOne,
+	day("1003", "2026-11-24", {
+		status: "auto",
+		price: 282,
+		priceInPms: 275,
+		recommendedPrice: 280,
+		variance: {
+			value: -0.4,
+			direction: "down",
+			severity: "low",
+			label: "-0.4%",
+		},
+		availability: "available",
+		occupancy: 0.66,
+		restrictions: [],
+		isClosed: false,
+		error: null,
+	}),
+	day("1003", "2026-11-25", {
+		status: "manual",
+		price: 286,
+		priceInPms: 275,
+		recommendedPrice: null,
+		variance: null,
+		availability: "restricted",
+		occupancy: 0.79,
+		restrictions: ["closed-to-arrival"],
+		isClosed: false,
+		error: null,
+	}),
+	day("1003", "2026-11-26", {
+		status: "manual",
+		price: 299,
+		priceInPms: 275,
+		recommendedPrice: null,
+		variance: null,
+		availability: "available",
+		occupancy: 0.88,
+		restrictions: [],
+		isClosed: false,
+		error: null,
+	}),
+	day("1003", "2026-11-27", {
+		status: "auto",
+		price: 277,
+		priceInPms: 275,
+		recommendedPrice: 269,
+		variance: {
+			value: -2.2,
+			direction: "down",
+			severity: "medium",
+			label: "-2.2%",
+		},
+		availability: "available",
+		occupancy: 0.6,
+		restrictions: [],
+		isClosed: false,
+		error: null,
+	}),
+	day("1003", "2026-11-28", {
+		status: "unavailable",
+		price: null,
+		priceInPms: null,
+		recommendedPrice: null,
+		variance: null,
+		availability: "sold_out",
+		occupancy: 0.96,
+		restrictions: [],
+		isClosed: false,
+		error: { code: "NO_INVENTORY", message: "No inventory available" },
+	}),
+	day("1003", "2026-11-29", {
+		status: "auto",
+		price: 292,
+		priceInPms: 275,
+		recommendedPrice: 305,
+		variance: { value: 4.4, direction: "up", severity: "high", label: "+4.4%" },
+		availability: "available",
+		occupancy: 0.75,
+		restrictions: [],
+		isClosed: false,
+		error: null,
+	}),
+];
+
+export const roomFixtures: Room[] = [
+	{ id: "1001", name: "Single Room", isReference: true },
+	{ id: "1002", name: "Double Room", isReference: false },
+	{ id: "1003", name: "Family Room", isReference: false },
+];
+
+export const fixtureDateRange = {
+	from: "2026-11-23",
+	to: "2026-11-29",
+} as const;
+
+export const settingsFixture: SettingsResponse = {
+	hotel: {
+		timezone: "Pacific/Auckland",
+		locale: "en-NZ",
+		currency,
+	},
+	rooms: roomFixtures,
+	dateRange: { ...fixtureDateRange },
+};
+
+export const pricesFixture: PricesResponse = {
+	timezone: "Pacific/Auckland",
+	currency,
+	generatedAt: "2026-11-23T22:30:00.000Z",
+	rooms: [
+		{ roomId: "1001", name: "Single Room", days: singleDays },
+		{ roomId: "1002", name: "Double Room", days: doubleDays },
+		{ roomId: "1003", name: "Family Room", days: familyDays },
+	],
+};
+
+export const updateFixtures: Record<string, UpdatePriceResponse> = {
+	"1001:2026-11-23": {
+		day: {
+			...singleDayOne,
+			status: "manual",
+			price: 205,
+			variance: null,
+		},
+		acceptedAt: "2026-11-23T22:31:00.000Z",
+	},
+	"1002:2026-11-23": {
+		day: {
+			...doubleDayOne,
+			status: "manual",
+			price: 245,
+			variance: null,
+		},
+		acceptedAt: "2026-11-23T22:31:00.000Z",
+	},
+	"1003:2026-11-23": {
+		day: {
+			...familyDayOne,
+			status: "manual",
+			price: 310,
+			variance: null,
+		},
+		acceptedAt: "2026-11-23T22:31:00.000Z",
+	},
+};
+
+export const apiError = (code: string, message: string): ApiError => ({
+	error: { code, message },
+});

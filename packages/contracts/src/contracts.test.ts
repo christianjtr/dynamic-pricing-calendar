@@ -3,6 +3,7 @@ import {
 	apiPaths,
 	ContractValidationError,
 	type DayPrice,
+	DayPriceSchema,
 	PricesResponseSchema,
 	parseContract,
 	SettingsResponseSchema,
@@ -74,6 +75,22 @@ describe("external API contracts", () => {
 			severity: "high",
 			label: "+4.2%",
 		});
+	});
+
+	it("accepts closed days with null prices and unavailable inventory", () => {
+		const result = DayPriceSchema.parse({
+			...dayPrice,
+			price: null,
+			priceInPms: null,
+			recommendedPrice: null,
+			variance: null,
+			status: "closed",
+			availability: "unavailable",
+			isClosed: true,
+		});
+
+		expect(result.price).toBeNull();
+		expect(result.availability).toBe("unavailable");
 	});
 
 	it("rejects variance without backend-computed direction and severity", () => {
