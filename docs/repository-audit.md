@@ -132,6 +132,6 @@ Each stage is one branch and one commit after review. Verification per stage: `p
 - Error states: "NO MARKET DATA", "PRICING ERROR", "NO INVENTORY", plus loading overlay and retry actions.
 - Room selection and room category labels.
 - Desktop grid and mobile list presentations, tooltips and "today" highlighting.
-- RoomPriceGenie branding assets and basic theme tokens.
+- Basic theme tokens; legacy branding assets are intentionally removed in favor of neutral names.
 - Runtime validation of API responses and typed client hooks with caching, retries and devtools.
 - The working agreement: ADRs, Memory.md, conventional commits, branch convention and tandem review before every commit.

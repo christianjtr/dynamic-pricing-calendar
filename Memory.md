@@ -2,7 +2,7 @@
 
 Living record of project decisions. Inspired by the Architecture Decision Records in [`docs/adr`](docs/adr), but intentionally shorter: this file answers "what is currently true and why" without replacing the ADRs. All project documentation is written in English.
 
-Last updated: 2026-11-23 — Stage 2 (toolchain upgrade).
+Last updated: 2026-11-23 — Stage 3 (external API contracts).
 
 ## Product direction
 
@@ -21,10 +21,11 @@ A lightweight, developer-friendly, **headless pricing calendar**. The external b
 | 5 | The second presentation is a separate Vite SPA app with its own tokens | Proves the SDK is independent of Start and Mantine | [0002](docs/adr/0002-start-and-fixture-runtime-boundaries.md) |
 | 6 | Property ID identifies context; it never authorizes. Credentials are injected by the consumer | Backend must enforce access permissions | [0001](docs/adr/0001-headless-backend-driven-direction.md) |
 | 7 | Writes show `pending` state only, then render the canonical backend response; no local price calculation | The backend is the single source of truth | [0001](docs/adr/0001-headless-backend-driven-direction.md) |
-| 8 | Contract is defined from scratch with fully precomputed fields | The external API schema is not available yet | [0004](docs/adr/0004-external-api-contracts.md) (planned) |
-| 9 | Design tokens are CSS variables (`--rpg-*`) with a Mantine theme derived from them | White-label without touching component internals | [0008](docs/adr/0008-design-tokens-and-white-label.md) (planned) |
+| 8 | Contract is defined from scratch with fully precomputed fields | The external API schema is not available yet | [0004](docs/adr/0004-external-api-contracts.md) |
+| 9 | Design tokens are CSS variables (`--hpc-*`) with a Mantine theme derived from them | White-label without touching component internals | [0008](docs/adr/0008-design-tokens-and-white-label.md) (planned) |
 | 10 | Default calendar is a rooms × dates matrix; price editing happens in a contextual side panel | Information density for operational pricing work | [0009](docs/adr/0009-matrix-and-contextual-editing.md) (planned) |
 | 11 | All documentation is written in English | Shared project language for docs and ADRs | — |
+| 12 | All legacy branding references are removed; new names and tokens are neutral | The product is a generic headless calendar, not a legacy-branded app | — |
 
 ## Toolchain targets
 
@@ -41,7 +42,7 @@ Baseline note: `skipLibCheck: true` is required with TypeScript 7 because Vinxi/
 | [0001](docs/adr/0001-headless-backend-driven-direction.md) | Headless Pricing Calendar with externally computed business logic | Accepted |
 | [0002](docs/adr/0002-start-and-fixture-runtime-boundaries.md) | TanStack Start in reference apps only; fixture server runtime | Accepted |
 | [0003](docs/adr/0003-toolchain-compatibility-and-upgrade-order.md) | Toolchain compatibility and upgrade order | Accepted |
-| 0004 | External API contracts | Planned — Stage 3 |
+| [0004](docs/adr/0004-external-api-contracts.md) | External API contracts | Accepted |
 | 0005 | Fixture server without business logic | Planned — Stage 4 |
 | 0006 | React SDK core and injected authentication | Planned — Stage 5 |
 | 0007 | SSR query integration in the playground | Planned — Stage 8 |
@@ -63,8 +64,8 @@ Baseline note: `skipLibCheck: true` is required with TypeScript 7 because Vinxi/
 |-------|--------|--------|
 | 0 | `docs/add-architecture-audit` | Complete — merged to `main` |
 | 1 | `test/stabilize-baseline` | Complete — merged to `main` |
-| 2 | `chore/upgrade-toolchain` | In progress — awaiting review |
-| 3 | `feat/create-contracts-package` | Pending |
+| 2 | `chore/upgrade-toolchain` | Complete — merged to `main` |
+| 3 | `feat/create-contracts-package` | In progress — awaiting review |
 | 4 | `feat/add-fixture-api-server` | Pending |
 | 5 | `feat/build-react-sdk-core` | Pending |
 | 6 | `feat/build-mantine-ui` | Pending |
