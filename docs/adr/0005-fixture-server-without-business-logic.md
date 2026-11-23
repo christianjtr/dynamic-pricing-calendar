@@ -12,7 +12,7 @@ The previous `api/index.ts` generated 365 days of random prices, applied 4% vari
 
 - No randomness, thresholds or price derivation in this repository.
 - Responses must validate against `@hpc/contracts`.
-- Keep the existing Vinxi/Nitro runtime until Stage 7 replaces the app.
+- Keep the existing Vinxi/Nitro runtime until Stage 8 replaces the app.
 - Make routing testable without starting an HTTP server.
 - Writes must return a canonical backend response, never a locally calculated value.
 

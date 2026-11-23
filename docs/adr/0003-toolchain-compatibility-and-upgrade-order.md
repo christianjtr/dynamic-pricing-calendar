@@ -14,7 +14,7 @@ The repository had a green baseline after Stage 1, but it still used Node 25, Ty
 - Pin one runtime and one package-manager version for local development and CI.
 - Upgrade toolchain majors before changing the repository structure, so compatibility failures are isolated.
 - Avoid changes to product behavior or business logic during the upgrade.
-- Keep the Vinxi/Nitro fixture runtime temporarily; it is removed in Stage 7.
+- Keep the Vinxi/Nitro fixture runtime temporarily; it was removed in Stage 8.
 
 ## Considered options
 
@@ -32,12 +32,12 @@ The baseline is now pinned to:
 - TypeScript 7.0.2, React 19.3.1, Vite 8.3.8, Mantine 9.8.2, TanStack Query 5.108.4, Zod 4.6.7, date-fns 4.4.0, Biome 2.6.8 and Vitest 5.1.1.
 - pnpm settings in `pnpm-workspace.yaml` (`overrides`, `allowBuilds`); the `pnpm` field in `package.json` was removed.
 - `skipLibCheck: true` in `tsconfig.json` to avoid errors from Vinxi/Nitro declarations that reference optional peers.
-- Vitest aliases in `resolve.alias` and `"type": "module"` in `package.json`.
+- Vitest with jsdom, a setup file and no path alias; `"type": "module"` in `package.json`.
 - Biome 2 configuration migrated; Markdown files excluded from Biome formatting.
 
 ### Justification
 
-TypeScript 7 keeps the `tsc` command for the 7.0 release, Mantine 9 keeps `@mantine/core/styles.css`, and Vitest 5 requires Vite 8. Upgrading them together removes the old override stack and keeps a single coherent dependency graph. The Vinxi/Nitro runtime is left untouched because its replacement is already scheduled for Stage 7.
+TypeScript 7 keeps the `tsc` command for the 7.0 release, Mantine 9 keeps `@mantine/core/styles.css`, and Vitest 5 requires Vite 8. Upgrading them together removes the old override stack and keeps a single coherent dependency graph. The Vinxi/Nitro runtime was left untouched in Stage 2 because its replacement was scheduled for Stage 8.
 
 ## Consequences
 
@@ -50,7 +50,7 @@ TypeScript 7 keeps the `tsc` command for the 7.0 release, Mantine 9 keeps `@mant
 
 ### Negative and mitigations
 
-- Vinxi 0.4.3 remains on an older major while Vite is overridden to 8 — mitigation: Stage 7 replaces the Vinxi app with TanStack Start.
+- Vinxi 0.4.3 initially remained on an older major while Vite was overridden to 8 — mitigation: Stage 8 replaced the Vinxi app with TanStack Start.
 - Biome 2 import sorting touches many existing files — mitigation: changes are mechanical and limited to import/export order.
 - Markdown is excluded from Biome formatting — mitigation: documentation remains manually reviewed in English.
 

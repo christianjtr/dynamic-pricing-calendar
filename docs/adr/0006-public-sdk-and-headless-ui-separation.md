@@ -55,9 +55,9 @@ Separate exports make it possible to embed logic-only hooks without paying for M
 
 ### Negative and mitigations
 
-- `./ui` is an empty barrel until Stage 6 — mitigation: documented as reserved; no consumer should import it yet.
-- The legacy UI still consumes `client/src` data — mitigation: Stages 6–7 replace it with the new SDK and headless selectors.
-- CI does not yet run `pnpm build` — mitigation: Stage 10 completes CI; local verification already runs it.
+- `./ui` started as an empty barrel — mitigation: Stage 6 filled it with Mantine components; the headless demo deliberately does not import it.
+- The legacy UI initially consumed `client/src` data — mitigation: Stages 6–7 replaced it with the new SDK and headless selectors.
+- CI initially did not run `pnpm build` — mitigation: Stage 10 added it to the workflow.
 
 ## Compliance and verification
 

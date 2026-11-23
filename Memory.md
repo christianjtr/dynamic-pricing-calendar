@@ -1,6 +1,6 @@
 # Memory
 
-Last updated: Stage 9 (headless demo app in progress).
+Last updated: Stage 10 (documentation and CI finalization in progress).
 
 ## Project goal
 
@@ -21,7 +21,7 @@ Backend author: project owner. Product owner instruction: “toda la lógica se 
 9. Manual prices, restrictions, closed dates and occupancy need non-color-only indicators from Stage 4 onward.
 10. Design tokens must be neutral (`--hpc-*`, not `--rpg-*`) and consumer-overridable, ADR-0008.
 11. Wallet/auth, tenant and property context are injected by the consuming app; `propertyId` identifies context but never authorizes. ADR-0009.
-12. All legacy branding references will disappear as stages progress.
+12. Live docs, apps and code contain no legacy branding; historical ADRs and the pre-migration audit remain as decision records.
 13. Fixture server serves explicit static data and deterministic in-memory canonical updates only; it never derives prices or computes business rules, ADR-0005.
 14. The published SDK must consume the external backend directly through TanStack Query and `@hpc/contracts`; it must never call or depend on the local fixture endpoints.
 
@@ -101,8 +101,8 @@ Important contract rules:
 | 6 | `feat/build-mantine-ui` | Complete and merged to `main` (`881fde6`) | Tokens, rooms × dates matrix, contextual panel, ADR-0008 and ADR-0009 |
 | 7 | `feat/add-contextual-pricing-indicators` | Complete and merged to `main` (`55b3bba`) | Backend-only indicators rendered accessibly |
 | 8 | `refactor/move-playground-to-start` | Complete and merged to `main` (`2fce3d6`) | Start playground, SSR, per-request QueryClient, fixture routes, ADR-0007 |
-| 9 | `feat/add-headless-demo-app` | In progress — awaiting review | Separate Vite SPA, independent tokens, injected fixture fetch, deterministic PATCH state |
-| 10 | `docs/finalize-guides` | Pending | English README, integration examples, complete CI, closure |
+| 9 | `feat/add-headless-demo-app` | Complete and merged to `main` (`7c2ea3e`) | Separate Vite SPA, independent tokens, injected fixture fetch, deterministic PATCH state |
+| 10 | `docs/finalize-guides` | In progress — awaiting review | English README, integration examples, complete CI, final branding cleanup |
 
 ## ADR index
 
@@ -217,7 +217,7 @@ Important contract rules:
 
 - `pnpm lint`, `pnpm typecheck`, `pnpm test:run` and `pnpm build` pass on `feat/build-mantine-ui`.
 - 11 test files and 44 tests pass, including accessible table rendering and a PATCH write that displays the backend's canonical response.
-- No `RoomPriceGenie`, `BRAND_COLORS`, `#5B48EE`, `--rpg-*`, `vinxi`, `rateComputations`, `hasHighDisparity` or `Math.random` references exist under `packages/react/src/ui`.
+- No legacy brand names, `--rpg-*` tokens, generated random data or local business logic remain under `packages/react/src/ui`; the neutral accent defaults are `#2563eb` and `#e8f0fe`.
 
 ### Outcome
 
@@ -225,7 +225,7 @@ Important contract rules:
 2. Committed on `feat/build-mantine-ui` (`881fde6`), fast-forwarded `main`, and created `feat/add-contextual-pricing-indicators`.
 3. Stage 7 started from the merged Mantine UI.
 
-## Stage 7 (current) — contextual pricing indicators
+## Stage 7 — contextual pricing indicators
 
 ### Implemented
 
@@ -247,7 +247,7 @@ Important contract rules:
 2. Committed on `feat/add-contextual-pricing-indicators` (`55b3bba`), fast-forwarded `main`, and created `refactor/move-playground-to-start`.
 3. Stage 8 started from the merged UI with indicators.
 
-## Stage 8 (current) — TanStack Start playground
+## Stage 8 — TanStack Start playground
 
 ### Implemented
 
@@ -274,7 +274,7 @@ Important contract rules:
 2. Committed on `refactor/move-playground-to-start` (`2fce3d6`), fast-forwarded `main`, and created `feat/add-headless-demo-app`.
 3. Stage 9 started from the merged Start playground.
 
-## Stage 9 (current) — Headless demo app
+## Stage 9 — Headless demo app
 
 ### Implemented
 
@@ -294,8 +294,32 @@ Important contract rules:
 - Browser smoke check: the SPA renders settings, three rooms, seven days, backend labels and a manual-price form; submitting the default fixture update shows `Backend accepted $205.00 with status manual.` and the table row updates to `$205.00` / `manual`.
 - No Mantine, Start, RoomPriceGenie, local price calculation or optimistic business logic in the demo.
 
+### Outcome
+
+1. Reviewed and approved the Stage 9 diff.
+2. Committed on `feat/add-headless-demo-app` (`7c2ea3e`), fast-forwarded `main`, and created `docs/finalize-guides`.
+3. Stage 10 started from the merged headless demo.
+
+## Stage 10 (current) — Documentation and CI finalization
+
+### Implemented
+
+- Rewrote `README.md` in English for the current headless architecture, workspace layout, public entry points, scripts and verification commands.
+- Added `docs/integration.md` with ready-made UI, headless, transport-only and SSR examples based on the shipped API.
+- Removed the obsolete challenge brief, demo GIF and orphaned `shared/types/` directory.
+- Replaced remaining purple accent defaults in `packages/react/src/ui/tokens.css` with neutral blues.
+- Removed the unused `@tanstack/react-query-devtools` dependency and updated the root package description.
+- CI now pins pnpm `12.9.1`, reads Node from `.nvmrc`, keeps `--frozen-lockfile` and runs all four canonical checks including `pnpm build`.
+- Marked `docs/repository-audit.md` as a historical snapshot and closed stale mitigation notes in ADR-0003, ADR-0005 and ADR-0006.
+
+### Verification
+
+- `pnpm lint`, `pnpm typecheck`, `pnpm test:run` and `pnpm build` pass.
+- `pnpm install --frozen-lockfile` passes after dependency cleanup; CI uses the same install mode.
+- Live user-facing docs and app code contain no legacy brand names; historical ADRs remain intentional decision records.
+
 ### Next actions
 
-1. Review the Stage 9 diff after verification.
-2. After approval, commit on `feat/add-headless-demo-app`, fast-forward `main`, and create `docs/finalize-guides`.
-3. Stage 10: English README/integration examples, final branding cleanup and complete CI.
+1. Review the Stage 10 diff after verification.
+2. After approval, commit on `docs/finalize-guides` and fast-forward `main`.
+3. Project closure: no further stages are planned.

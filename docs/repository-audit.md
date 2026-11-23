@@ -1,5 +1,7 @@
 # Repository Audit
 
+> Historical snapshot of the repository at `main` (commit `55fcc29`), recorded before any migration. Current architecture is documented in [README.md](../README.md) and [integration.md](./integration.md); decisions are recorded in `docs/adr/`.
+
 Scope: read-only inspection of the repository at `main` (commit `55fcc29`), performed before any migration. This document covers the six requested deliverables: current architecture assessment, comparison with the target direction, technology migration plan, proposed minimal structure, phased roadmap, and functionality that must not be lost.
 
 ## 1. Current architecture assessment
@@ -118,9 +120,9 @@ Public exports: `.` (ready-to-use), `./headless`, `./ui`, `./contracts`. React, 
 | 7 | `feat/add-contextual-pricing-indicators` | Render backend-provided restrictions, closed dates, manual price and occupancy accessibly |
 | 8 | `refactor/move-playground-to-start` | Start playground with SSR, per-request QueryClient, fixture server routes and ADR-0007; removes Vinxi |
 | 9 | `feat/add-headless-demo-app` | Separate Vite SPA with independent tokens, injected fixture transport and deterministic canonical updates |
-| 10 | `docs/finalize-guides` | English README and integration examples, complete CI, Memory.md closure |
+| 10 | `docs/finalize-guides` | English README and integration examples, complete CI, final branding cleanup, Memory.md closure |
 
-Each stage is one branch and one commit after review. Verification per stage: `pnpm lint`, `pnpm typecheck`, `pnpm test:run`, `pnpm build`; from Stage 4 onward, a contract → fixture → SDK → UI smoke check; from Stage 6 onward, responsive and accessibility checks.
+Each stage is one branch and one commit after review. Verification per stage: `pnpm lint`, `pnpm typecheck`, `pnpm test:run`, `pnpm build`; CI enforces all four commands on pushes and pull requests to `main`. From Stage 4 onward, a contract → fixture → SDK → UI smoke check; from Stage 6 onward, responsive and accessibility checks.
 
 ## 6. Existing functionality that must not be lost
 

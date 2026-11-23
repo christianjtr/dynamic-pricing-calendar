@@ -1,113 +1,92 @@
-# Dynamic Pricing Calendar
+# Headless Pricing Calendar
 
-RoomPriceGenie SaaS Revenue Management System — Pricing Calendar simulation built with React, TypeScript, and TanStack Query.
+A React SDK for displaying prices computed by an external backend. This repository owns transport, contract validation, caching and presentation only. All pricing logic, recommendations, variance, availability, occupancy, restrictions, currency and validation belong to the backend.
 
-## Tech Stack
+## Repository layout
 
-- React 18 + TypeScript
-- TanStack Query v5
-- Mantine UI v7
-- Vinxi (Vite + Nitro)
-- Zod + date-fns + date-fns-tz + es-toolkit
-- pnpm as package manager
-
-## Project Structure
-
-```
-client/           # React frontend application
-  src/
-    components/     # Reusable UI components (BaseCalendar, Layout, ErrorBoundary)
-    context/        # HotelSettingsContext (UI state only)
-    features/       # Feature modules (OptimizedRates)
-    hooks/          # Custom hooks (queries, useCalendar, etc.)
-    services/       # API clients (hotel-api)
-    types/          # Client-specific Zod schemas and types
-    utils/          # Pure utility functions
-api/              # Server handlers (Vinxi)
-shared/types/     # Shared TypeScript types between client and server
+```text
+apps/
+  playground/          TanStack Start SSR reference app with local fixture routes
+  headless-demo/       Plain Vite SPA with independent presentation and tokens
+packages/
+  contracts/           Zod schemas and inferred types for the external API
+  react/               Public SDK: client, headless and UI entry points
+docs/
+  integration.md       Integration guide and code examples
+  adr/                 Architecture decision records
 ```
 
-## Architecture & Data Flow
+## Public entry points
 
-**Single Source of Truth**: TanStack Query (`useHotelSettings`, `usePrices`) is the only source of server data.
+| Import | Purpose |
+|---|---|
+| `@hpc/pricing-calendar` | `PricingCalendarProvider`, `createPricingClient`, query hooks, `usePricingCalendar` |
+| `@hpc/pricing-calendar/headless` | Headless selectors and hook without UI dependencies |
+| `@hpc/pricing-calendar/ui` | Optional Mantine-based ready-to-use UI |
+| `@hpc/pricing-calendar/contracts` | Re-exported contract schemas and types |
 
-**UI State**: `HotelSettingsContext` holds ephemeral UI state (`selectedRoomId`, `locale`, `displayTimezone`).
+`@hpc/contracts` is an internal workspace package. Consumers should import contract types from `@hpc/pricing-calendar/contracts`.
 
-**Derived Values**: Computed via `useMemo` inside the Context Provider (`activeRoomName`, `roomSelectOptions`, `currencySymbol`).
-
-**Data Flow Diagram** (Mermaid):
+## Architecture
 
 ```mermaid
-flowchart TD
-    A[API /api/settings] -->|fetch| B[useHotelSettings Query]
-    C[API /api/prices] -->|fetch| D[usePrices Query]
-    B -->|HotelSettings| E[HotelSettingsProvider Context]
-    E -->|UI State + Derived| F[useHotelSettingsContext]
-    D -->|PriceData + select filter| G[PricingCalendar]
-    F -->|selectedRoomId, locale, displayTimezone| G
-    G -->|renderDay + priceList| H[BaseCalendar]
-    H -->|CalendarCell| I[CalendarDayRates]
+flowchart LR
+  B[External pricing backend] -->|contract HTTP API| S[@hpc/pricing-calendar]
+  S --> P[Start playground]
+  S --> H[Headless Vite demo]
 ```
 
-## Advantages of the Current Solution
+The SDK never defaults to `/api`. Consumers inject `baseUrl`, `propertyId`, optional `fetch`, headers and credentials through `PricingCalendarProvider` or `createPricingClient`. The `/api` routes in `apps/playground` are a deterministic local stand-in for development only.
 
-- **Single Source of Truth** — TanStack Query owns all server data. Context never duplicates it.
-- **Clean Separation** — Context only manages ephemeral UI state (`selectedRoomId`, `locale`).
-- **Strong Type Safety** — Zod schemas + shared types + strict TypeScript.
-- **Timezone Awareness** — Full user-selectable "Display Timezone" using `date-fns-tz` (`toZonedTime`, `formatInTimeZone`).
-- **Error Resilience** — Comprehensive error handling with visible UI feedback, retry mechanisms, and no silent failures.
-- **Developer Experience** — Biome formatting, React Query Devtools, descriptive error messages and global error handler.
-- **Performance** — `useMemo` for derived values, `query.select` for filtered price data, stable keys.
+See [the integration guide](docs/integration.md) for ready-made UI, headless and transport-only examples.
 
-## Sample
+## Getting started
 
-<p align="center">
-    <img src="https://github.com/christianjtr/dynamic-pricing-calendar/blob/main/samples/demo.gif" alt="gif-demo"/>
-</p>
-
-### Test Suite Blueprint (Sample Showcase)
-
-*Note: These tests serve as a structural sample to demonstrate the testing patterns and architectural compatibility implemented across the workspace.*
-
-- **Hooks Isolation (`useCalendar.test.ts`)** — Validates timezone-aware date calculations, `displayTimezone` propagation, and calendar navigation using `vi.useFakeTimers()`.
-- **Component UI Nodes (`BaseCalendar.test.tsx`)** — Tests presentational components with timezone context and error states inside `<MantineProvider>`.
-- **Network API Clients (`settings.test.ts`)** — Verifies error handling, serialization, and proper error propagation from API layer.
-
-## Implemented Improvements (Post Take-home Feedback)
-
-- Full **Display Timezone** support using `date-fns-tz` (user can choose their preferred timezone)
-- Comprehensive **error handling**: No more silent failures. Clear UI messages, retry buttons, and global error handler.
-- `QueryClient` configured with `staleTime`, retry logic, and global `onError`
-- Replaced generic "ERR" with descriptive messages ("NO MARKET DATA", "PRICING ERROR")
-- Improved API layer to throw meaningful errors instead of returning `null`
-
-## Possible Improvements
-
-- Persist `selectedRoomId`, `locale`, and `displayTimezone` in URL or localStorage
-- Add unit tests for pure functions (`getRoomSelectOptions`, `getCurrencyFromLocale`)
-- Document the `renderDay` prop contract in `BaseCalendar`
-- Extract `PricingCalendar` state into a dedicated `useCalendarDate` hook
-- Add visual indicator when user timezone differs from hotel timezone
-
-## Getting Started
-
-**Prerequisites**: Node.js + pnpm
+Prerequisites: Node 26 and pnpm 12.9.1.
 
 ```bash
 pnpm install
 pnpm dev
 ```
 
-## Available Scripts
+The Start playground runs on port `3000`. To run the independent headless SPA on port `3001`:
+
+```bash
+pnpm dev:demo
+```
+
+## Available scripts
 
 | Script | Description |
-|--------|-------------|
-| `pnpm dev` | Start development server (Vinxi) |
+|---|---|
+| `pnpm dev` | Start the TanStack Start playground |
+| `pnpm dev:demo` | Start the headless Vite demo |
+| `pnpm build` | Build both apps |
+| `pnpm start` | Preview the playground build |
+| `pnpm start:demo` | Preview the headless demo build |
 | `pnpm lint` | Run Biome checks |
-| `pnpm lint:fix` | Auto-fix formatting and imports |
-| `pnpm typecheck` | Run TypeScript type checking |
-| `pnpm test` | Run Tests |
-  
+| `pnpm lint:fix` | Apply Biome fixes |
+| `pnpm typecheck` | Type-check the workspace and both apps |
+| `pnpm test` | Run Vitest in watch mode |
+| `pnpm test:run` | Run Vitest once |
+
+## Verification
+
+```bash
+pnpm lint
+pnpm typecheck
+pnpm test:run
+pnpm build
+```
+
+The same commands run in CI on pushes and pull requests to `main`.
+
+## Documentation
+
+- [Integration guide](docs/integration.md)
+- [Architecture decision records](docs/adr/0001-headless-backend-driven-direction.md)
+- [Repository audit](docs/repository-audit.md) — historical pre-migration snapshot
+
 ## License
 
 MIT — Christian Torrealba
