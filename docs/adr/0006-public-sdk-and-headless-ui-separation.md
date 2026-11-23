@@ -31,7 +31,7 @@ The new workspace package `packages/react` exposes:
 
 - `@hpc/pricing-calendar` — client provider, query hooks and headless primitives.
 - `@hpc/pricing-calendar/headless` — selectors and `usePricingCalendar` with no Mantine imports.
-- `@hpc/pricing-calendar/ui` — reserved for Mantine components in Stage 6.
+- `@hpc/pricing-calendar/ui` — Mantine-based ready-to-use UI; Mantine is an optional peer.
 - `@hpc/pricing-calendar/contracts` — re-export of `@hpc/contracts`.
 
 `createPricingClient(config)` accepts `baseUrl`, `propertyId`, an optional injected `fetch`, async `headers`, and `credentials`. It builds paths from `apiPaths`, validates requests and responses with the Zod schemas, sends `x-property-id`, and maps API errors to `PricingApiError`.
@@ -42,7 +42,7 @@ Query hooks use stable factories from `pricingKeys`. `useSettings` and `usePrice
 
 ### Justification
 
-Separate exports make it possible to embed logic-only hooks without paying for Mantine, while still offering a batteries-included UI later. Injected transport keeps the SDK framework-agnostic and testable. The write path satisfies the headless rule: pending state is UI information; the returned day is backend truth.
+Separate exports make it possible to embed logic-only hooks without paying for Mantine, while still offering a batteries-included UI. Injected transport keeps the SDK framework-agnostic and testable. The write path satisfies the headless rule: pending state is UI information; the returned day is backend truth.
 
 ## Consequences
 
@@ -63,7 +63,7 @@ Separate exports make it possible to embed logic-only hooks without paying for M
 
 - `pnpm lint`, `pnpm typecheck`, `pnpm test:run` and `pnpm build` pass.
 - 8 test files and 37 tests pass, including injected fetch/headers, abort signal, contract validation, API error mapping, pending writes, canonical cache replacement and headless selectors.
-- No code in `packages/react` imports `vinxi`, `@mantine/*` or a hard-coded `/api` path.
+- Client and headless entry points import neither `vinxi`, `@mantine/*` nor a hard-coded `/api` path. Mantine is confined to `./ui`.
 
 ## Links
 

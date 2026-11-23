@@ -1,6 +1,6 @@
 # Memory
 
-Last updated: Stage 10 (documentation and CI finalization in progress).
+Last updated: Stage 10 complete (`48ef608`).
 
 ## Project goal
 
@@ -102,7 +102,7 @@ Important contract rules:
 | 7 | `feat/add-contextual-pricing-indicators` | Complete and merged to `main` (`55b3bba`) | Backend-only indicators rendered accessibly |
 | 8 | `refactor/move-playground-to-start` | Complete and merged to `main` (`2fce3d6`) | Start playground, SSR, per-request QueryClient, fixture routes, ADR-0007 |
 | 9 | `feat/add-headless-demo-app` | Complete and merged to `main` (`7c2ea3e`) | Separate Vite SPA, independent tokens, injected fixture fetch, deterministic PATCH state |
-| 10 | `docs/finalize-guides` | In progress — awaiting review | English README, integration examples, complete CI, final branding cleanup |
+| 10 | `docs/finalize-guides` | Complete and merged to `main` (`48ef608`) | English README, integration examples, complete CI, final branding cleanup |
 
 ## ADR index
 
@@ -300,7 +300,7 @@ Important contract rules:
 2. Committed on `feat/add-headless-demo-app` (`7c2ea3e`), fast-forwarded `main`, and created `docs/finalize-guides`.
 3. Stage 10 started from the merged headless demo.
 
-## Stage 10 (current) — Documentation and CI finalization
+## Stage 10 — Documentation and CI finalization
 
 ### Implemented
 
@@ -318,8 +318,8 @@ Important contract rules:
 - `pnpm install --frozen-lockfile` passes after dependency cleanup; CI uses the same install mode.
 - Live user-facing docs and app code contain no legacy brand names; historical ADRs remain intentional decision records.
 
-### Next actions
+### Outcome
 
-1. Review the Stage 10 diff after verification.
-2. After approval, commit on `docs/finalize-guides` and fast-forward `main`.
+1. Reviewed and approved the Stage 10 diff.
+2. Committed on `docs/finalize-guides` (`48ef608`) and fast-forwarded `main`.
 3. Project closure: no further stages are planned.
