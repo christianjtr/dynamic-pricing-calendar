@@ -1,6 +1,6 @@
 # ADR-0002: TanStack Start in reference apps only; fixture server for local development
 
-- **Status**: Accepted
+- **Status**: Partially superseded by [ADR-0007](./0007-playground-start-ssr-and-query-boundaries.md) for the fixture runtime; otherwise Accepted
 - **Date**: 2026-11-23
 - **Deciders**: project owner, implementation agent
 
@@ -30,7 +30,7 @@ Chosen option: **2**.
 
 - `apps/playground` is a TanStack Start application and the main reference integration. It may use SSR and file-based routing, but it consumes the public SDK exactly as a third-party application would.
 - `apps/headless-demo` is a plain Vite SPA with its own presentation and tokens, proving that neither Start nor Mantine leaks into the headless contract.
-- `apps/api` keeps the current Vinxi/Nitro HTTP runtime and becomes a deterministic fixture server. It serves fixed responses that conform to `packages/contracts` and implements no business logic, no random price generation and no rule evaluation.
+- `apps/api` originally kept the Vinxi/Nitro HTTP runtime as a deterministic fixture server. Stage 8 supersedes this hosting choice; ADR-0007 moves the fixture endpoints into Start server routes while keeping the same no-business-logic rule.
 - The runtime baseline is Node.js 26 LTS with pnpm pinned; TypeScript 7 adoption is gated by the compatibility check in ADR-0003.
 
 ### Justification
@@ -55,7 +55,7 @@ The SDK remains portable because neither app framework is imported by `packages/
 
 - `packages/react` has no dependency on `@tanstack/react-start`.
 - `apps/headless-demo` has no dependency on `@mantine/*` or `@tanstack/react-start`.
-- `apps/api` contains no threshold, pricing formula or random data generation; responses are static fixtures validated against the shared schemas.
+- Fixture endpoints contain no threshold, pricing formula or random data generation; responses are static fixtures validated against the shared schemas.
 - Both apps consume the same SDK entry points and property context.
 
 ## Links

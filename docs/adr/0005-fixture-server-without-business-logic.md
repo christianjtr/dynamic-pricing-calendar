@@ -1,6 +1,6 @@
 # ADR-0005: Fixture server without business logic
 
-- **Status**: Accepted
+- **Status**: Partially superseded by [ADR-0007](./0007-playground-start-ssr-and-query-boundaries.md) for runtime hosting; no-business-logic rule remains Accepted
 - **Date**: 2026-11-23
 - **Deciders**: project owner, implementation agent
 
@@ -28,9 +28,9 @@ Chosen option: **Option 3**, because static fixtures cannot silently reintroduce
 
 The server is split into:
 
-- `api/fixtures.ts` — explicit settings, room, day and canonical-update fixtures. A small `day()` helper only assembles static values; it does not compute them.
-- `api/router.ts` — a pure function that maps path, method, query and body to a status and contract-shaped body. It only filters by room and date range.
-- `api/index.ts` — a thin Vinxi `eventHandler` adapter that reads the URL/body, calls the router and sets the response status.
+- `apps/playground/src/fixtures/fixtures.ts` — explicit settings, room, day and canonical-update fixtures. A small `day()` helper only assembles static values; it does not compute them.
+- `apps/playground/src/fixtures/router.ts` — a pure function that maps path, method, query and body to a status and contract-shaped body. It only filters by room and date range.
+- `apps/playground/src/routes/api/*.ts` — thin Start server route adapters that read the URL/body, call the router and return the response.
 
 The fixture range is seven days (`2026-11-23` to `2026-11-29`) for three rooms, including auto, manual, closed, restricted, sold-out and error days. `PATCH /prices/:roomId/:date` validates the request and returns a precomputed canonical day; the requested price is never echoed back as truth.
 

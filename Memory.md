@@ -1,6 +1,6 @@
 # Memory
 
-Last updated: Stage 7 (Contextual pricing indicators in progress).
+Last updated: Stage 8 (TanStack Start playground in progress).
 
 ## Project goal
 
@@ -12,7 +12,7 @@ Backend author: project owner. Product owner instruction: “toda la lógica se 
 
 1. Backend is the single source of truth for all pricing logic and data shape.
 2. Frontend must not implement fallback pricing logic, random generation, business thresholds or optimistic local business decisions.
-3. Vinxi/Nitro remains only as the temporary local fixture server, ADR-0002 / ADR-0005.
+3. Vinxi/Nitro has been removed; deterministic fixture endpoints live only in the Start playground server routes, ADR-0005 / ADR-0007.
 4. React SDK will be framework-agnostic; TanStack Start exists only in the playground, ADR-0002 / ADR-0007.
 5. `@tanstack/react-query` is the client cache/write layer.
 6. Zod is the runtime validator, centralized in `@hpc/contracts`, ADR-0004.
@@ -23,7 +23,7 @@ Backend author: project owner. Product owner instruction: “toda la lógica se 
 11. Wallet/auth, tenant and property context are injected by the consuming app; `propertyId` identifies context but never authorizes. ADR-0009.
 12. All legacy branding references will disappear as stages progress.
 13. Fixture server serves explicit static data only; it never derives prices or computes business rules, ADR-0005.
-14. The published SDK must consume the external backend directly through TanStack Query and `@hpc/contracts`; it must never call or depend on the local Vinxi fixture server.
+14. The published SDK must consume the external backend directly through TanStack Query and `@hpc/contracts`; it must never call or depend on the local fixture endpoints.
 
 ## Toolchain baseline
 
@@ -31,8 +31,9 @@ Backend author: project owner. Product owner instruction: “toda la lógica se 
 - pnpm: `12.9.1`. Workspace config lives in `pnpm-workspace.yaml`; the `pnpm` field in `package.json` is ignored by pnpm 12.
 - pnpm config: `allowBuilds` plus `minimumReleaseAgeExclude` entries for TanStack packages were auto-added by pnpm; keep them unless intentionally updated.
 - Versions installed: React `19.3.1`, Vite `8.3.8`, Mantine `9.8.2`, TypeScript `7.0.2`, TanStack Query `5.108.4`, Zod `4.6.7`, date-fns `4.4.0`, Biome `2.6.8`, Vitest `5.1.1`.
-- `vite: ^8.3.8` is pinned via pnpm overrides; legacy Vinxi peer metadata still mentions older Vite ranges, but `pnpm dev` already served API routes successfully on Vite 8.
-- `tsconfig.json` uses `skipLibCheck: true` due to optional peer declarations in Vinxi/Nitro.
+- `vite: ^8.3.8` is pinned via pnpm overrides and drives the Start playground build.
+- Installed Start packages: `@tanstack/react-start 1.169.7`, `@tanstack/react-router 1.170.46`, `@tanstack/react-router-ssr-query 1.167.3`.
+- TypeScript 7 checks CSS side-effect imports by default; `declare module "*.css" {}` is required in each TS project that imports stylesheets.
 - Biome 2: `organizeImports` moved under `assist`; Markdown files are excluded from Biome with `!**/*.md`.
 - Vitest 5: `@/*` alias is configured via `resolve.alias` using `fileURLToPath(new URL('./client/src', import.meta.url))`.
 - `package.json` has `"type": "module"` and a `test:run` script (`vitest run`).
@@ -41,8 +42,7 @@ Backend author: project owner. Product owner instruction: “toda la lógica se 
 
 ```text
 apps/
-  api/                 # Vinxi/Nitro fixture server (contract-serving only)
-  playground/          # TanStack Start reference app, SSR, per-request QueryClient
+  playground/          # TanStack Start reference app, SSR, per-request QueryClient, fixture routes
   headless-demo/       # Vite SPA, independent tokens, no Mantine/Start
 packages/
   contracts/           # Zod schemas + inferred types for external API
@@ -99,8 +99,8 @@ Important contract rules:
 | 4 | `feat/add-fixture-api-server` | Complete and merged to `main` (`eb60557`) | Static fixtures, pure router, thin Vinxi adapter, ADR-0005 |
 | 5 | `feat/build-react-sdk-core` | Complete and merged to `main` (`25292ef`) | `@hpc/pricing-calendar` client, headless selectors/hooks, injected fetch/auth, ADR-0006 |
 | 6 | `feat/build-mantine-ui` | Complete and merged to `main` (`881fde6`) | Tokens, rooms × dates matrix, contextual panel, ADR-0008 and ADR-0009 |
-| 7 | `feat/add-contextual-pricing-indicators` | In progress — awaiting review | Render backend restrictions, closed dates, manual price, occupancy accessibly |
-| 8 | `refactor/move-playground-to-start` | Pending | Start playground, SSR, per-request QueryClient, ADR-0007 |
+| 7 | `feat/add-contextual-pricing-indicators` | Complete and merged to `main` (`55b3bba`) | Backend-only indicators rendered accessibly |
+| 8 | `refactor/move-playground-to-start` | In progress — awaiting review | Start playground, SSR, per-request QueryClient, fixture routes, ADR-0007 |
 | 9 | `feat/add-headless-demo-app` | Pending | Separate Vite SPA with independent tokens |
 | 10 | `docs/finalize-guides` | Pending | English README, integration examples, complete CI, closure |
 
@@ -112,7 +112,7 @@ Important contract rules:
 - [ADR-0004](docs/adr/0004-external-api-contracts.md) — External API contracts. Accepted.
 - [ADR-0005](docs/adr/0005-fixture-server-without-business-logic.md) — Fixture server without business logic. Accepted.
 - [ADR-0006](docs/adr/0006-public-sdk-and-headless-ui-separation.md) — Public SDK and headless/UI separation. Accepted.
-- ADR-0007 — Playground Start SSR and query boundaries. Planned for Stage 8.
+- [ADR-0007](docs/adr/0007-playground-start-ssr-and-query-boundaries.md) — Playground Start SSR and query boundaries. Accepted.
 - [ADR-0008](docs/adr/0008-neutral-and-overridable-ui-tokens.md) — Neutral and overridable UI tokens. Accepted.
 - [ADR-0009](docs/adr/0009-backend-and-property-context-injection.md) — Backend and property context injection. Accepted.
 
@@ -154,7 +154,7 @@ Important contract rules:
 - `pnpm-lock.yaml` is committed and is part of the implementation, not an artifact.
 - Node 26 is mandatory; CI must use the same major version.
 - `pnpm lint`, `pnpm typecheck`, `pnpm test:run`, `pnpm build` are the canonical checks.
-- `pnpm build` runs `vinxi build`, which remains the legacy Vite/Vinxi validation until Stage 8.
+- `pnpm build` delegates to the playground's Vite production build.
 - pnpm 12 overrides are necessary to keep transitive dev server deps aligned with Vite 8.
 - Markdown files must be excluded from Biome until the docs are migrated to a formatter-compatible style.
 
@@ -241,8 +241,35 @@ Important contract rules:
 - `pnpm lint`, `pnpm typecheck`, `pnpm test:run` and `pnpm build` pass on `feat/add-contextual-pricing-indicators`.
 - 12 test files and 50 tests pass, including backend-only indicator labels, restrictions, occupancy, closed dates and accessible day names.
 
+### Outcome
+
+1. Reviewed and approved the Stage 7 diff.
+2. Committed on `feat/add-contextual-pricing-indicators` (`55b3bba`), fast-forwarded `main`, and created `refactor/move-playground-to-start`.
+3. Stage 8 started from the merged UI with indicators.
+
+## Stage 8 (current) — TanStack Start playground
+
+### Implemented
+
+- Added `apps/playground` as `@hpc/playground` with TanStack Start, Vite 8 and file-based routes.
+- `src/router.tsx` creates one `QueryClient` inside `getRouter()` and wires `setupRouterSsrQueryIntegration` for SSR dehydration/hydration.
+- `src/routes/__root.tsx` provides the SSR document, Mantine stylesheet and playground stylesheet.
+- `src/routes/index.tsx` derives an absolute API base URL from the SSR request origin, prefetches settings and prices into the per-request QueryClient, then renders the public SDK providers and `PricingCalendar`.
+- Moved static fixtures and the pure router from `api/` to `apps/playground/src/fixtures/`.
+- Replaced the Vinxi adapter with Start server routes for `GET /api/settings`, `GET /api/prices` and `PATCH /api/prices/:roomId/:date`.
+- Removed root Vinxi/Nitro config, root SPA entry, legacy client, Tailwind/PostCSS config and Vinxi dependencies.
+- Root `dev`, `build` and `start` scripts now delegate to `@hpc/playground`.
+- Added ADR-0007 and marked the runtime-hosting portions of ADR-0002 and ADR-0005 as superseded.
+
+### Verification
+
+- `pnpm lint`, `pnpm typecheck`, `pnpm test:run` and `pnpm build` pass.
+- 9 test files and 39 tests pass after removing legacy client tests.
+- Smoke checks passed for SSR `/`, contract-valid `GET /api/settings`, filtered `GET /api/prices`, canonical `PATCH /api/prices/:roomId/:date`.
+- No Vinxi/Nitro imports or scripts remain in source/config files.
+
 ### Next actions
 
-1. Review the Stage 7 diff after verification.
-2. After approval, commit on `feat/add-contextual-pricing-indicators`, fast-forward `main`, and create `refactor/move-playground-to-start`.
-3. Stage 8: replace the Vinxi client app with a TanStack Start playground, per-request QueryClient and ADR-0007; remove the temporary fixture runtime.
+1. Review the Stage 8 diff after verification.
+2. After approval, commit on `refactor/move-playground-to-start`, fast-forward `main`, and create `feat/add-headless-demo-app`.
+3. Stage 9: add the separate Vite SPA with independent presentation and tokens.

@@ -3,18 +3,19 @@
 	"version": "1.0.0",
 	"type": "module",
 	"scripts": {
-		"dev": "vinxi dev",
-		"build": "vinxi build",
+		"dev": "pnpm --filter @hpc/playground dev",
+		"build": "pnpm --filter @hpc/playground build",
+		"start": "pnpm --filter @hpc/playground start",
 		"lint": "biome check .",
 		"lint:fix": "biome check --write .",
-		"typecheck": "tsc --noEmit",
+		"typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p apps/playground/tsconfig.json",
 		"test": "vitest",
 		"test:run": "vitest run"
 	},
 	"author": "Christian Torrealba",
 	"packageManager": "pnpm@12.9.1",
 	"license": "MIT",
-	"description": "RoomPriceGenie SaaS Revenue Management System Pricing Calendar simulation with React, TypeScript, and TanStack Query.",
+	"description": "Headless pricing calendar SDK and TanStack Start reference playground.",
 	"engines": {
 		"node": ">=26.0.0 <27.0.0",
 		"pnpm": ">=12.9.1 <13.0.0"
@@ -23,18 +24,10 @@
 		"@hpc/contracts": "workspace:*",
 		"@mantine/core": "^9.8.2",
 		"@mantine/hooks": "^9.8.2",
-		"@tabler/icons-react": "^3.52.0",
 		"@tanstack/react-query": "^5.108.4",
 		"@tanstack/react-query-devtools": "^5.108.4",
-		"@vinxi/react": "^0.2.5",
-		"@vitejs/plugin-react": "^6.3.0",
-		"date-fns": "^4.4.0",
-		"date-fns-tz": "^3.2.0",
-		"es-toolkit": "^1.53.2",
 		"react": "^19.3.1",
 		"react-dom": "^19.3.1",
-		"react-error-boundary": "^6.1.2",
-		"vinxi": "^0.4.3",
 		"zod": "^4.6.7"
 	},
 	"devDependencies": {
@@ -44,14 +37,8 @@
 		"@types/node": "^26.6.6",
 		"@types/react": "^19.3.0",
 		"@types/react-dom": "^19.3.0",
-		"autoprefixer": "^10.7.0",
 		"jsdom": "^31.0.1",
-		"postcss": "^8.5.33",
-		"postcss-preset-mantine": "^1.18.0",
-		"postcss-simple-vars": "^7.0.1",
-		"tailwindcss": "^3.4.19",
 		"typescript": "^7.0.2",
-		"vite-tsconfig-paths": "^6.1.1",
 		"vitest": "^5.1.1"
 	}
 }

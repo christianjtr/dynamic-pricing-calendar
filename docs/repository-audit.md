@@ -89,8 +89,7 @@ References: [Vite library mode](https://vite.dev/guide/build#library-mode), [pnp
 ```text
 dynamic-pricing-calendar/
 ├── apps/
-│   ├── api/                     # deterministic fixture server, existing runtime, no business logic
-│   ├── playground/              # TanStack Start reference app (SSR)
+│   ├── playground/              # TanStack Start reference app (SSR) and local fixture routes
 │   └── headless-demo/           # Vite SPA, second presentation, own tokens
 ├── packages/
 │   ├── contracts/               # Zod schemas for the external API
@@ -117,7 +116,7 @@ Public exports: `.` (ready-to-use), `./headless`, `./ui`, `./contracts`. React, 
 | 5 | `feat/build-react-sdk-core` | Client and headless hooks, injected auth, pending/refetch writes, ADR-0006 |
 | 6 | `feat/build-mantine-ui` | Tokens, rooms × dates matrix, contextual edit panel, base indicators, ADR-0008 and ADR-0009 |
 | 7 | `feat/add-contextual-pricing-indicators` | Render backend-provided restrictions, closed dates, manual price and occupancy accessibly |
-| 8 | `refactor/move-playground-to-start` | Start playground with SSR and per-request QueryClient, ADR-0007 |
+| 8 | `refactor/move-playground-to-start` | Start playground with SSR, per-request QueryClient, fixture server routes and ADR-0007; removes Vinxi |
 | 9 | `feat/add-headless-demo-app` | Separate Vite SPA with independent presentation and tokens |
 | 10 | `docs/finalize-guides` | English README and integration examples, complete CI, Memory.md closure |
 

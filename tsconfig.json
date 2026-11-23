@@ -3,23 +3,18 @@
 		"target": "ESNext",
 		"module": "ESNext",
 		"moduleResolution": "bundler",
+		"allowArbitraryExtensions": true,
 		"allowSyntheticDefaultImports": true,
 		"esModuleInterop": true,
 		"jsx": "react-jsx",
-		"allowJs": true,
-		"checkJs": true,
 		"noEmit": true,
-		"types": ["vinxi/client"],
+		"types": ["node"],
 		"isolatedModules": true,
 		"skipLibCheck": true,
 		"strict": true,
 		"strictNullChecks": true,
 		"noImplicitAny": true,
-		"noUncheckedIndexedAccess": true,
-		"paths": {
-			"@shared/types": ["./shared/types"],
-			"@shared/types/*": ["./shared/types/*"],
-			"@/*": ["./client/src/*"]
-		}
-	}
+		"noUncheckedIndexedAccess": true
+	},
+	"include": ["packages/**/*.ts", "packages/**/*.tsx", "*.ts"]
 }
