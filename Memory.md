@@ -2,7 +2,7 @@
 
 Living record of project decisions. Inspired by the Architecture Decision Records in [`docs/adr`](docs/adr), but intentionally shorter: this file answers "what is currently true and why" without replacing the ADRs. All project documentation is written in English.
 
-Last updated: 2026-11-23 — Stage 1 (baseline stabilization).
+Last updated: 2026-11-23 — Stage 2 (toolchain upgrade).
 
 ## Product direction
 
@@ -28,11 +28,11 @@ A lightweight, developer-friendly, **headless pricing calendar**. The external b
 
 ## Toolchain targets
 
-Node.js 26 LTS (installed locally and pinned in `engines`, `.nvmrc` and CI) · pnpm 12 with a committed lockfile and `packageManager` · TypeScript 7.x (native compiler; compatibility spike required) · React 19.3 · Vite 8.x · Mantine 9.x (optional, UI package only) · TanStack Query 5.x · Zod 4.x · date-fns 4.x · Biome 2.6.x · Vitest 5.1.x.
+Node.js 26.13.1 is installed locally and pinned in `engines`, `.nvmrc` and CI · pnpm 12.9.1 via `packageManager`, with a committed lockfile · TypeScript 7.0.2 (native compiler) · React 19.3.1 · Vite 8.3.8 · Mantine 9.8.2 (optional, UI package only) · TanStack Query 5.108.4 · Zod 4.6.7 · date-fns 4.4.0 · Biome 2.6.8 · Vitest 5.1.1.
 
-No bulk dependency upgrade before the baseline is green. Compatibility is validated in Stage 2 and recorded in ADR-0003.
+No bulk dependency upgrade before the baseline is green. Compatibility was validated in Stage 2 and recorded in [ADR-0003](docs/adr/0003-toolchain-compatibility-and-upgrade-order.md).
 
-Baseline note: `skipLibCheck: true` is required at TypeScript 6 because Vinxi/Nitro declarations reference optional peer types.
+Baseline note: `skipLibCheck: true` is required with TypeScript 7 because Vinxi/Nitro declarations reference optional peer types. Markdown is excluded from Biome formatting.
 
 ## ADR index
 
@@ -40,7 +40,7 @@ Baseline note: `skipLibCheck: true` is required at TypeScript 6 because Vinxi/Ni
 |-----|-------|--------|
 | [0001](docs/adr/0001-headless-backend-driven-direction.md) | Headless Pricing Calendar with externally computed business logic | Accepted |
 | [0002](docs/adr/0002-start-and-fixture-runtime-boundaries.md) | TanStack Start in reference apps only; fixture server runtime | Accepted |
-| 0003 | Toolchain compatibility and upgrade order | Planned — Stage 2 |
+| [0003](docs/adr/0003-toolchain-compatibility-and-upgrade-order.md) | Toolchain compatibility and upgrade order | Accepted |
 | 0004 | External API contracts | Planned — Stage 3 |
 | 0005 | Fixture server without business logic | Planned — Stage 4 |
 | 0006 | React SDK core and injected authentication | Planned — Stage 5 |
@@ -62,8 +62,8 @@ Baseline note: `skipLibCheck: true` is required at TypeScript 6 because Vinxi/Ni
 | Stage | Branch | Status |
 |-------|--------|--------|
 | 0 | `docs/add-architecture-audit` | Complete — merged to `main` |
-| 1 | `test/stabilize-baseline` | In progress — awaiting review |
-| 2 | `chore/upgrade-toolchain` | Pending |
+| 1 | `test/stabilize-baseline` | Complete — merged to `main` |
+| 2 | `chore/upgrade-toolchain` | In progress — awaiting review |
 | 3 | `feat/create-contracts-package` | Pending |
 | 4 | `feat/add-fixture-api-server` | Pending |
 | 5 | `feat/build-react-sdk-core` | Pending |

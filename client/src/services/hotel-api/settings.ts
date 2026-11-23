@@ -1,8 +1,8 @@
+import { z } from "zod";
 import {
 	type HotelSettings,
 	HotelSettingsResponseSchema,
 } from "@/types/HotelSettings";
-import { z } from "zod";
 
 export const getSettings = async (
 	signal?: AbortSignal,

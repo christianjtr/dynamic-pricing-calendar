@@ -1,5 +1,5 @@
-import { BRAND_COLORS } from "@/theme/tokens";
 import { LoadingOverlay } from "@mantine/core";
+import { BRAND_COLORS } from "@/theme/tokens";
 
 interface CalendarLoadingOverlayProps {
 	isLoading: boolean;

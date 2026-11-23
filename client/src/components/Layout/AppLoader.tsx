@@ -1,10 +1,10 @@
-import { BRAND_COLORS } from "@/theme";
 import {
 	Center,
 	Loader,
 	type MantineLoader,
 	type MantineSize,
 } from "@mantine/core";
+import { BRAND_COLORS } from "@/theme";
 
 interface AppLoaderProps {
 	height?: string | number;

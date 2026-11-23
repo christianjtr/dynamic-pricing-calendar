@@ -1,6 +1,3 @@
-import { useHotelSettingsContext } from "@/context/HotelSettingsContext";
-import { BRAND_COLORS } from "@/theme";
-import type { DayPriceItem } from "@/types/Pricing";
 import { Badge, Flex, Group, Stack, Text, Tooltip } from "@mantine/core";
 import {
 	IconAlertTriangle,
@@ -10,6 +7,9 @@ import {
 	IconCalendarOff,
 	IconDatabase,
 } from "@tabler/icons-react";
+import { useHotelSettingsContext } from "@/context/HotelSettingsContext";
+import { BRAND_COLORS } from "@/theme";
+import type { DayPriceItem } from "@/types/Pricing";
 import { computeDayRatesBusinessState } from "../services/rateComputations";
 
 interface CalendarDayRatesProps {

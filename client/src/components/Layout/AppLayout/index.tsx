@@ -1,4 +1,3 @@
-import { layoutTokens } from "@/theme";
 import {
 	AppShell,
 	Box,
@@ -9,6 +8,7 @@ import {
 	Text,
 	Title,
 } from "@mantine/core";
+import { layoutTokens } from "@/theme";
 import { SettingsPanel } from "../SettingsPanel";
 import { RoomPriceGenieLogo } from "./components/RoomPriceGenieLogo";
 

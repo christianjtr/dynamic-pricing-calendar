@@ -1,6 +1,3 @@
-import { useHotelSettingsContext } from "@/context/HotelSettingsContext";
-import { useCalendar } from "@/hooks/useCalendar";
-import { getDateMetadata } from "@/utils/date";
 import {
 	ActionIcon,
 	Box,
@@ -14,6 +11,9 @@ import {
 	Tooltip,
 } from "@mantine/core";
 import { IconChevronLeft, IconChevronRight } from "@tabler/icons-react";
+import { useHotelSettingsContext } from "@/context/HotelSettingsContext";
+import { useCalendar } from "@/hooks/useCalendar";
+import { getDateMetadata } from "@/utils/date";
 import { CalendarCell } from "./components/CalendarCell";
 import { CalendarLoadingOverlay } from "./components/CalendarLoadingOverlay";
 

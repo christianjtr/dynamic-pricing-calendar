@@ -1,10 +1,9 @@
-import { useHotelSettingsContext } from "@/context/HotelSettingsContext";
-import { BRAND_COLORS } from "@/theme";
-import { getBrowserTimezone } from "@/utils/browserAPI";
-import { SUPPORTED_LOCALES } from "@/utils/browserAPI";
 import { Button, Divider, Popover, Select, Stack, Text } from "@mantine/core";
 import { IconBuildingCog } from "@tabler/icons-react";
 import { useState } from "react";
+import { useHotelSettingsContext } from "@/context/HotelSettingsContext";
+import { BRAND_COLORS } from "@/theme";
+import { getBrowserTimezone, SUPPORTED_LOCALES } from "@/utils/browserAPI";
 
 export const SettingsPanel: React.FC = () => {
 	const {

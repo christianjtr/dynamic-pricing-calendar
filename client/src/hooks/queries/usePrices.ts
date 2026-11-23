@@ -1,7 +1,7 @@
+import { useQuery } from "@tanstack/react-query";
 import { getPrices } from "@/services/hotel-api/prices";
 import type { DayPriceItem, PriceData } from "@/types/Pricing";
 import { getDateMetadata, isSameMonthAndYear } from "@/utils/date";
-import { useQuery } from "@tanstack/react-query";
 
 interface UsePricesFilters {
 	locale: string;

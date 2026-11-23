@@ -1,11 +1,10 @@
 import { Alert, Button, Container, Stack, Text } from "@mantine/core";
 import { IconAlertTriangle } from "@tabler/icons-react";
-
-import { BRAND_COLORS } from "@/theme";
 import {
 	type FallbackProps,
 	ErrorBoundary as ReactErrorBoundary,
 } from "react-error-boundary";
+import { BRAND_COLORS } from "@/theme";
 
 const ErrorFallback: React.FC<FallbackProps> = ({
 	error,

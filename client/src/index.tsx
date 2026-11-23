@@ -3,15 +3,14 @@ import ReactDOM from "react-dom/client";
 
 import "@mantine/core/styles.css";
 
-import { Alert, Button, Container, Text } from "@mantine/core";
-import { MantineProvider } from "@mantine/core";
+import { Alert, Button, Container, MantineProvider, Text } from "@mantine/core";
 import { IconAlertTriangle } from "@tabler/icons-react";
 import {
 	QueryCache,
 	QueryClient,
 	QueryClientProvider,
 } from "@tanstack/react-query";
-import { Suspense, lazy } from "react";
+import { lazy, Suspense } from "react";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import { AppLayout } from "./components/Layout/AppLayout";
 import { AppLoader } from "./components/Layout/AppLoader";

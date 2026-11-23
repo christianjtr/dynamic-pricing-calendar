@@ -1,7 +1,7 @@
+import { createContext, useContext, useMemo, useState } from "react";
 import type { HotelSettings } from "@/types/HotelSettings";
 import { getBrowserTimezone, getCurrencyFromLocale } from "@/utils/browserAPI";
 import { getRoomSelectOptions } from "@/utils/rooms";
-import { createContext, useContext, useMemo, useState } from "react";
 
 interface HotelSettingsContextType {
 	locale: string;

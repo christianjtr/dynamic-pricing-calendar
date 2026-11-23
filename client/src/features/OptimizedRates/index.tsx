@@ -1,7 +1,7 @@
-import { useHotelSettingsContext } from "@/context/HotelSettingsContext";
-import { BRAND_COLORS } from "@/theme";
 import { Badge, Container, Group, Stack, Text, Title } from "@mantine/core";
 import { IconBed } from "@tabler/icons-react";
+import { useHotelSettingsContext } from "@/context/HotelSettingsContext";
+import { BRAND_COLORS } from "@/theme";
 import { PricingCalendar } from "./components/PricingCalendar";
 
 export const OptimizedRatesDashboard: React.FC = () => {

@@ -1,6 +1,6 @@
+import { Card, Flex, rem, Text } from "@mantine/core";
 import { BRAND_COLORS } from "@/theme";
 import { getDateMetadata } from "@/utils/date";
-import { Card, Flex, Text, rem } from "@mantine/core";
 
 interface CalendarCellProps {
 	dateKey: string;

@@ -1,10 +1,10 @@
+import { Paper } from "@mantine/core";
+import { useMemo, useState } from "react";
 import { BaseCalendar } from "@/components/BaseCalendar";
 import { useHotelSettingsContext } from "@/context/HotelSettingsContext";
 import { usePrices } from "@/hooks/queries/usePrices";
 import { useCalendar } from "@/hooks/useCalendar";
 import { validateAndGetDate } from "@/utils/date";
-import { Paper } from "@mantine/core";
-import { useMemo, useState } from "react";
 import { CalendarDayRates } from "./CalendarDayRates";
 
 export const PricingCalendar: React.FC = () => {

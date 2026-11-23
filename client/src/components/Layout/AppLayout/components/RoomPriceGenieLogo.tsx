@@ -1,5 +1,5 @@
-import { layoutTokens } from "@/theme";
 import { Group } from "@mantine/core";
+import { layoutTokens } from "@/theme";
 
 export const RoomPriceGenieLogo = () => {
 	const { logo: BrandLogo } = layoutTokens;

@@ -1,5 +1,5 @@
-import type { HotelSettings } from "@/types/HotelSettings";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import type { HotelSettings } from "@/types/HotelSettings";
 import { getSettings } from "./settings";
 
 const mockSettings: HotelSettings = {
