@@ -1,0 +1,74 @@
+# ADR-0006: Public SDK and headless/UI separation
+
+- **Status**: Accepted
+- **Date**: 2026-11-23
+- **Deciders**: project owner, implementation agent
+
+## Context and problem statement
+
+The legacy client hardcoded `/api` URLs, created a module-scope `QueryClient`, inferred currency from the browser locale and recalculated variance locally. That couples the product to the temporary Vinxi fixture server and violates ADR-0001. The published package must instead work with any external backend, validate every response with the fixed contracts, and leave presentation to a separate entry point.
+
+## Decision drivers
+
+- The external backend is the only source of pricing truth.
+- The SDK must never call the local fixture server or hardcode `/api`.
+- React Query state must be instance-scoped so SSR and multiple embedders can coexist.
+- `headless` primitives must not import Mantine or any UI implementation.
+- Consumers must inject base URL, fetch, credentials, headers and property context.
+- Writes must expose pending state and show only the canonical response returned by the backend.
+
+## Considered options
+
+1. Adapt the existing `client/src` services in place and publish that folder.
+2. Put transport, hooks and Mantine components in a single `@hpc/pricing-calendar` entry point.
+3. Create `@hpc/pricing-calendar` with separate `client`, `headless`, `ui` and `contracts` exports.
+
+## Decision outcome
+
+Chosen option: **Option 3**.
+
+The new workspace package `packages/react` exposes:
+
+- `@hpc/pricing-calendar` — client provider, query hooks and headless primitives.
+- `@hpc/pricing-calendar/headless` — selectors and `usePricingCalendar` with no Mantine imports.
+- `@hpc/pricing-calendar/ui` — reserved for Mantine components in Stage 6.
+- `@hpc/pricing-calendar/contracts` — re-export of `@hpc/contracts`.
+
+`createPricingClient(config)` accepts `baseUrl`, `propertyId`, an optional injected `fetch`, async `headers`, and `credentials`. It builds paths from `apiPaths`, validates requests and responses with the Zod schemas, sends `x-property-id`, and maps API errors to `PricingApiError`.
+
+`PricingCalendarProvider` owns or accepts a `QueryClient`; it never creates one at module scope. Consumers running SSR can pass a per-request instance.
+
+Query hooks use stable factories from `pricingKeys`. `useSettings` and `usePrices` are read-only. `useUpdatePrice` exposes TanStack Query's `isPending`, cancels in-flight price queries, snapshots caches, replaces only the canonical day returned by the backend, rolls back on error and invalidates price queries on settle. It never computes a local price.
+
+### Justification
+
+Separate exports make it possible to embed logic-only hooks without paying for Mantine, while still offering a batteries-included UI later. Injected transport keeps the SDK framework-agnostic and testable. The write path satisfies the headless rule: pending state is UI information; the returned day is backend truth.
+
+## Consequences
+
+### Positive
+
+- No SDK code depends on Vinxi, `/api`, the legacy `PriceData` shape or local variance math.
+- Currency, timezone, room metadata and day status all come from `@hpc/contracts`.
+- Contract validation happens at the HTTP boundary, so malformed backend data fails early.
+- SSR embedders can supply their own `QueryClient`.
+
+### Negative and mitigations
+
+- `./ui` is an empty barrel until Stage 6 — mitigation: documented as reserved; no consumer should import it yet.
+- The legacy UI still consumes `client/src` data — mitigation: Stages 6–7 replace it with the new SDK and headless selectors.
+- CI does not yet run `pnpm build` — mitigation: Stage 10 completes CI; local verification already runs it.
+
+## Compliance and verification
+
+- `pnpm lint`, `pnpm typecheck`, `pnpm test:run` and `pnpm build` pass.
+- 8 test files and 37 tests pass, including injected fetch/headers, abort signal, contract validation, API error mapping, pending writes, canonical cache replacement and headless selectors.
+- No code in `packages/react` imports `vinxi`, `@mantine/*` or a hard-coded `/api` path.
+
+## Links
+
+- [Memory](../Memory.md)
+- [ADR-0001](./0001-headless-backend-driven-direction.md)
+- [ADR-0004](./0004-external-api-contracts.md)
+- [ADR-0005](./0005-fixture-server-without-business-logic.md)
+- https://tanstack.com/query/latest/docs/framework/react/overview

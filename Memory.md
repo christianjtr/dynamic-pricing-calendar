@@ -1,6 +1,6 @@
 # Memory
 
-Last updated: Stage 4 (Fixture server implementation in progress).
+Last updated: Stage 5 (Public SDK implementation in progress).
 
 ## Project goal
 
@@ -84,7 +84,7 @@ Important contract rules:
 - `price: null`, `priceInPms: null`, `recommendedPrice: null` and `variance: null` are valid for closed/unavailable days.
 - `availability` includes `unavailable` in addition to `available`, `restricted` and `sold_out`.
 - Variance requires backend-provided `direction`, `severity` and display `label`; no frontend threshold.
-- `PricesQuerySchema` accepts `from`, `to` and `room`.
+- `PricesQuerySchema` accepts `from`, `to` and `rooms: string[]`; `apiPaths.prices` serializes rooms as repeated `room=` params.
 - `UpdatePriceRequestSchema` only accepts a non-negative `price`.
 - `apiPaths` is exported; handlers should use it instead of hard-coded strings.
 
@@ -96,8 +96,8 @@ Important contract rules:
 | 1 | `test/stabilize-baseline` | Complete and merged to `main` (`3a0ebd9`) | Fixed stale settings tests, added `test:run`, CI, lockfile |
 | 2 | `chore/upgrade-toolchain` | Complete and merged to `main` (`65d82bc`) | Node 26, Vite 8, React 19, Mantine 9, ADR-0003 |
 | 3 | `feat/create-contracts-package` | Complete and merged to `main` (`c6f29a8`) | `@hpc/contracts`, ADR-0004, docs refreshed, legacy audit language removed |
-| 4 | `feat/add-fixture-api-server` | In progress — awaiting review | Static fixtures, pure router, thin Vinxi adapter, ADR-0005 added, 27 tests pass |
-| 5 | `feat/build-react-sdk-core` | Pending | Client, headless hooks, injected auth, pending/refetch writes, ADR-0006 |
+| 4 | `feat/add-fixture-api-server` | Complete and merged to `main` (`eb60557`) | Static fixtures, pure router, thin Vinxi adapter, ADR-0005 |
+| 5 | `feat/build-react-sdk-core` | In progress — awaiting review | `@hpc/pricing-calendar` client, headless selectors/hooks, injected fetch/auth, ADR-0006 |
 | 6 | `feat/build-mantine-ui` | Pending | Tokens, rooms × dates matrix, contextual panel, ADR-0008 and ADR-0009 |
 | 7 | `feat/add-contextual-pricing-indicators` | Pending | Render backend restrictions, closed dates, manual price, occupancy accessibly |
 | 8 | `refactor/move-playground-to-start` | Pending | Start playground, SSR, per-request QueryClient, ADR-0007 |
@@ -111,12 +111,12 @@ Important contract rules:
 - [ADR-0003](docs/adr/0003-toolchain-compatibility-and-upgrade-order.md) — Toolchain compatibility and upgrade order. Accepted.
 - [ADR-0004](docs/adr/0004-external-api-contracts.md) — External API contracts. Accepted.
 - [ADR-0005](docs/adr/0005-fixture-server-without-business-logic.md) — Fixture server without business logic. Accepted.
-- ADR-0006 — Public SDK and headless/UI separation. Planned for Stage 5.
-- [ADR-0007](docs/adr/0007-playground-start-ssr-and-query-boundaries.md) — Playground Start SSR and query boundaries. Planned for Stage 8.
+- [ADR-0006](docs/adr/0006-public-sdk-and-headless-ui-separation.md) — Public SDK and headless/UI separation. Accepted.
+- ADR-0007 — Playground Start SSR and query boundaries. Planned for Stage 8.
 - ADR-0008 — Neutral theme tokens and overrides. Planned for Stage 6.
 - ADR-0009 — Auth/property injection. Planned for Stage 6.
 
-## Stage 4 (current) — discoveries and pending review
+## Stage 4 recap — fixture server
 
 ### Implemented
 
@@ -165,7 +165,7 @@ Important contract rules:
 - Tandem workflow: implement → verify → show diff → wait for approval → commit → fast-forward `main` → next branch.
 - The user often creates the commit themselves before approving the merge; always inspect `git status` and `git log --oneline -4` before merging.
 - No push unless explicitly requested.
-- Do not jump stages. Do not start Stage 5 until Stage 4 is committed and merged.
+- Do not jump stages. Do not start the next stage until the current one is committed and merged.
 - No comments in code unless asked.
 
 ## Stage 3 recap
@@ -175,8 +175,25 @@ Important contract rules:
 - Kept Vinxi as local fixture host only; no business logic was moved into contracts.
 - Verified with `pnpm install --frozen-lockfile`, `pnpm lint`, `pnpm typecheck`, `pnpm test:run`.
 
-## Stage 4 next actions
+## Stage 5 (current) — discoveries and pending review
 
-1. Review the fixture server diff.
-2. After approval, commit Stage 4 on `feat/add-fixture-api-server`, fast-forward `main`, and create `feat/build-react-sdk-core`.
-3. Stage 5: build `@hpc/pricing-calendar` client that calls the external backend directly through TanStack Query, using an injected base URL/fetch/auth and `@hpc/contracts` for validation; add query keys, pending writes, refetch-after-write and ADR-0006. Do not route SDK calls through Vinxi or `/api`.
+### Implemented
+
+- Created `packages/react` as `@hpc/pricing-calendar` with exports `.`, `./headless`, `./ui`, `./contracts`.
+- `client/client.ts`: `createPricingClient({ baseUrl, propertyId, fetch?, headers?, credentials? })` builds paths from `apiPaths`, validates with `@hpc/contracts`, sends `x-property-id`, maps API errors to `PricingApiError`, forwards abort signals and returns canonical backend data.
+- `client/provider.tsx`: `PricingCalendarProvider` accepts an optional per-request `QueryClient` and never creates one at module scope.
+- `client/queryKeys.ts`, `client/hooks.ts`: stable keys, `useSettings`, `usePrices`, `useUpdatePrice`.
+- Writes expose `isPending`, snapshot/cancel price queries, replace only the canonical day, roll back on error and invalidate on settle. No optimistic business recalculation.
+- `headless/selectors.ts` and `headless/usePricingCalendar.ts`: room/day selection without Mantine or UI imports.
+- `./ui` is an intentionally empty barrel reserved for Stage 6; Mantine is an optional peer.
+
+### Verification
+
+- `pnpm lint`, `pnpm typecheck`, `pnpm test:run` and `pnpm build` pass.
+- 8 test files and 37 tests pass, covering injected headers/fetch, abort signal, contract validation, error mapping, pending writes, canonical cache replacement and headless selectors.
+
+### Next actions
+
+1. Review the Stage 5 diff.
+2. After approval, commit on `feat/build-react-sdk-core`, fast-forward `main`, and create `feat/build-mantine-ui`.
+3. Stage 6: implement `./ui` tokens, rooms × dates matrix and contextual edit panel using `usePricingCalendar`; add ADR-0008 and ADR-0009.
