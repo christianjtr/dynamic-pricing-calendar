@@ -1,6 +1,6 @@
 # ADR-0004: External API contracts
 
-- **Status**: Accepted
+- **Status**: Superseded in part by [ADR-0010](./0010-openapi-canonical-api-contract.md) for the contract source format; domain shape remains accepted
 - **Date**: 2026-11-23
 - **Deciders**: project owner, implementation agent
 
@@ -26,7 +26,7 @@ The external backend owns every business decision, but its schema is not availab
 
 Chosen option: **Option 2**, because a new schema can express the backend-driven contract precisely without inheriting legacy ambiguities.
 
-`@hpc/contracts` is a private workspace package containing Zod schemas and inferred TypeScript types for:
+The original implementation placed the contract in a private `@hpc/contracts` workspace package containing Zod schemas and inferred TypeScript types for:
 
 - `GET /settings` — hotel timezone, locale, currency, rooms and date range.
 - `GET /prices?from=&to=&room=` — room/day arrays with canonical price, PMS price, recommended price, variance, status, availability, occupancy, restrictions, closed flag and precomputed errors.
@@ -34,6 +34,8 @@ Chosen option: **Option 2**, because a new schema can express the backend-driven
 - A generic API error envelope and a labelled `parseContract` helper.
 
 Paths are base-relative: the consumer supplies the base URL and credentials. The contract never handles authentication or authorization.
+
+The decision to use Zod as the canonical wire-contract source is superseded by ADR-0010. The endpoint and domain shapes remain the starting point for `packages/contracts/openapi.yaml`; Zod remains the SDK runtime validator and is to be generated from that OpenAPI document.
 
 ### Justification
 
@@ -43,7 +45,7 @@ The schema mirrors the product decision that the backend is the single source of
 
 ### Positive
 
-- Fixture server, SDK and demo apps share one typed source of truth.
+- Fixture server, SDK and demo apps share validated contract shapes; ADR-0010 makes OpenAPI the language-neutral source of truth.
 - Missing derived fields fail validation in tests and at runtime.
 - The package has no React, Mantine or Start dependency.
 - All new names are neutral; no legacy branding is introduced.
@@ -64,4 +66,5 @@ The schema mirrors the product decision that the backend is the single source of
 - [Memory](../Memory.md)
 - [ADR-0001](./0001-headless-backend-driven-direction.md)
 - [ADR-0003](./0003-toolchain-compatibility-and-upgrade-order.md)
+- [ADR-0010](./0010-openapi-canonical-api-contract.md)
 - https://zod.dev/?id=basic-usage

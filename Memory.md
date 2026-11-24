@@ -1,21 +1,21 @@
 # Memory
 
-Last updated: Stage 10 complete (`48ef608`).
+Last updated: Stage 11 in progress on `feat/publish-openapi-contract`; Stage 10 completed at `48ef608`.
 
 ## Project goal
 
-Transform `dynamic-pricing-calendar` into a **Headless Pricing Calendar**: a reusable React component library that displays prices computed by an external backend. This repository must not calculate prices, recommendations, variance, availability, occupancy, restrictions, closed dates, currency, timezone or validation. It only transports, validates, caches and renders backend data.
+Transform `dynamic-pricing-calendar` into a **Headless Pricing Calendar**: a reusable React component library that displays prices computed by an external backend. This repository must not calculate prices, recommendations, variance, availability, occupancy, restrictions, closed dates, currency or business validation. It transports, structurally validates, caches and renders backend data.
 
 Backend author: project owner. Product owner instruction: “toda la lógica se computa en un backend externo, nuestro producto sólo muestra la información”. UI team focus: product and presentation layer.
 
 ## Locked decisions (do not revisit without explicit approval)
 
-1. Backend is the single source of truth for all pricing logic and data shape.
+1. Backend is the single source of truth for pricing logic and values; `packages/contracts/openapi.yaml` is the canonical wire shape (ADR-0010).
 2. Frontend must not implement fallback pricing logic, random generation, business thresholds or optimistic local business decisions.
 3. Vinxi/Nitro has been removed; deterministic fixture endpoints live only in the Start playground server routes, ADR-0005 / ADR-0007.
 4. React SDK will be framework-agnostic; TanStack Start exists only in the playground, ADR-0002 / ADR-0007.
 5. `@tanstack/react-query` is the client cache/write layer.
-6. Zod is the runtime validator, centralized in `@hpc/contracts`, ADR-0004.
+6. OpenAPI 3.1.1 is the language-neutral API contract; Zod remains the SDK runtime validator and will be generated from OpenAPI, ADR-0010.
 7. Headless hooks and UI components must be in separate package exports, ADR-0006.
 8. Rooms × dates matrix is the base visualization; contextual panel edits one day.
 9. Manual prices, restrictions, closed dates and occupancy need non-color-only indicators from Stage 4 onward.
@@ -103,18 +103,20 @@ Important contract rules:
 | 8 | `refactor/move-playground-to-start` | Complete and merged to `main` (`2fce3d6`) | Start playground, SSR, per-request QueryClient, fixture routes, ADR-0007 |
 | 9 | `feat/add-headless-demo-app` | Complete and merged to `main` (`7c2ea3e`) | Separate Vite SPA, independent tokens, injected fixture fetch, deterministic PATCH state |
 | 10 | `docs/finalize-guides` | Complete and merged to `main` (`48ef608`) | English README, integration examples, complete CI, final branding cleanup |
+| 11 | `feat/publish-openapi-contract` | In progress | Add canonical OpenAPI 3.1.1 contract, ADR-0010; update ADR-0004 source-format decision |
 
 ## ADR index
 
 - [ADR-0001](docs/adr/0001-headless-backend-driven-direction.md) — Headless backend-driven direction. Accepted.
 - [ADR-0002](docs/adr/0002-start-and-fixture-runtime-boundaries.md) — Start and fixture runtime boundaries. Accepted.
 - [ADR-0003](docs/adr/0003-toolchain-compatibility-and-upgrade-order.md) — Toolchain compatibility and upgrade order. Accepted.
-- [ADR-0004](docs/adr/0004-external-api-contracts.md) — External API contracts. Accepted.
+- [ADR-0004](docs/adr/0004-external-api-contracts.md) — External API domain contract. Superseded in part by ADR-0010 for source format.
 - [ADR-0005](docs/adr/0005-fixture-server-without-business-logic.md) — Fixture server without business logic. Accepted.
 - [ADR-0006](docs/adr/0006-public-sdk-and-headless-ui-separation.md) — Public SDK and headless/UI separation. Accepted.
 - [ADR-0007](docs/adr/0007-playground-start-ssr-and-query-boundaries.md) — Playground Start SSR and query boundaries. Accepted.
 - [ADR-0008](docs/adr/0008-neutral-and-overridable-ui-tokens.md) — Neutral and overridable UI tokens. Accepted.
 - [ADR-0009](docs/adr/0009-backend-and-property-context-injection.md) — Backend and property context injection. Accepted.
+- [ADR-0010](docs/adr/0010-openapi-canonical-api-contract.md) — OpenAPI as the canonical API contract. Accepted.
 
 ## Stage 4 recap — fixture server
 

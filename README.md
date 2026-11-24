@@ -1,6 +1,6 @@
 # Headless Pricing Calendar
 
-A React SDK for displaying prices computed by an external backend. This repository owns transport, contract validation, caching and presentation only. All pricing logic, recommendations, variance, availability, occupancy, restrictions, currency and validation belong to the backend.
+A React SDK for displaying prices computed by an external backend. This repository owns transport, structural contract validation, caching and presentation only. Pricing logic, recommendations, variance decisions, availability decisions, restrictions, currency and business validation belong to the backend.
 
 ## Repository layout
 
@@ -9,7 +9,7 @@ apps/
   playground/          TanStack Start SSR reference app with local fixture routes
   headless-demo/       Plain Vite SPA with independent presentation and tokens
 packages/
-  contracts/           Zod schemas and inferred types for the external API
+  contracts/           Canonical OpenAPI contract and SDK runtime schemas
   react/               Public SDK: client, headless and UI entry points
 docs/
   integration.md       Integration guide and code examples
@@ -26,6 +26,8 @@ docs/
 | `@hpc/pricing-calendar/contracts` | Re-exported contract schemas and types |
 
 `@hpc/contracts` is an internal workspace package. Consumers should import contract types from `@hpc/pricing-calendar/contracts`.
+
+The language-neutral wire contract is [`packages/contracts/openapi.yaml`](packages/contracts/openapi.yaml); OpenAPI is canonical, while the TypeScript package serves the React SDK.
 
 ## Architecture
 
@@ -84,7 +86,9 @@ The same commands run in CI on pushes and pull requests to `main`.
 ## Documentation
 
 - [Integration guide](docs/integration.md)
+- [OpenAPI contract](packages/contracts/openapi.yaml)
 - [Architecture decision records](docs/adr/0001-headless-backend-driven-direction.md)
+- [ADR-0010 — OpenAPI as the canonical API contract](docs/adr/0010-openapi-canonical-api-contract.md)
 - [Repository audit](docs/repository-audit.md) — historical pre-migration snapshot
 
 ## License

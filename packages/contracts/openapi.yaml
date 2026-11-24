@@ -1,0 +1,406 @@
+openapi: 3.1.1
+info:
+  title: Headless Pricing Calendar API
+  version: 0.1.0
+  description: |
+    Backend-neutral HTTP contract for property settings and backend-computed
+    pricing calendar data. Implementations own pricing decisions and persistence.
+    `x-property-id` identifies property context; it is not an authorization
+    mechanism. Authentication requirements are defined by each deployment.
+paths:
+  /settings:
+    get:
+      operationId: getSettings
+      summary: Get property settings
+      description: Returns the property's locale, timezone, currency, rooms and date range.
+      parameters:
+        - $ref: "#/components/parameters/PropertyId"
+      responses:
+        "200":
+          description: Property settings.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SettingsResponse"
+        default:
+          $ref: "#/components/responses/ApiError"
+  /prices:
+    get:
+      operationId: getPrices
+      summary: Get prices for a date range
+      description: >
+        The `from` and `to` dates are inclusive. Prices, recommendations and
+        indicators are computed by the backend. A reversed range returns rooms
+        with empty day arrays.
+      parameters:
+        - $ref: "#/components/parameters/PropertyId"
+        - name: from
+          in: query
+          required: true
+          description: First included date, in ISO 8601 full-date format.
+          schema:
+            type: string
+            format: date
+        - name: to
+          in: query
+          required: true
+          description: Last included date, in ISO 8601 full-date format.
+          schema:
+            type: string
+            format: date
+        - name: room
+          in: query
+          required: false
+          description: >
+            Optional room filter. Repeat this parameter to request multiple
+            rooms, for example `room=1001&room=1002`.
+          style: form
+          explode: true
+          schema:
+            type: array
+            items:
+              type: string
+              minLength: 1
+      responses:
+        "200":
+          description: Backend-computed prices for the requested range and rooms.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PricesResponse"
+        "400":
+          description: Missing or malformed date parameters or invalid room filter.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        default:
+          $ref: "#/components/responses/ApiError"
+  /prices/{roomId}/{date}:
+    patch:
+      operationId: updatePrice
+      summary: Submit a manual price intent
+      description: >
+        The backend decides whether to accept the intent and returns the
+        canonical day. Clients must use that response as the source of truth.
+      parameters:
+        - $ref: "#/components/parameters/PropertyId"
+        - name: roomId
+          in: path
+          required: true
+          schema:
+            type: string
+            minLength: 1
+        - name: date
+          in: path
+          required: true
+          schema:
+            type: string
+            format: date
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdatePriceRequest"
+      responses:
+        "200":
+          description: Accepted update and canonical backend day.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UpdatePriceResponse"
+        "400":
+          description: Invalid update request.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "404":
+          description: Property, room or date was not found.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        default:
+          $ref: "#/components/responses/ApiError"
+components:
+  parameters:
+    PropertyId:
+      name: x-property-id
+      in: header
+      required: true
+      description: Property context identifier; authorization remains backend-specific.
+      schema:
+        type: string
+        minLength: 1
+  responses:
+    ApiError:
+      description: API error response. Authentication and server errors use this envelope too.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ApiError"
+  schemas:
+    ApiError:
+      type: object
+      required:
+        - error
+      properties:
+        error:
+          type: object
+          required:
+            - code
+            - message
+          properties:
+            code:
+              type: string
+              minLength: 1
+            message:
+              type: string
+              minLength: 1
+            details:
+              type: object
+              additionalProperties: true
+    CurrencyCode:
+      type: string
+      pattern: "^[A-Z]{3}$"
+      description: Three-letter uppercase currency code.
+      example: NZD
+    IsoDate:
+      type: string
+      format: date
+      description: ISO 8601 full-date value.
+      example: "2026-11-23"
+    IsoDateTime:
+      type: string
+      format: date-time
+      pattern: "Z$"
+      description: RFC 3339 timestamp in UTC with a trailing Z.
+      example: "2026-11-23T22:30:00.000Z"
+    Room:
+      type: object
+      required:
+        - id
+        - name
+        - isReference
+      properties:
+        id:
+          type: string
+          minLength: 1
+        name:
+          type: string
+          minLength: 1
+        isReference:
+          type: boolean
+    SettingsResponse:
+      type: object
+      required:
+        - hotel
+        - rooms
+        - dateRange
+      properties:
+        hotel:
+          type: object
+          required:
+            - timezone
+            - locale
+            - currency
+          properties:
+            timezone:
+              type: string
+              minLength: 1
+              description: Property timezone identifier, normally an IANA timezone.
+            locale:
+              type: string
+              minLength: 1
+              description: Property locale identifier.
+            currency:
+              $ref: "#/components/schemas/CurrencyCode"
+        rooms:
+          type: array
+          minItems: 1
+          items:
+            $ref: "#/components/schemas/Room"
+        dateRange:
+          type: object
+          required:
+            - from
+            - to
+          properties:
+            from:
+              $ref: "#/components/schemas/IsoDate"
+            to:
+              $ref: "#/components/schemas/IsoDate"
+    PriceStatus:
+      type: string
+      enum:
+        - auto
+        - manual
+        - closed
+        - unavailable
+    DayAvailability:
+      type: string
+      enum:
+        - available
+        - restricted
+        - sold_out
+        - unavailable
+    PriceError:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+          minLength: 1
+        message:
+          type: string
+          minLength: 1
+    DayVariance:
+      type: object
+      required:
+        - value
+        - direction
+        - severity
+        - label
+      properties:
+        value:
+          type: number
+        direction:
+          type: string
+          enum:
+            - up
+            - down
+            - flat
+        severity:
+          type: string
+          enum:
+            - low
+            - medium
+            - high
+        label:
+          type: string
+          minLength: 1
+    DayPrice:
+      type: object
+      required:
+        - roomId
+        - date
+        - status
+        - currency
+        - price
+        - priceInPms
+        - recommendedPrice
+        - variance
+        - availability
+        - occupancy
+        - restrictions
+        - isClosed
+        - error
+      properties:
+        roomId:
+          type: string
+          minLength: 1
+        date:
+          $ref: "#/components/schemas/IsoDate"
+        status:
+          $ref: "#/components/schemas/PriceStatus"
+        currency:
+          $ref: "#/components/schemas/CurrencyCode"
+        price:
+          anyOf:
+            - type: number
+              minimum: 0
+            - type: "null"
+        priceInPms:
+          anyOf:
+            - type: number
+              minimum: 0
+            - type: "null"
+        recommendedPrice:
+          anyOf:
+            - type: number
+              minimum: 0
+            - type: "null"
+        variance:
+          anyOf:
+            - $ref: "#/components/schemas/DayVariance"
+            - type: "null"
+        availability:
+          $ref: "#/components/schemas/DayAvailability"
+        occupancy:
+          anyOf:
+            - type: number
+              minimum: 0
+              maximum: 1
+            - type: "null"
+        restrictions:
+          type: array
+          items:
+            type: string
+            minLength: 1
+        isClosed:
+          type: boolean
+        error:
+          anyOf:
+            - $ref: "#/components/schemas/PriceError"
+            - type: "null"
+    RoomPrices:
+      type: object
+      required:
+        - roomId
+        - name
+        - days
+      properties:
+        roomId:
+          type: string
+          minLength: 1
+        name:
+          type: string
+          minLength: 1
+        days:
+          type: array
+          items:
+            $ref: "#/components/schemas/DayPrice"
+    PricesResponse:
+      type: object
+      required:
+        - timezone
+        - currency
+        - generatedAt
+        - rooms
+      properties:
+        timezone:
+          type: string
+          minLength: 1
+        currency:
+          $ref: "#/components/schemas/CurrencyCode"
+        generatedAt:
+          $ref: "#/components/schemas/IsoDateTime"
+        rooms:
+          type: array
+          items:
+            $ref: "#/components/schemas/RoomPrices"
+    UpdatePriceRequest:
+      type: object
+      required:
+        - price
+      properties:
+        price:
+          type: number
+          minimum: 0
+        reason:
+          type: string
+          maxLength: 500
+    UpdatePriceResponse:
+      type: object
+      required:
+        - day
+        - acceptedAt
+      properties:
+        day:
+          $ref: "#/components/schemas/DayPrice"
+        acceptedAt:
+          $ref: "#/components/schemas/IsoDateTime"
