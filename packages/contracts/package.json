@@ -8,6 +8,14 @@
 	"exports": {
 		".": "./src/index.ts"
 	},
+	"files": [
+		"openapi.yaml",
+		"src/common.ts",
+		"src/index.ts",
+		"src/prices.ts",
+		"src/settings.ts",
+		"src/generated"
+	],
 	"scripts": {
 		"generate": "orval --config ./orval.config.ts",
 		"check:generated": "orval --config ./orval.config.ts --outdated"

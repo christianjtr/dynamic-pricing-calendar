@@ -73,11 +73,13 @@ pnpm dev:demo
 | `pnpm test:run` | Run Vitest once |
 | `pnpm --filter @hpc/contracts generate` | Generate runtime Zod schemas from OpenAPI |
 | `pnpm --filter @hpc/contracts check:generated` | Check generated schemas are current |
+| `pnpm test:external-consumer` | Pack, install, type-check and build a clean Vite consumer |
 
 ## Verification
 
 ```bash
 pnpm --filter @hpc/contracts check:generated
+pnpm test:external-consumer
 pnpm lint
 pnpm typecheck
 pnpm test:run

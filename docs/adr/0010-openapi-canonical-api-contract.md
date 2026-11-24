@@ -39,7 +39,7 @@ OpenAPI is an HTTP-level, language-neutral artifact that can be read by backend 
 ### Positive
 
 - Backend implementations in different stacks can target the same downloadable contract.
-- The same artifact can drive the interactive API reference and client/server tooling.
+- The same artifact can drive the interactive API reference, ships in the contracts tarball and supports client/server tooling.
 - React, TanStack Query and the local fixture runtime remain implementation details.
 
 ### Negative and mitigations

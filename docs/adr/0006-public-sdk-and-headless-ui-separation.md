@@ -58,12 +58,16 @@ Separate exports make it possible to embed logic-only hooks without paying for M
 - `./ui` started as an empty barrel — mitigation: Stage 6 filled it with Mantine components; the headless demo deliberately does not import it.
 - The legacy UI initially consumed `client/src` data — mitigation: Stages 6–7 replaced it with the new SDK and headless selectors.
 - CI initially did not run `pnpm build` — mitigation: Stage 10 added it to the workflow.
+- The SDK is not released to a registry, `@hpc/contracts` remains private, and exports target TypeScript source — mitigation: the tarball smoke test verifies Vite consumers; registry release and Node-native package output remain future work. Backend teams can use the standalone OpenAPI artifact without either package.
 
 ## Compliance and verification
 
 - `pnpm lint`, `pnpm typecheck`, `pnpm test:run` and `pnpm build` pass.
 - 8 test files and 37 tests pass, including injected fetch/headers, abort signal, contract validation, API error mapping, pending writes, canonical cache replacement and headless selectors.
 - Client and headless entry points import neither `vinxi`, `@mantine/*` nor a hard-coded `/api` path. Mantine is confined to `./ui`.
+- `pnpm test:external-consumer` packs the SDK and contracts, installs their tarballs into a clean Vite app without workspace links, and type-checks/builds that app.
+- The external consumer smoke asserts the contract package tarball includes `openapi.yaml`.
+- The SDK has no registry release yet; its exports point to TypeScript source and are verified with a TypeScript-aware bundler.
 
 ## Links
 

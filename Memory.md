@@ -1,6 +1,6 @@
 # Memory
 
-Last updated: Stage 15 in progress on `fix/resolve-mantine-overlap`; Stage 14 merged to `main` at `c28ae93`.
+Last updated: Stage 16 in progress on `feat/verify-external-sdk-consumption`; Stage 15 merged to `main` at `de19613`.
 
 ## Project goal
 
@@ -109,7 +109,8 @@ Important contract rules:
 | 12 | `chore/generate-zod-from-openapi` | Complete and merged to `main` (`712f895`) | Orval-generated Zod component/operation validators, CI drift check, request parameter validation; ADRs 0001, 0002, 0005, 0006 and 0010 updated |
 | 13 | `feat/add-api-contract-docs` | Complete and merged to `main` (`ac8dd93`) | Scalar reference and YAML download use canonical OpenAPI; ADR-0011, ADR-0007 updated |
 | 14 | `chore/configure-import-aliases` | Complete and merged to `main` (`c28ae93`) | App-scoped `@/*` aliases resolved by TypeScript, Vite and Vitest; ADR-0003 updated |
-| 15 | `fix/resolve-mantine-overlap` | In progress | Constrain grid items/buttons to their tracks and wrap long backend indicators; browser-checked at 390px and desktop, with a long-label regression test; ADR-0008 updated |
+| 15 | `fix/resolve-mantine-overlap` | Complete and merged to `main` (`de19613`) | Constrain grid items/buttons to their tracks and wrap long backend indicators; browser-checked at 390px and desktop, with a long-label regression test; ADR-0008 updated |
+| 16 | `feat/verify-external-sdk-consumption` | In progress | Pack SDK and contract tarballs, type-check/build a clean Vite consumer without workspace links; this does not release packages to a registry |
 
 ## ADR index
 

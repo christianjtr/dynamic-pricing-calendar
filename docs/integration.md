@@ -2,7 +2,7 @@
 
 The SDK transports and validates backend data. It does not calculate prices, variance, recommendations, availability, occupancy or restrictions. Render the fields returned by the backend and treat the response to a price update as the only canonical value.
 
-The package is currently workspace-only. Consumer apps in this repository depend on it with `workspace:*`. React 19 and TanStack Query 5 are required peers; Mantine 9 is only needed for `@hpc/pricing-calendar/ui`.
+The SDK is not released to a package registry yet, and `@hpc/contracts` remains private. `pnpm test:external-consumer` packs both and installs them from local tarballs into a clean Vite consumer without workspace links. The package exports TypeScript source, so consumers need a TypeScript-aware bundler. React 19 and TanStack Query 5 are required peers; Mantine 9 is only needed for `@hpc/pricing-calendar/ui`. Backend teams can consume the OpenAPI artifact directly without these packages.
 
 The language-neutral API contract is available as [`packages/contracts/openapi.yaml`](../packages/contracts/openapi.yaml) and from the playground at `/docs/api` (download: `/openapi.yaml`).
 

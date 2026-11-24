@@ -10,6 +10,7 @@
 		"start:demo": "pnpm --filter @hpc/headless-demo start",
 		"lint": "biome check .",
 		"lint:fix": "biome check --write .",
+		"test:external-consumer": "node scripts/test-external-consumer.mjs",
 		"typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p apps/playground/tsconfig.json && tsc --noEmit -p apps/headless-demo/tsconfig.json",
 		"test": "vitest",
 		"test:run": "vitest run"
