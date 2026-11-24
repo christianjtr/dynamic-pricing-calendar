@@ -39,20 +39,28 @@
 	gap: var(--hpc-space-1);
 }
 
+.hpc-matrix-row > * {
+	min-width: 0;
+}
+
 .hpc-matrix-cell {
 	align-items: flex-start;
 	background: var(--hpc-color-surface-muted);
 	border: 1px solid var(--hpc-color-border);
 	border-radius: var(--hpc-radius-sm);
+	box-sizing: border-box;
 	color: var(--hpc-color-text);
 	cursor: pointer;
 	display: flex;
 	flex-direction: column;
 	font: inherit;
 	gap: var(--hpc-space-1);
+	min-width: 0;
 	min-height: 92px;
+	overflow-wrap: anywhere;
 	padding: var(--hpc-space-2);
 	text-align: left;
+	width: 100%;
 }
 
 .hpc-matrix-cell:hover,
@@ -96,8 +104,10 @@
 	border-radius: 999px;
 	font-size: var(--hpc-font-size-xs);
 	font-weight: 600;
+	max-width: 100%;
+	overflow-wrap: anywhere;
 	padding: 2px 6px;
-	white-space: nowrap;
+	white-space: normal;
 }
 
 .hpc-indicator-accent {

@@ -95,6 +95,54 @@ describe("PricingCalendar", () => {
 		expect(screen.getAllByText("Closed date").length).toBeGreaterThan(0);
 	});
 
+	it("preserves long backend indicator text in the day cell", async () => {
+		const longRestriction = `restriction:${"x".repeat(80)}`;
+		const pricesWithLongRestriction = {
+			...pricesFixture,
+			rooms: pricesFixture.rooms.map((room, roomIndex) =>
+				roomIndex === 0
+					? {
+							...room,
+							days: room.days.map((day, dayIndex) =>
+								dayIndex === 0
+									? { ...day, restrictions: [longRestriction] }
+									: day,
+							),
+						}
+					: room,
+			),
+		};
+		const fetchWithLongRestriction = vi.fn(
+			async (input: string | URL | Request) => {
+				const url = new URL(input.toString(), "https://be.test/");
+				return jsonResponse(
+					url.pathname.endsWith("/settings")
+						? settingsFixture
+						: pricesWithLongRestriction,
+				);
+			},
+		);
+
+		render(
+			<PricingCalendarUIProvider>
+				<PricingCalendarProvider
+					config={{
+						baseUrl: "https://be.test/backend/",
+						propertyId: "prop-1",
+						fetch: fetchWithLongRestriction,
+					}}
+				>
+					<PricingCalendar from="2026-11-23" to="2026-11-23" />
+				</PricingCalendarProvider>
+			</PricingCalendarUIProvider>,
+		);
+
+		await screen.findByRole("button", {
+			name: new RegExp(`Restricted: ${longRestriction}`),
+		});
+		expect(screen.getByText(`Restricted: ${longRestriction}`)).toBeTruthy();
+	});
+
 	it("saves a selected day through the backend and shows the canonical response", async () => {
 		render(
 			<PricingCalendarUIProvider>

@@ -36,6 +36,10 @@ Chosen option: **Option 2**.
 
 `pricingCalendarTheme` in `src/ui/theme.ts` provides Mantine defaults. It does not encode a vendor brand.
 
+### Follow-up: matrix cell sizing
+
+The rooms-by-dates matrix keeps native table semantics while its rows use CSS Grid for alignment. Grid items and day buttons must be allowed to shrink to their column tracks; indicator badges wrap long backend-provided labels instead of forcing adjacent cells wider. Horizontal scrolling remains on the matrix wrapper.
+
 ### Justification
 
 CSS variables are the smallest override surface that works for SSR, SPAs and shadow-DOM-free embedding. A neutral namespace prevents collisions with host applications and makes the removal of legacy branding explicit. Keeping defaults in CSS means the UI renders correctly without consumer configuration.
@@ -58,6 +62,7 @@ CSS variables are the smallest override surface that works for SSR, SPAs and sha
 
 - `pnpm lint`, `pnpm typecheck`, `pnpm test:run` and `pnpm build` pass.
 - UI tests assert that the calendar renders an accessible rooms-by-dates table and writes through the backend.
+- Browser checks at desktop and mobile widths confirm day buttons stay within their cells while long indicators wrap.
 - Grep over `packages/react/src/ui` finds no legacy brand names, `--rpg-*` tokens or `#5B48EE`.
 
 ## Links
