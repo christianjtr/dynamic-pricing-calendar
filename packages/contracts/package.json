@@ -8,6 +8,10 @@
 	"exports": {
 		".": "./src/index.ts"
 	},
+	"scripts": {
+		"generate": "orval --config ./orval.config.ts",
+		"check:generated": "orval --config ./orval.config.ts --outdated"
+	},
 	"dependencies": {
 		"zod": "^4.6.7"
 	}

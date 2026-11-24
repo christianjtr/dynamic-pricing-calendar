@@ -1,18 +1,13 @@
-import { z } from "zod";
+import type { z } from "zod";
+import {
+	ApiError as ApiErrorSchema,
+	CurrencyCode as CurrencyCodeSchema,
+	IsoDate as IsoDateSchema,
+	IsoDateTime as IsoDateTimeSchema,
+} from "./generated/schemas";
 
-export const IsoDateSchema = z.iso.date();
-export const IsoDateTimeSchema = z.iso.datetime();
-export const CurrencyCodeSchema = z.string().regex(/^[A-Z]{3}$/);
-
-export const ApiErrorSchema = z.object({
-	error: z.object({
-		code: z.string().min(1),
-		message: z.string().min(1),
-		details: z.record(z.string(), z.unknown()).optional(),
-	}),
-});
-
-export type ApiError = z.infer<typeof ApiErrorSchema>;
+export type { ApiError } from "./generated/schemas";
+export { ApiErrorSchema, CurrencyCodeSchema, IsoDateSchema, IsoDateTimeSchema };
 
 export class ContractValidationError extends Error {
 	readonly label: string;

@@ -4,9 +4,13 @@ import {
 	ContractValidationError,
 	type DayPrice,
 	DayPriceSchema,
+	GetPricesQueryParams,
+	GetSettingsHeader,
+	IsoDateTimeSchema,
 	PricesResponseSchema,
 	parseContract,
 	SettingsResponseSchema,
+	UpdatePriceParams,
 	UpdatePriceResponseSchema,
 } from "./index";
 
@@ -148,6 +152,31 @@ describe("external API contracts", () => {
 		expect(apiPaths.price("room 1", "2026-11-23")).toBe(
 			"/prices/room%201/2026-11-23",
 		);
+		expect(apiPaths.price("1001", "../settings")).toBe(
+			"/prices/1001/..%2Fsettings",
+		);
+	});
+
+	it("validates generated HTTP parameters and property context", () => {
+		expect(
+			GetPricesQueryParams.parse({
+				from: "2026-11-23",
+				to: "2026-11-29",
+				room: ["1001", "1002"],
+			}).room,
+		).toEqual(["1001", "1002"]);
+		expect(GetSettingsHeader.safeParse({ "x-property-id": "" }).success).toBe(
+			false,
+		);
+		expect(
+			UpdatePriceParams.safeParse({
+				roomId: "1001",
+				date: "../settings",
+			}).success,
+		).toBe(false);
+		expect(
+			IsoDateTimeSchema.safeParse("2026-11-23T22:30:00+00:00").success,
+		).toBe(false);
 	});
 
 	it("throws a labelled validation error through parseContract", () => {

@@ -196,7 +196,7 @@ export async function prefetchPricing(
 }
 ```
 
-`createPricingClient` sends `x-property-id`, validates requests and responses with the shared Zod schemas, and maps backend errors to `PricingApiError`. Raw base-relative paths are available as `apiPaths` from `@hpc/pricing-calendar/contracts`.
+`createPricingClient` sends `x-property-id`, validates requests and responses with Zod schemas generated from the OpenAPI contract, and maps backend errors to `PricingApiError`. Raw base-relative paths are available as `apiPaths` from `@hpc/pricing-calendar/contracts`.
 
 ## Server rendering
 

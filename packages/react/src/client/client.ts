@@ -1,15 +1,17 @@
 import {
 	ApiErrorSchema,
 	apiPaths,
+	GetPricesQueryParams,
+	GetSettingsHeader,
 	type PricesQuery,
-	PricesQuerySchema,
 	type PricesResponse,
 	PricesResponseSchema,
 	parseContract,
 	type SettingsResponse,
 	SettingsResponseSchema,
+	UpdatePriceBody,
+	UpdatePriceParams,
 	type UpdatePriceRequest,
-	UpdatePriceRequestSchema,
 	type UpdatePriceResponse,
 	UpdatePriceResponseSchema,
 } from "@hpc/contracts";
@@ -80,8 +82,8 @@ const createRequestInit = async (
 		headers: {
 			Accept: "application/json",
 			...(body ? { "Content-Type": "application/json" } : {}),
-			"x-property-id": config.propertyId,
 			...extraHeaders,
+			"x-property-id": config.propertyId,
 		},
 		credentials: config.credentials,
 		signal: options?.signal,
@@ -119,32 +121,45 @@ export function createPricingClient(
 ): PricingClient {
 	const baseUrl = normalizeBaseUrl(config.baseUrl);
 	const fetchFn = config.fetch ?? globalThis.fetch.bind(globalThis);
+	const propertyId = GetSettingsHeader.parse({
+		"x-property-id": config.propertyId,
+	})["x-property-id"];
+	const clientConfig = { ...config, propertyId };
 
 	return {
-		propertyId: config.propertyId,
+		propertyId,
 		async getSettings(signal) {
 			const json = await requestJson(
 				fetchFn,
 				`${baseUrl}${apiPaths.settings}`,
-				await createRequestInit(config, "GET", { signal }),
+				await createRequestInit(clientConfig, "GET", { signal }),
 			);
 			return parseContract(SettingsResponseSchema, json, "settings");
 		},
 		async getPrices(query, signal) {
-			const validated = PricesQuerySchema.parse(query);
+			const params = GetPricesQueryParams.parse({
+				from: query.from,
+				to: query.to,
+				room: query.rooms,
+			});
 			const json = await requestJson(
 				fetchFn,
-				`${baseUrl}${apiPaths.prices(validated)}`,
-				await createRequestInit(config, "GET", { signal }),
+				`${baseUrl}${apiPaths.prices({
+					from: params.from,
+					to: params.to,
+					rooms: params.room,
+				})}`,
+				await createRequestInit(clientConfig, "GET", { signal }),
 			);
 			return parseContract(PricesResponseSchema, json, "prices");
 		},
 		async updatePrice(roomId, date, request, signal) {
-			const validated = UpdatePriceRequestSchema.parse(request);
+			const params = UpdatePriceParams.parse({ roomId, date });
+			const validated = UpdatePriceBody.parse(request);
 			const json = await requestJson(
 				fetchFn,
-				`${baseUrl}${apiPaths.price(roomId, date)}`,
-				await createRequestInit(config, "PATCH", {
+				`${baseUrl}${apiPaths.price(params.roomId, params.date)}`,
+				await createRequestInit(clientConfig, "PATCH", {
 					body: validated,
 					signal,
 				}),

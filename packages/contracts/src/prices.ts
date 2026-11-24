@@ -1,90 +1,44 @@
 import { z } from "zod";
-import { CurrencyCodeSchema, IsoDateSchema, IsoDateTimeSchema } from "./common";
+import { GetPricesQueryParams } from "./generated/operations.zod";
+import { DayVariance as GeneratedDayVariance } from "./generated/schemas";
 
-export const PriceStatusSchema = z.enum([
-	"auto",
-	"manual",
-	"closed",
-	"unavailable",
-]);
-export const VarianceDirectionSchema = z.enum(["up", "down", "flat"]);
-export const VarianceSeveritySchema = z.enum(["low", "medium", "high"]);
-export const DayAvailabilitySchema = z.enum([
-	"available",
-	"restricted",
-	"sold_out",
-	"unavailable",
-]);
+export type {
+	DayAvailability,
+	DayPrice,
+	DayVariance,
+	PriceError,
+	PriceStatus,
+	PricesResponse,
+	RoomPrices,
+	UpdatePriceRequest,
+	UpdatePriceResponse,
+} from "./generated/schemas";
+export {
+	DayAvailability as DayAvailabilitySchema,
+	DayPrice as DayPriceSchema,
+	DayVariance as DayVarianceSchema,
+	PriceError as PriceErrorSchema,
+	PriceStatus as PriceStatusSchema,
+	PricesResponse as PricesResponseSchema,
+	RoomPrices as RoomPricesSchema,
+	UpdatePriceRequest as UpdatePriceRequestSchema,
+	UpdatePriceResponse as UpdatePriceResponseSchema,
+} from "./generated/schemas";
 
-export const PriceErrorSchema = z.object({
-	code: z.string().min(1),
-	message: z.string().min(1),
-});
+export type VarianceDirection = z.infer<
+	typeof GeneratedDayVariance
+>["direction"];
+export type VarianceSeverity = z.infer<typeof GeneratedDayVariance>["severity"];
+export const VarianceDirectionSchema = GeneratedDayVariance.shape.direction;
+export const VarianceSeveritySchema = GeneratedDayVariance.shape.severity;
 
-export const DayVarianceSchema = z.object({
-	value: z.number(),
-	direction: VarianceDirectionSchema,
-	severity: VarianceSeveritySchema,
-	label: z.string().min(1),
-});
-
-export const DayPriceSchema = z.object({
-	roomId: z.string().min(1),
-	date: IsoDateSchema,
-	status: PriceStatusSchema,
-	currency: CurrencyCodeSchema,
-	price: z.number().nonnegative().nullable(),
-	priceInPms: z.number().nonnegative().nullable(),
-	recommendedPrice: z.number().nonnegative().nullable(),
-	variance: DayVarianceSchema.nullable(),
-	availability: DayAvailabilitySchema,
-	occupancy: z.number().min(0).max(1).nullable(),
-	restrictions: z.array(z.string().min(1)),
-	isClosed: z.boolean(),
-	error: PriceErrorSchema.nullable(),
-});
-
-export const RoomPricesSchema = z.object({
-	roomId: z.string().min(1),
-	name: z.string().min(1),
-	days: z.array(DayPriceSchema),
-});
-
-export const PricesResponseSchema = z.object({
-	timezone: z.string().min(1),
-	currency: CurrencyCodeSchema,
-	generatedAt: IsoDateTimeSchema,
-	rooms: z.array(RoomPricesSchema),
-});
-
+// The SDK uses `rooms`; the wire contract serializes it as repeated `room` parameters.
 export const PricesQuerySchema = z.object({
-	from: IsoDateSchema,
-	to: IsoDateSchema,
-	rooms: z.array(z.string().min(1)).optional(),
+	from: GetPricesQueryParams.shape.from,
+	to: GetPricesQueryParams.shape.to,
+	rooms: GetPricesQueryParams.shape.room,
 });
-
-export const UpdatePriceRequestSchema = z.object({
-	price: z.number().nonnegative(),
-	reason: z.string().max(500).optional(),
-});
-
-export const UpdatePriceResponseSchema = z.object({
-	day: DayPriceSchema,
-	acceptedAt: IsoDateTimeSchema,
-});
-
-export type PriceStatus = z.infer<typeof PriceStatusSchema>;
-export type VarianceDirection = z.infer<typeof VarianceDirectionSchema>;
-export type VarianceSeverity = z.infer<typeof VarianceSeveritySchema>;
-export type DayAvailability = z.infer<typeof DayAvailabilitySchema>;
-export type PriceError = z.infer<typeof PriceErrorSchema>;
-export type DayVariance = z.infer<typeof DayVarianceSchema>;
-export type DayPrice = z.infer<typeof DayPriceSchema>;
-export type RoomPrices = z.infer<typeof RoomPricesSchema>;
-export type PricesResponse = z.infer<typeof PricesResponseSchema>;
 export type PricesQuery = z.infer<typeof PricesQuerySchema>;
-export type UpdatePriceRequest = z.infer<typeof UpdatePriceRequestSchema>;
-export type UpdatePriceResponse = z.infer<typeof UpdatePriceResponseSchema>;
 
 export const apiPaths = {
 	settings: "/settings",
@@ -96,5 +50,5 @@ export const apiPaths = {
 		return `/prices?${params.toString()}`;
 	},
 	price: (roomId: string, date: string) =>
-		`/prices/${encodeURIComponent(roomId)}/${date}`,
+		`/prices/${encodeURIComponent(roomId)}/${encodeURIComponent(date)}`,
 } as const;

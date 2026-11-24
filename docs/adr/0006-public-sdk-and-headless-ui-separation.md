@@ -34,7 +34,7 @@ The new workspace package `packages/react` exposes:
 - `@hpc/pricing-calendar/ui` — Mantine-based ready-to-use UI; Mantine is an optional peer.
 - `@hpc/pricing-calendar/contracts` — re-export of `@hpc/contracts`.
 
-`createPricingClient(config)` accepts `baseUrl`, `propertyId`, an optional injected `fetch`, async `headers`, and `credentials`. It builds paths from `apiPaths`, validates requests and responses with the Zod schemas, sends `x-property-id`, and maps API errors to `PricingApiError`.
+`createPricingClient(config)` accepts `baseUrl`, `propertyId`, an optional injected `fetch`, async `headers`, and `credentials`. It builds paths from `apiPaths`, validates request parameters and bodies plus responses with Zod schemas generated from the canonical OpenAPI contract, sends `x-property-id`, and maps API errors to `PricingApiError`.
 
 `PricingCalendarProvider` owns or accepts a `QueryClient`; it never creates one at module scope. Consumers running SSR can pass a per-request instance.
 
@@ -50,7 +50,7 @@ Separate exports make it possible to embed logic-only hooks without paying for M
 
 - No SDK code depends on Vinxi, `/api`, the legacy `PriceData` shape or local variance math.
 - Currency, timezone, room metadata and day status all come from `@hpc/contracts`.
-- Contract validation happens at the HTTP boundary, so malformed backend data fails early.
+- Generated contract validation happens at the HTTP boundary, so malformed backend data and invalid request parameters fail early.
 - SSR embedders can supply their own `QueryClient`.
 
 ### Negative and mitigations
@@ -71,4 +71,5 @@ Separate exports make it possible to embed logic-only hooks without paying for M
 - [ADR-0001](./0001-headless-backend-driven-direction.md)
 - [ADR-0004](./0004-external-api-contracts.md)
 - [ADR-0005](./0005-fixture-server-without-business-logic.md)
+- [ADR-0010](./0010-openapi-canonical-api-contract.md)
 - https://tanstack.com/query/latest/docs/framework/react/overview

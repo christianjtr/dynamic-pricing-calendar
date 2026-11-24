@@ -48,7 +48,7 @@ The SDK remains portable because neither app framework is imported by `packages/
 ### Negative and mitigations
 
 - Two app frameworks increase setup surface — mitigate by keeping both apps minimal and sharing one SDK package.
-- Fixture data can drift from the real external API — mitigate by generating fixtures from the shared Zod schemas and validating responses at runtime.
+- Fixture data can drift from the real external API — mitigate by validating it at runtime with Zod schemas generated from the canonical OpenAPI contract.
 - The fixture server is not a business backend — mitigate by documenting that it never computes values and must not receive rule logic.
 
 ## Compliance and verification
@@ -62,3 +62,4 @@ The SDK remains portable because neither app framework is imported by `packages/
 
 - [Repository audit](../repository-audit.md)
 - [ADR-0001](0001-headless-backend-driven-direction.md)
+- [ADR-0010](0010-openapi-canonical-api-contract.md)

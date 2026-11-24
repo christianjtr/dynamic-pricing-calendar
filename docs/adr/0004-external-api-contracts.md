@@ -35,7 +35,7 @@ The original implementation placed the contract in a private `@hpc/contracts` wo
 
 Paths are base-relative: the consumer supplies the base URL and credentials. The contract never handles authentication or authorization.
 
-The decision to use Zod as the canonical wire-contract source is superseded by ADR-0010. The endpoint and domain shapes remain the starting point for `packages/contracts/openapi.yaml`; Zod remains the SDK runtime validator and is to be generated from that OpenAPI document.
+The decision to use Zod as the canonical wire-contract source is superseded by ADR-0010. The endpoint and domain shapes remain the basis of `packages/contracts/openapi.yaml`; Orval generates the SDK's Zod runtime validators from that OpenAPI document.
 
 ### Justification
 

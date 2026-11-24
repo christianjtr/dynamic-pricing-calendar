@@ -7,7 +7,13 @@
 	},
 	"files": {
 		"ignoreUnknown": false,
-		"includes": ["**", "!**/*.md", "!**/routeTree.gen.ts", "!**/dist"]
+		"includes": [
+			"**",
+			"!**/*.md",
+			"!**/routeTree.gen.ts",
+			"!**/dist",
+			"!packages/contracts/src/generated"
+		]
 	},
 	"formatter": {
 		"enabled": true,

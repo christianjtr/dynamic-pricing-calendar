@@ -27,9 +27,9 @@ The question is: what boundary separates this repository from the external backe
 
 Chosen option: **1. Headless SDK plus optional default UI**.
 
-The external backend is the single source of truth for property context, currency, timezone, rooms, prices, recommendations, variance, availability, occupancy, restrictions, validation and persistence. This repository contains only:
+The external backend is the single source of truth for property context, currency, timezone, rooms, prices, recommendations, variance, availability, occupancy, restrictions, business validation and persistence. The language-neutral wire shape is specified by OpenAPI per ADR-0010; structural validation in this repository checks conformance to that contract. This repository contains only:
 
-- `packages/contracts`: Zod schemas mirroring the external API, with precomputed values (for example `variance { value, direction, severity }` and `status: auto | manual | closed | unavailable`). No threshold constants and no business formulas.
+- `packages/contracts`: the canonical OpenAPI contract and generated Zod runtime schemas, with precomputed values (for example `variance { value, direction, severity }` and `status: auto | manual | closed | unavailable`). No threshold constants and no business formulas.
 - `packages/react/src/client`: typed transport and credential injection. Property IDs identify context; they never authorize.
 - `packages/react/src/headless`: server state, selection and navigation; `updatePrice` forwards an intent and exposes a `pending` state.
 - `packages/react/src/ui`: a default Mantine presentation and centralized design tokens. Mantine is an optional peer dependency and is never imported by `client` or `headless`.
@@ -53,7 +53,7 @@ Option 1 satisfies every driver: it is embeddable, UI-agnostic and small, and it
 
 ### Negative and mitigations
 
-- The SDK depends on an external API that is not available yet — mitigate by defining the contract from scratch in Stage 3 and validating every boundary with Zod.
+- The SDK depends on an external API that is not available yet — mitigate by versioning the OpenAPI contract and validating SDK boundaries with generated Zod schemas.
 - Local development needs an external service — mitigate with the deterministic fixture server described in ADR-0002.
 - Contract drift is possible once the real API appears — mitigate by keeping all wire shapes in `packages/contracts` and changing them in one place.
 
@@ -68,3 +68,4 @@ Option 1 satisfies every driver: it is embeddable, UI-agnostic and small, and it
 
 - [Repository audit](../repository-audit.md)
 - [ADR-0002](0002-start-and-fixture-runtime-boundaries.md)
+- [ADR-0010](0010-openapi-canonical-api-contract.md)

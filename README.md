@@ -9,7 +9,7 @@ apps/
   playground/          TanStack Start SSR reference app with local fixture routes
   headless-demo/       Plain Vite SPA with independent presentation and tokens
 packages/
-  contracts/           Canonical OpenAPI contract and SDK runtime schemas
+  contracts/           Canonical OpenAPI contract and generated Zod validators
   react/               Public SDK: client, headless and UI entry points
 docs/
   integration.md       Integration guide and code examples
@@ -71,10 +71,13 @@ pnpm dev:demo
 | `pnpm typecheck` | Type-check the workspace and both apps |
 | `pnpm test` | Run Vitest in watch mode |
 | `pnpm test:run` | Run Vitest once |
+| `pnpm --filter @hpc/contracts generate` | Generate runtime Zod schemas from OpenAPI |
+| `pnpm --filter @hpc/contracts check:generated` | Check generated schemas are current |
 
 ## Verification
 
 ```bash
+pnpm --filter @hpc/contracts check:generated
 pnpm lint
 pnpm typecheck
 pnpm test:run

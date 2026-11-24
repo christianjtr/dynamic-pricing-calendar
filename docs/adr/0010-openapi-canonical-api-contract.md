@@ -26,9 +26,9 @@ The API surface already exists as `GET /settings`, `GET /prices` and `PATCH /pri
 
 ## Decision outcome
 
-Chosen option: **Option 2**. `packages/contracts/openapi.yaml` is the canonical, versioned HTTP contract. The SDK may keep using Zod for runtime validation, but its schemas must be generated from OpenAPI or mechanically checked against it; the two definitions must not evolve independently.
+Chosen option: **Option 2**. `packages/contracts/openapi.yaml` is the canonical, versioned HTTP contract. The SDK keeps using Zod for runtime validation, and its schemas are generated from OpenAPI; the two definitions must not evolve independently.
 
-The OpenAPI document describes the current endpoints, the repeated `room` query parameter, the required `x-property-id` context header, request and response models, and the shared API error envelope. The property header is context only; each backend remains responsible for authentication and authorization. No server URL or authentication scheme is mandated because these vary by deployment.
+The OpenAPI document describes the current endpoints, the repeated `room` query parameter, the required `x-property-id` context header, request and response models, and the shared API error envelope. Orval 8.48.0 generates the SDK's Zod component and operation schemas, including query, path, header, body and response validation; the existing HTTP client and `apiPaths` remain hand-written. The property header is context only; each backend remains responsible for authentication and authorization. No server URL or authentication scheme is mandated because these vary by deployment.
 
 ## Justification
 
@@ -44,18 +44,21 @@ OpenAPI is an HTTP-level, language-neutral artifact that can be read by backend 
 
 ### Negative and mitigations
 
-- OpenAPI generators may not preserve every runtime constraint, especially parameter and date semantics — verify generation coverage and add conformance tests before relying on generated schemas.
-- The existing Zod schemas are still hand-written during the transition — do not treat them as a second source; complete generation and CI drift checks in the follow-up stage.
+- OpenAPI generators may not preserve every runtime constraint, especially parameter and date semantics — verify generation coverage and keep conformance tests for generated schemas.
+- Generated schemas must be regenerated when OpenAPI changes; CI runs Orval's `--outdated` check to detect drift.
 - An OpenAPI contract alone does not prove that a backend conforms — test implementations against shared examples and conformance cases when they become available.
 
 ## Compliance and verification
 
 - `packages/contracts/openapi.yaml` is valid OpenAPI 3.1.1 and covers the implemented endpoint shapes.
 - Operation paths, methods, headers, parameters and response schemas agree with `apiPaths`, the SDK client and fixture routes.
-- The next stage verifies OpenAPI-to-Zod generation, including query, path and header parameters, before replacing hand-written runtime schemas.
+- Orval generation covers query, path, header, body and response schemas; contract tests cover representative valid and invalid parameters.
+- `pnpm --filter @hpc/contracts check:generated` passes against the committed generated output.
+- `apiPaths` serialization and the SDK client use the generated parameter schemas.
 
 ## Links
 
 - [ADR-0004](./0004-external-api-contracts.md)
 - [ADR-0006](./0006-public-sdk-and-headless-ui-separation.md)
 - [OpenAPI Specification 3.1.1](https://spec.openapis.org/oas/v3.1.1.html)
+- [Orval Zod generation guide](https://orval.dev/docs/guides/zod)

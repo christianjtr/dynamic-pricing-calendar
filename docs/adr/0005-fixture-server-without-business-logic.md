@@ -11,7 +11,7 @@ The previous `api/index.ts` generated 365 days of random prices, applied 4% vari
 ## Decision drivers
 
 - No randomness, thresholds or price derivation in this repository.
-- Responses must validate against `@hpc/contracts`.
+- Responses must validate against runtime schemas generated from the canonical OpenAPI contract.
 - Keep the existing Vinxi/Nitro runtime until Stage 8 replaces the app.
 - Make routing testable without starting an HTTP server.
 - Writes must return a canonical backend response, never a locally calculated value.
@@ -45,7 +45,7 @@ A pure router keeps the HTTP adapter trivial and makes it possible to assert the
 ### Positive
 
 - No `Math.random`, percentage thresholds or derived prices remain in the API layer.
-- Contract schemas are the single source of truth for fixture validation.
+- Generated Zod schemas validate fixtures against the canonical OpenAPI contract.
 - HTTP responses were smoke-checked through `pnpm dev` for settings and filtered prices.
 - `pnpm build` is now available and passes with Vite 8.
 
@@ -70,5 +70,6 @@ A pure router keeps the HTTP adapter trivial and makes it possible to assert the
 - [Memory](../Memory.md)
 - [ADR-0002](./0002-start-and-fixture-runtime-boundaries.md)
 - [ADR-0004](./0004-external-api-contracts.md)
+- [ADR-0010](./0010-openapi-canonical-api-contract.md)
 - https://github.com/nksaraf/vinxi/blob/main/docs/api/server/request.md
 - https://github.com/nksaraf/vinxi/blob/main/docs/api/server/response.md

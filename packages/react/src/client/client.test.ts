@@ -50,13 +50,25 @@ const jsonResponse = (body: unknown, status = 200) =>
 	}) as Response;
 
 describe("createPricingClient", () => {
+	it("rejects an empty property context", () => {
+		expect(() =>
+			createPricingClient({
+				baseUrl: "https://be.test",
+				propertyId: "",
+			}),
+		).toThrow();
+	});
+
 	it("sends injected headers and validates settings", async () => {
 		const fetchMock = vi.fn(async () => jsonResponse(settings));
 		const client = createPricingClient({
 			baseUrl: "https://be.test/backend/",
 			propertyId: "hotel-1",
 			fetch: fetchMock as unknown as typeof fetch,
-			headers: async () => ({ Authorization: "Bearer token" }),
+			headers: async () => ({
+				Authorization: "Bearer token",
+				"x-property-id": "overridden",
+			}),
 			credentials: "include",
 		});
 
@@ -75,6 +87,23 @@ describe("createPricingClient", () => {
 				},
 			}),
 		);
+	});
+
+	it("rejects invalid query and path parameters before making requests", async () => {
+		const fetchMock = vi.fn(async () => jsonResponse(prices));
+		const client = createPricingClient({
+			baseUrl: "https://be.test",
+			propertyId: "hotel-1",
+			fetch: fetchMock as unknown as typeof fetch,
+		});
+
+		await expect(
+			client.getPrices({ from: "invalid", to: "2026-11-24" }),
+		).rejects.toThrow();
+		await expect(
+			client.updatePrice("1001", "../settings", { price: 205 }),
+		).rejects.toThrow();
+		expect(fetchMock).not.toHaveBeenCalled();
 	});
 
 	it("builds prices paths from the contract and forwards the abort signal", async () => {
