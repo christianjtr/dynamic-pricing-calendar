@@ -3,6 +3,9 @@ import { defineConfig } from "vite";
 
 export default defineConfig({
 	plugins: [viteReact()],
+	resolve: {
+		tsconfigPaths: true,
+	},
 	server: {
 		port: 3001,
 	},

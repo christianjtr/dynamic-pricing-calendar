@@ -4,8 +4,12 @@ import {
 	UpdatePriceResponseSchema,
 } from "@hpc/contracts";
 import { describe, expect, it } from "vitest";
-import { pricesFixture, settingsFixture, updateFixtures } from "./fixtures";
-import { handleFixtureRequest } from "./router";
+import {
+	pricesFixture,
+	settingsFixture,
+	updateFixtures,
+} from "@/fixtures/fixtures";
+import { handleFixtureRequest } from "@/fixtures/router";
 
 describe("fixture server", () => {
 	it("serves settings conforming to the external contract", () => {

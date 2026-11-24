@@ -1,6 +1,6 @@
 # Memory
 
-Last updated: Stage 13 in progress on `feat/add-api-contract-docs`; Stage 12 merged to `main` at `712f895`.
+Last updated: Stage 14 in progress on `chore/configure-import-aliases`; Stage 13 merged to `main` at `ac8dd93`.
 
 ## Project goal
 
@@ -107,7 +107,8 @@ Important contract rules:
 | 10 | `docs/finalize-guides` | Complete and merged to `main` (`48ef608`) | English README, integration examples, complete CI, final branding cleanup |
 | 11 | `feat/publish-openapi-contract` | Complete and merged to `main` (`822687a`) | Canonical OpenAPI 3.1.1 spec and ADR-0010; ADR-0004 now superseded in part |
 | 12 | `chore/generate-zod-from-openapi` | Complete and merged to `main` (`712f895`) | Orval-generated Zod component/operation validators, CI drift check, request parameter validation; ADRs 0001, 0002, 0005, 0006 and 0010 updated |
-| 13 | `feat/add-api-contract-docs` | In progress | Playground `/docs/api` and `/openapi.yaml` routes from canonical spec; ADR-0011 |
+| 13 | `feat/add-api-contract-docs` | Complete and merged to `main` (`ac8dd93`) | Scalar reference and YAML download use canonical OpenAPI; ADR-0011, ADR-0007 updated |
+| 14 | `chore/configure-import-aliases` | In progress | App-scoped `@/*` aliases resolved by TypeScript, Vite and Vitest; ADR-0003 updated |
 
 ## ADR index
 

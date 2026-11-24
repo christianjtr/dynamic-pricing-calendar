@@ -1,8 +1,8 @@
 import { PricingCalendarProvider } from "@hpc/pricing-calendar";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import { App } from "./App";
-import { fixtureFetch } from "./fixtureFetch";
+import { App } from "@/App";
+import { fixtureFetch } from "@/fixtureFetch";
 import "./styles.css";
 
 const container = document.getElementById("root");

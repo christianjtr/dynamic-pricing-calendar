@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { toFixtureResponse } from "../../../../fixtures/response";
-import { handleFixtureRequest } from "../../../../fixtures/router";
+import { toFixtureResponse } from "@/fixtures/response";
+import { handleFixtureRequest } from "@/fixtures/router";
 
 export const Route = createFileRoute("/api/prices/$roomId/$date")({
 	server: {

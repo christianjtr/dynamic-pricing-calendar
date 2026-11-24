@@ -32,7 +32,7 @@ The baseline is now pinned to:
 - TypeScript 7.0.2, React 19.3.1, Vite 8.3.8, Mantine 9.8.2, TanStack Query 5.108.4, Zod 4.6.7, date-fns 4.4.0, Biome 2.6.8 and Vitest 5.1.1.
 - pnpm settings in `pnpm-workspace.yaml` (`overrides`, `allowBuilds`); the `pnpm` field in `package.json` was removed.
 - `skipLibCheck: true` in `tsconfig.json` to avoid errors from Vinxi/Nitro declarations that reference optional peers.
-- Vitest with jsdom, a setup file and no path alias; `"type": "module"` in `package.json`.
+- Vitest with jsdom and a setup file; `"type": "module"` in `package.json`.
 - Biome 2 configuration migrated; Markdown files excluded from Biome formatting.
 
 ### Justification
@@ -59,6 +59,10 @@ TypeScript 7 keeps the `tsc` command for the 7.0 release, Mantine 9 keeps `@mant
 - `pnpm install --frozen-lockfile` succeeds with Node 26.
 - `pnpm lint`, `pnpm typecheck` and `pnpm test:run` pass; 3 test files and 11 tests pass.
 - CI uses Node 26 and runs the same three checks plus frozen-lockfile installation.
+
+## Follow-up: app-scoped import aliases
+
+Each app may use `@/*` for imports inside its own `src`, with matching `paths` in its `tsconfig.json`. Vite and Vitest use their built-in `resolve.tsconfigPaths` support rather than a separate alias plugin. Workspace package boundaries continue to use `@hpc/*`; fixture modules shared across apps keep relative imports so one app's `@/` mapping cannot capture the other app's source.
 
 ## Links
 
