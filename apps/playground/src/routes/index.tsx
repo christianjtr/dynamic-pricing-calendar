@@ -8,7 +8,7 @@ import {
 	PricingCalendar,
 	PricingCalendarUIProvider,
 } from "@hpc/pricing-calendar/ui";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import { getRequestUrl } from "@tanstack/react-start/server";
 
@@ -62,6 +62,7 @@ function PlaygroundPage() {
 					Server-rendered playground consuming the public SDK through the
 					external-style pricing API.
 				</p>
+				<Link to="/docs/api">API contract and integration guide</Link>
 			</div>
 			<PricingCalendarUIProvider>
 				<PricingCalendarProvider

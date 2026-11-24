@@ -26,3 +26,19 @@ body {
 	color: #5f6879;
 	margin: 0;
 }
+
+.api-docs-shell {
+	max-width: 1360px;
+}
+
+.api-docs-viewer {
+	border-top: 1px solid #e3e6ef;
+	margin-top: 24px;
+	min-height: 70vh;
+}
+
+.api-docs-fixture-note {
+	background: #fff8e7;
+	border-left: 3px solid #d99a00;
+	padding: 12px;
+}

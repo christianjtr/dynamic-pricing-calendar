@@ -34,6 +34,7 @@ Chosen option: **2**.
 - `setupRouterSsrQueryIntegration` owns dehydration, streaming and hydration. No second independent dehydrate/hydrate path is added.
 - The index route prefetches settings and prices into that request's QueryClient. The SDK provider receives the same QueryClient instead of creating a hidden module-scope cache.
 - Static fixture HTTP endpoints are Start server routes under `src/routes/api`. They are a local test double for the external backend, not part of the SDK and not a business backend.
+- The playground exposes the canonical OpenAPI document at `/openapi.yaml` and its interactive reference at `/docs/api`; the YAML is imported from `packages/contracts/openapi.yaml`, never copied.
 - Root `dev`, `build` and `start` scripts delegate to the playground. Vinxi, Nitro, the root SPA entry, the legacy client and legacy Tailwind/PostCSS configuration are removed.
 
 ### Justification
@@ -61,6 +62,7 @@ The Start router factory gives a natural request boundary for Query state. The S
 - No `QueryClient` is created at module scope in the playground.
 - `pnpm lint`, `pnpm typecheck`, `pnpm test:run` and `pnpm build` pass.
 - HTTP smoke checks cover `GET /api/settings`, `GET /api/prices`, `PATCH /api/prices/:roomId/:date` and server-rendered `/`.
+- The OpenAPI download route serves the same contract used to generate runtime schemas.
 - No Vinxi/Nitro configuration, dependencies or scripts remain.
 
 ## Links
@@ -69,5 +71,7 @@ The Start router factory gives a natural request boundary for Query state. The S
 - [ADR-0002](./0002-start-and-fixture-runtime-boundaries.md)
 - [ADR-0005](./0005-fixture-server-without-business-logic.md)
 - [ADR-0006](./0006-public-sdk-and-headless-ui-separation.md)
+- [ADR-0010](./0010-openapi-canonical-api-contract.md)
+- [ADR-0011](./0011-integrated-openapi-documentation.md)
 - [TanStack Start + TanStack Query](https://tanstack.com/start/latest/docs/framework/react/guide/tanstack-query)
 - [TanStack Start server routes](https://tanstack.com/start/latest/docs/framework/react/guide/server-routes)

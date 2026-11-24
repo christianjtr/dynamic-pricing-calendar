@@ -4,6 +4,8 @@ The SDK transports and validates backend data. It does not calculate prices, var
 
 The package is currently workspace-only. Consumer apps in this repository depend on it with `workspace:*`. React 19 and TanStack Query 5 are required peers; Mantine 9 is only needed for `@hpc/pricing-calendar/ui`.
 
+The language-neutral API contract is available as [`packages/contracts/openapi.yaml`](../packages/contracts/openapi.yaml) and from the playground at `/docs/api` (download: `/openapi.yaml`).
+
 ## Ready-to-use UI
 
 ```tsx

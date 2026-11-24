@@ -1,6 +1,6 @@
 # Memory
 
-Last updated: Stage 12 in progress on `chore/generate-zod-from-openapi`; Stage 11 merged to `main` at `822687a`.
+Last updated: Stage 13 in progress on `feat/add-api-contract-docs`; Stage 12 merged to `main` at `712f895`.
 
 ## Project goal
 
@@ -29,10 +29,11 @@ Backend author: project owner. Product owner instruction: “toda la lógica se 
 
 - Node: `v26.13.1` via `pnpm runtime set node 26 -g -y`. There is no nvm-managed Node in this shell. `pnpm shim add node` failed with `ERR_PNPM_SHIM_BIN_CONFLICT`, but the runtime works and `pnpm` selects Node 26.
 - pnpm: `12.9.1`. Workspace config lives in `pnpm-workspace.yaml`; the `pnpm` field in `package.json` is ignored by pnpm 12.
-- pnpm config: `allowBuilds` plus `minimumReleaseAgeExclude` entries for TanStack packages were auto-added by pnpm; keep them unless intentionally updated.
+- pnpm config: `allowBuilds` permits Biome, Parcel watcher, esbuild and `vue-demi` (Scalar's Vue compatibility setup); `minimumReleaseAgeExclude` contains TanStack entries.
 - Versions installed: React `19.3.1`, Vite `8.3.8`, Mantine `9.8.2`, TypeScript `7.0.2`, TanStack Query `5.108.4`, Zod `4.6.7`, date-fns `4.4.0`, Biome `2.6.8`, Vitest `5.1.1`.
 - `vite: ^8.3.8` is pinned via pnpm overrides and drives both app builds.
 - Orval `8.48.0` generates Zod schemas and operation parameter validators from `packages/contracts/openapi.yaml`; `check:generated` detects drift.
+- Scalar API Reference React `0.9.96` is used only by the playground docs route and is mounted after hydration.
 - Installed Start packages: `@tanstack/react-start 1.169.7`, `@tanstack/react-router 1.170.46`, `@tanstack/react-router-ssr-query 1.167.3`.
 - TypeScript 7 checks CSS side-effect imports by default; `declare module "*.css" {}` is required in each TS project that imports stylesheets.
 - Biome 2: `organizeImports` moved under `assist`; Markdown files are excluded from Biome with `!**/*.md`.
@@ -105,7 +106,8 @@ Important contract rules:
 | 9 | `feat/add-headless-demo-app` | Complete and merged to `main` (`7c2ea3e`) | Separate Vite SPA, independent tokens, injected fixture fetch, deterministic PATCH state |
 | 10 | `docs/finalize-guides` | Complete and merged to `main` (`48ef608`) | English README, integration examples, complete CI, final branding cleanup |
 | 11 | `feat/publish-openapi-contract` | Complete and merged to `main` (`822687a`) | Canonical OpenAPI 3.1.1 spec and ADR-0010; ADR-0004 now superseded in part |
-| 12 | `chore/generate-zod-from-openapi` | In progress | Generate Zod component and operation validators with Orval; preserve SDK API and add CI drift checks |
+| 12 | `chore/generate-zod-from-openapi` | Complete and merged to `main` (`712f895`) | Orval-generated Zod component/operation validators, CI drift check, request parameter validation; ADRs 0001, 0002, 0005, 0006 and 0010 updated |
+| 13 | `feat/add-api-contract-docs` | In progress | Playground `/docs/api` and `/openapi.yaml` routes from canonical spec; ADR-0011 |
 
 ## ADR index
 
@@ -119,6 +121,7 @@ Important contract rules:
 - [ADR-0008](docs/adr/0008-neutral-and-overridable-ui-tokens.md) — Neutral and overridable UI tokens. Accepted.
 - [ADR-0009](docs/adr/0009-backend-and-property-context-injection.md) — Backend and property context injection. Accepted.
 - [ADR-0010](docs/adr/0010-openapi-canonical-api-contract.md) — OpenAPI as the canonical API contract. Accepted.
+- [ADR-0011](docs/adr/0011-integrated-openapi-documentation.md) — Integrated OpenAPI documentation. Accepted.
 
 ## Stage 4 recap — fixture server
 

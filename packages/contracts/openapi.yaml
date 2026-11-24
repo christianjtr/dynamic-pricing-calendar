@@ -131,6 +131,7 @@ components:
       in: header
       required: true
       description: Property context identifier; authorization remains backend-specific.
+      example: playground-property
       schema:
         type: string
         minLength: 1

@@ -90,8 +90,10 @@ The same commands run in CI on pushes and pull requests to `main`.
 
 - [Integration guide](docs/integration.md)
 - [OpenAPI contract](packages/contracts/openapi.yaml)
+- Interactive API reference: `/docs/api` in the playground
 - [Architecture decision records](docs/adr/0001-headless-backend-driven-direction.md)
 - [ADR-0010 — OpenAPI as the canonical API contract](docs/adr/0010-openapi-canonical-api-contract.md)
+- [ADR-0011 — Integrated OpenAPI documentation](docs/adr/0011-integrated-openapi-documentation.md)
 - [Repository audit](docs/repository-audit.md) — historical pre-migration snapshot
 
 ## License

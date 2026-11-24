@@ -10,7 +10,9 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as OpenapiDotyamlRouteImport } from './routes/openapi[.]yaml'
 import { Route as ApiSettingsRouteImport } from './routes/api/settings'
+import { Route as DocsApiRouteImport } from './routes/docs/api'
 import { Route as ApiPricesIndexRouteImport } from './routes/api/prices/index'
 import { Route as ApiPricesRoomIdDateRouteImport } from './routes/api/prices/$roomId/$date'
 
@@ -19,9 +21,19 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const OpenapiDotyamlRoute = OpenapiDotyamlRouteImport.update({
+  id: '/openapi.yaml',
+  path: '/openapi.yaml',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiSettingsRoute = ApiSettingsRouteImport.update({
   id: '/api/settings',
   path: '/api/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DocsApiRoute = DocsApiRouteImport.update({
+  id: '/docs/api',
+  path: '/docs/api',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiPricesIndexRoute = ApiPricesIndexRouteImport.update({
@@ -37,40 +49,61 @@ const ApiPricesRoomIdDateRoute = ApiPricesRoomIdDateRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/openapi.yaml': typeof OpenapiDotyamlRoute
   '/api/settings': typeof ApiSettingsRoute
+  '/docs/api': typeof DocsApiRoute
   '/api/prices/': typeof ApiPricesIndexRoute
   '/api/prices/$roomId/$date': typeof ApiPricesRoomIdDateRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/openapi.yaml': typeof OpenapiDotyamlRoute
   '/api/settings': typeof ApiSettingsRoute
+  '/docs/api': typeof DocsApiRoute
   '/api/prices': typeof ApiPricesIndexRoute
   '/api/prices/$roomId/$date': typeof ApiPricesRoomIdDateRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/openapi.yaml': typeof OpenapiDotyamlRoute
   '/api/settings': typeof ApiSettingsRoute
+  '/docs/api': typeof DocsApiRoute
   '/api/prices/': typeof ApiPricesIndexRoute
   '/api/prices/$roomId/$date': typeof ApiPricesRoomIdDateRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/api/settings' | '/api/prices/' | '/api/prices/$roomId/$date'
+    | '/'
+    | '/openapi.yaml'
+    | '/api/settings'
+    | '/docs/api'
+    | '/api/prices/'
+    | '/api/prices/$roomId/$date'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/api/settings' | '/api/prices' | '/api/prices/$roomId/$date'
+  to:
+    | '/'
+    | '/openapi.yaml'
+    | '/api/settings'
+    | '/docs/api'
+    | '/api/prices'
+    | '/api/prices/$roomId/$date'
   id:
     | '__root__'
     | '/'
+    | '/openapi.yaml'
     | '/api/settings'
+    | '/docs/api'
     | '/api/prices/'
     | '/api/prices/$roomId/$date'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  OpenapiDotyamlRoute: typeof OpenapiDotyamlRoute
   ApiSettingsRoute: typeof ApiSettingsRoute
+  DocsApiRoute: typeof DocsApiRoute
   ApiPricesIndexRoute: typeof ApiPricesIndexRoute
   ApiPricesRoomIdDateRoute: typeof ApiPricesRoomIdDateRoute
 }
@@ -84,11 +117,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/openapi.yaml': {
+      id: '/openapi.yaml'
+      path: '/openapi.yaml'
+      fullPath: '/openapi.yaml'
+      preLoaderRoute: typeof OpenapiDotyamlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/settings': {
       id: '/api/settings'
       path: '/api/settings'
       fullPath: '/api/settings'
       preLoaderRoute: typeof ApiSettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/docs/api': {
+      id: '/docs/api'
+      path: '/docs/api'
+      fullPath: '/docs/api'
+      preLoaderRoute: typeof DocsApiRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/prices/': {
@@ -110,7 +157,9 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  OpenapiDotyamlRoute: OpenapiDotyamlRoute,
   ApiSettingsRoute: ApiSettingsRoute,
+  DocsApiRoute: DocsApiRoute,
   ApiPricesIndexRoute: ApiPricesIndexRoute,
   ApiPricesRoomIdDateRoute: ApiPricesRoomIdDateRoute,
 }
