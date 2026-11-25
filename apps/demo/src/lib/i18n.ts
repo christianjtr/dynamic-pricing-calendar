@@ -145,14 +145,19 @@ export async function loadLocale(): Promise<void> {
 		if (url.origin !== window.location.origin) {
 			console.warn("pricingCalendarI18n.messagesUrl must be same-host");
 		} else {
+			// A stalled messages file must never block the first render.
+			const controller = new AbortController();
+			const timer = setTimeout(() => controller.abort(), 3000);
 			try {
-				const response = await fetch(url);
+				const response = await fetch(url, { signal: controller.signal });
 				if (!response.ok) {
 					throw new Error(`HTTP ${response.status}`);
 				}
 				source = await response.json();
 			} catch {
 				console.warn("Could not load pricingCalendarI18n.messagesUrl");
+			} finally {
+				clearTimeout(timer);
 			}
 		}
 	}

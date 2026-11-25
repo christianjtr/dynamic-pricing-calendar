@@ -36,7 +36,7 @@ The calendar ships with an English message registry and stable keys. There is no
 </script>
 ```
 
-The JSON file is a flat map of the published keys, for example `{ "calendar.title": "…", "empty.body": "…" }`. Inline `messages` are supported as well. `messagesUrl` must stay on the same origin; cross-origin URLs are ignored. Missing keys fall back to English, unknown keys are ignored, and the app waits for the file before the first render so translated users never see an English flash. `locale` sets `<html lang>` and `title` overrides `document.title`.
+The JSON file is a flat map of the published keys, for example `{ "calendar.title": "…", "empty.body": "…" }`. Inline `messages` are supported as well. `messagesUrl` must stay on the same origin; cross-origin URLs are ignored. Missing keys fall back to English, unknown keys are ignored, and the app waits for the file before the first render so translated users never see an English flash. That wait is bounded to three seconds: a stalled or failed request falls back to English instead of blocking the app. `locale` sets `<html lang>` and `title` overrides `document.title`.
 
 The scope is the calendar UI only: `/faq` body copy, Swagger UI on `/docs`, and shared chrome such as the site header and theme switch remain owned by the integrator. Contract enums use registry keys (`status.*`, `availability.*`) when translated and fall back to the raw value otherwise. Open-ended backend strings — room names and descriptions, restrictions, error messages, currencies — are shown verbatim and marked `translate="no"` where appropriate.
 

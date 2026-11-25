@@ -1,7 +1,8 @@
-import { beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
 	getLocale,
 	hasMessage,
+	loadLocale,
 	resolveMessages,
 	setLocale,
 	setMessages,
@@ -11,6 +12,12 @@ import {
 beforeEach(() => {
 	setLocale("en");
 	setMessages({});
+});
+
+afterEach(() => {
+	vi.useRealTimers();
+	vi.unstubAllGlobals();
+	vi.restoreAllMocks();
 });
 
 describe("in-house locale registry", () => {
@@ -48,5 +55,35 @@ describe("in-house locale registry", () => {
 				other: "ignored",
 			}),
 		).toEqual({ "table.price": "Precio" });
+	});
+
+	it("aborts a stalled messagesUrl so the first render is not blocked", async () => {
+		vi.useFakeTimers();
+		vi.stubGlobal("window", {
+			location: { href: "http://localhost/", origin: "http://localhost" },
+			pricingCalendarI18n: { messagesUrl: "/i18n/stalled.json" },
+		});
+		vi.stubGlobal("document", {
+			documentElement: { lang: "en" },
+			title: "",
+		});
+		const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+		const fetchMock = vi.fn(
+			(_url: URL, init: RequestInit) =>
+				new Promise<Response>((_resolve, reject) => {
+					init.signal?.addEventListener("abort", () =>
+						reject(new Error("aborted")),
+					);
+				}),
+		);
+		vi.stubGlobal("fetch", fetchMock);
+
+		const pending = loadLocale();
+		await vi.advanceTimersByTimeAsync(3001);
+		await pending;
+
+		expect(fetchMock).toHaveBeenCalledOnce();
+		expect(warn).toHaveBeenCalled();
+		expect(t("calendar.title")).toBe("Pricing Calendar");
 	});
 });
