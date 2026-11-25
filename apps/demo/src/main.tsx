@@ -2,6 +2,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { lazy, StrictMode, Suspense } from "react";
 import { createRoot } from "react-dom/client";
 import { App } from "@/App";
+import { SiteHeader } from "@/components/SiteHeader";
 import { Faq } from "@/Faq";
 import "./styles.css";
 
@@ -50,6 +51,7 @@ const skipLink = (
 createRoot(container).render(
 	<QueryClientProvider client={queryClient}>
 		{skipLink}
+		<SiteHeader />
 		{isDocsPage ? page : <StrictMode>{page}</StrictMode>}
 	</QueryClientProvider>,
 );

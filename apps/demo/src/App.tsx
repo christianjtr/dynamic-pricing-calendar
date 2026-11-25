@@ -1,6 +1,5 @@
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { ThemeToggle } from "@/components/ThemeToggle";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -211,32 +210,21 @@ export function App() {
 			id="main-content"
 			tabIndex={-1}
 		>
-			<header className="mb-8 flex flex-wrap items-start justify-between gap-4">
-				<div>
-					<div className="mb-3 flex flex-wrap items-center gap-2">
-						<Badge variant="outline">Fixture data</Badge>
-						<span className="text-sm text-muted-foreground">
-							No live backend connected
-						</span>
-					</div>
-					<h1 className="text-balance text-3xl font-semibold tracking-tight sm:text-4xl">
-						Pricing Calendar
-					</h1>
-					<p className="mt-2 max-w-2xl text-muted-foreground">
-						A reference UI for prices computed by an external backend. This demo
-						renders static fixtures and never calculates, recommends or
-						validates a price itself.
-					</p>
+			<header className="mb-8">
+				<div className="mb-3 flex flex-wrap items-center gap-2">
+					<Badge variant="outline">Fixture data</Badge>
+					<span className="text-sm text-muted-foreground">
+						No live backend connected
+					</span>
 				</div>
-				<div className="flex flex-wrap items-center gap-2">
-					<Button asChild size="sm" variant="outline">
-						<a href="/faq">How to use</a>
-					</Button>
-					<Button asChild size="sm" variant="outline">
-						<a href="/docs">API documentation</a>
-					</Button>
-					<ThemeToggle />
-				</div>
+				<h1 className="text-balance text-3xl font-semibold tracking-tight sm:text-4xl">
+					Pricing Calendar
+				</h1>
+				<p className="mt-2 max-w-2xl text-muted-foreground">
+					A reference UI for prices computed by an external backend. This demo
+					renders static fixtures and never calculates, recommends or validates
+					a price itself.
+				</p>
 			</header>
 
 			{settings.data ? (

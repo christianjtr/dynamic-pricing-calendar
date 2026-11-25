@@ -1,6 +1,3 @@
-import { ThemeToggle } from "@/components/ThemeToggle";
-import { Button } from "@/components/ui/button";
-
 const linkClass =
 	"underline underline-offset-4 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background";
 
@@ -11,22 +8,13 @@ export function Faq() {
 			id="main-content"
 			tabIndex={-1}
 		>
-			<header className="mb-8 flex flex-wrap items-end justify-between gap-4">
-				<div>
-					<h1 className="text-balance text-3xl font-semibold tracking-tight sm:text-4xl">
-						How to use the demo
-					</h1>
-					<p className="mt-2 max-w-2xl text-muted-foreground">
-						A short guide to the calendar, the edit dialog and the shareable
-						URL.
-					</p>
-				</div>
-				<div className="flex flex-wrap items-center gap-2">
-					<Button asChild size="sm" variant="outline">
-						<a href="/">Calendar</a>
-					</Button>
-					<ThemeToggle />
-				</div>
+			<header className="mb-8">
+				<h1 className="text-balance text-3xl font-semibold tracking-tight sm:text-4xl">
+					How to use the demo
+				</h1>
+				<p className="mt-2 max-w-2xl text-muted-foreground">
+					A short guide to the calendar, the edit dialog and the shareable URL.
+				</p>
 			</header>
 
 			<div className="grid gap-4">
