@@ -4,6 +4,7 @@ import { createRoot } from "react-dom/client";
 import { App } from "@/App";
 import { SiteHeader } from "@/components/SiteHeader";
 import { Faq } from "@/Faq";
+import { loadLocale } from "@/lib/i18n";
 import "./styles.css";
 
 const Docs = lazy(() => import("@/Docs"));
@@ -46,6 +47,8 @@ const skipLink = (
 		Skip to Content
 	</a>
 );
+
+await loadLocale();
 
 // Swagger UI uses legacy lifecycles that warn under StrictMode.
 createRoot(container).render(

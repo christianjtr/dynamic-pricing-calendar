@@ -36,6 +36,7 @@ import {
 	getDayNotes,
 	statusTone,
 } from "@/lib/format";
+import { t } from "@/lib/i18n";
 import {
 	readEdit,
 	readSelection,
@@ -192,9 +193,7 @@ export function App() {
 				tabIndex={-1}
 			>
 				<Card role="status">
-					<CardContent className="p-6">
-						Loading fixture-backed pricing data…
-					</CardContent>
+					<CardContent className="p-6">{t("calendar.loading")}</CardContent>
 				</Card>
 			</main>
 		);
@@ -210,9 +209,9 @@ export function App() {
 			>
 				<Card role="alert">
 					<CardHeader>
-						<CardTitle>Unable to load pricing data</CardTitle>
+						<CardTitle>{t("calendar.errorTitle")}</CardTitle>
 						<CardDescription>
-							{loadError.message} Check the fixture response and try again.
+							{t("calendar.errorBody", { message: loadError.message })}
 						</CardDescription>
 					</CardHeader>
 					<CardContent>
@@ -222,7 +221,7 @@ export function App() {
 								void prices.refetch();
 							}}
 						>
-							Retry
+							{t("calendar.retry")}
 						</Button>
 					</CardContent>
 				</Card>
@@ -243,30 +242,30 @@ export function App() {
 							aria-hidden="true"
 							className="size-1.5 rounded-full bg-warning"
 						/>
-						Fixture data
+						{t("calendar.fixtureBadge")}
 					</Badge>
 					<span className="text-sm text-muted-foreground">
-						No live backend connected
+						{t("calendar.noBackend")}
 					</span>
 				</div>
 				<h1 className="text-balance text-3xl font-semibold tracking-tight sm:text-4xl">
-					Pricing Calendar
+					{t("calendar.title")}
 				</h1>
 				<p className="mt-2 max-w-2xl text-muted-foreground">
-					A reference UI for prices computed by an external backend. This demo
-					renders static fixtures and never calculates, recommends or validates
-					a price itself.
+					{t("calendar.intro")}
 				</p>
 				{settings.data ? (
 					<dl className="mt-3 flex flex-wrap gap-2 text-xs">
 						<div className="flex items-center gap-1.5 rounded-full border bg-muted/40 px-2.5 py-1">
-							<dt className="text-muted-foreground">Timezone</dt>
+							<dt className="text-muted-foreground">
+								{t("calendar.timezone")}
+							</dt>
 							<dd className="font-semibold text-foreground" translate="no">
 								{settings.data.hotel.timezone}
 							</dd>
 						</div>
 						<div className="flex items-center gap-1.5 rounded-full border bg-muted/40 px-2.5 py-1">
-							<dt className="text-muted-foreground">Locale</dt>
+							<dt className="text-muted-foreground">{t("calendar.locale")}</dt>
 							<dd className="font-semibold text-foreground" translate="no">
 								{settings.data.hotel.locale}
 							</dd>
@@ -275,7 +274,10 @@ export function App() {
 				) : null}
 			</header>
 
-			<nav aria-label="Rooms" className="mb-6 flex flex-wrap gap-2">
+			<nav
+				aria-label={t("calendar.roomsLabel")}
+				className="mb-6 flex flex-wrap gap-2"
+			>
 				{rooms.map((room) => (
 					<Button
 						aria-pressed={room.id === activeRoomId}
@@ -306,19 +308,20 @@ export function App() {
 							) : null}
 							<CardDescription className="text-xs">
 								{formatDate(range.from)} – {formatDate(range.to)} ·{" "}
-								{dates.length} days · Prices in{" "}
+								{t("calendar.days", { count: dates.length })} ·{" "}
+								{t("calendar.pricesLabel")}{" "}
 								{headerCurrency ? (
 									<span className="text-foreground" translate="no">
 										{headerCurrency}
 									</span>
 								) : (
-									"multiple currencies"
+									t("calendar.multipleCurrencies")
 								)}
 							</CardDescription>
 						</div>
 						<div className="flex items-center gap-2">
 							<Button
-								aria-label="Previous Day"
+								aria-label={t("calendar.previousDay")}
 								disabled={selectedIndex <= 0}
 								onClick={() => moveDay(-1)}
 								size="icon"
@@ -330,10 +333,12 @@ export function App() {
 								aria-live="polite"
 								className="min-w-32 text-center text-sm font-medium tabular-nums"
 							>
-								{selectedDay ? formatDate(selectedDay.date) : "No day"}
+								{selectedDay
+									? formatDate(selectedDay.date)
+									: t("calendar.noDay")}
 							</span>
 							<Button
-								aria-label="Next Day"
+								aria-label={t("calendar.nextDay")}
 								disabled={selectedIndex < 0 || selectedIndex >= days.length - 1}
 								onClick={() => moveDay(1)}
 								size="icon"
@@ -350,7 +355,7 @@ export function App() {
 							className="grid gap-1 text-xs font-medium text-muted-foreground"
 							htmlFor="from"
 						>
-							From
+							{t("calendar.from")}
 							<Input
 								id="from"
 								max={range.to}
@@ -368,7 +373,7 @@ export function App() {
 							className="grid gap-1 text-xs font-medium text-muted-foreground"
 							htmlFor="to"
 						>
-							To
+							{t("calendar.to")}
 							<Input
 								id="to"
 								min={range.from}
@@ -385,7 +390,7 @@ export function App() {
 						<div className="flex items-center gap-2">
 							<Button onClick={goToToday} size="sm" variant="outline">
 								<CalendarDays aria-hidden="true" className="size-4" />
-								Today
+								{t("calendar.today")}
 							</Button>
 							<Button
 								onClick={() => applyRange(shiftMonth(range, -1))}
@@ -393,14 +398,14 @@ export function App() {
 								variant="outline"
 							>
 								<ChevronLeft aria-hidden="true" className="size-4" />
-								Previous month
+								{t("calendar.previousMonth")}
 							</Button>
 							<Button
 								onClick={() => applyRange(shiftMonth(range, 1))}
 								size="sm"
 								variant="outline"
 							>
-								Next month
+								{t("calendar.nextMonth")}
 								<ChevronRight aria-hidden="true" className="size-4" />
 							</Button>
 						</div>
@@ -417,11 +422,10 @@ export function App() {
 								/>
 							</div>
 							<p className="text-sm font-semibold text-foreground">
-								No prices in this range
+								{t("empty.title")}
 							</p>
 							<p className="mt-1 max-w-sm text-sm text-muted-foreground">
-								No fixture data for this period. Choose another range to see the
-								demo prices.
+								{t("empty.body")}
 							</p>
 							<Button
 								className="mt-4"
@@ -429,14 +433,14 @@ export function App() {
 								size="sm"
 								variant="outline"
 							>
-								Show fixture range
+								{t("empty.action")}
 							</Button>
 						</div>
 					) : (
 						<div className="overflow-x-auto">
 							<table className="w-full min-w-[56rem] border-collapse text-sm">
 								<caption className="sr-only">
-									Backend-provided prices for {roomName}
+									{t("table.caption", { room: roomName })}
 								</caption>
 								<thead>
 									<tr className="text-left text-muted-foreground">
@@ -444,34 +448,34 @@ export function App() {
 											className="min-w-[7.5rem] whitespace-nowrap px-3 py-2 font-medium"
 											scope="col"
 										>
-											Date
+											{t("table.date")}
 										</th>
 										<th
 											className="px-3 py-2 text-right font-medium"
 											scope="col"
 										>
-											Price
+											{t("table.price")}
 										</th>
 										<th className="px-3 py-2 font-medium" scope="col">
-											Status
+											{t("table.status")}
 										</th>
 										<th
 											className="px-3 py-2 text-right font-medium"
 											scope="col"
 										>
-											Recommended
+											{t("table.recommended")}
 										</th>
 										<th
 											className="px-3 py-2 text-right font-medium"
 											scope="col"
 										>
-											Availability
+											{t("table.availability")}
 										</th>
 										<th className="px-3 py-2 font-medium" scope="col">
-											Notes
+											{t("table.notes")}
 										</th>
 										<th className="px-3 py-2 font-medium" scope="col">
-											Actions
+											{t("table.actions")}
 										</th>
 									</tr>
 								</thead>
@@ -512,7 +516,7 @@ export function App() {
 														{formatMoney(day.price)}
 													</div>
 													<div className="text-xs font-normal text-muted-foreground">
-														In PMS: {currencyPrefix}
+														{t("table.inPms")} {currencyPrefix}
 														{formatMoney(day.priceInPms)}
 													</div>
 												</td>
@@ -527,7 +531,7 @@ export function App() {
 														{formatMoney(day.recommendedPrice)}
 													</div>
 													<div className="text-xs text-muted-foreground">
-														Variance:{" "}
+														{t("table.variance")}{" "}
 														<span translate="no">
 															{day.variance?.label ?? "—"}
 														</span>
@@ -537,7 +541,9 @@ export function App() {
 													<div>{formatAvailability(day.availability)}</div>
 													{day.occupancy !== null ? (
 														<div className="text-xs text-muted-foreground tabular-nums">
-															{formatPercent(day.occupancy)} occupied
+															{t("table.occupied", {
+																percent: formatPercent(day.occupancy),
+															})}
 														</div>
 													) : null}
 												</td>
@@ -560,7 +566,9 @@ export function App() {
 												<td className="px-3 py-2 text-right">
 													<Button
 														aria-haspopup="dialog"
-														aria-label={`Edit price for ${formatDate(day.date)}`}
+														aria-label={t("table.editDay", {
+															date: formatDate(day.date),
+														})}
 														onClick={(event) =>
 															openEditor(
 																day.date,
@@ -606,13 +614,13 @@ export function App() {
 								className="mt-1 text-sm text-muted-foreground"
 								id="day-edit-description"
 							>
-								Values in <span translate="no">{selectedDay.currency}</span>.
-								Backend values stay read-only. Save submits a manual price
-								intent.
+								{t("editor.valuesLabel")}{" "}
+								<span translate="no">{selectedDay.currency}</span>.{" "}
+								{t("editor.description")}
 							</p>
 						</div>
 						<Button
-							aria-label="Close editor"
+							aria-label={t("editor.close")}
 							onClick={() => dialogRef.current?.close()}
 							size="icon"
 							variant="ghost"
@@ -622,25 +630,29 @@ export function App() {
 					</div>
 					<dl className="mb-4 grid grid-cols-2 gap-2 text-sm">
 						<div className="rounded-md border bg-muted/40 p-2">
-							<dt className="text-muted-foreground">Backend price</dt>
+							<dt className="text-muted-foreground">
+								{t("editor.backendPrice")}
+							</dt>
 							<dd className="font-medium tabular-nums">
 								{formatMoney(selectedDay.price)}
 							</dd>
 						</div>
 						<div className="rounded-md border bg-muted/40 p-2">
-							<dt className="text-muted-foreground">Status</dt>
+							<dt className="text-muted-foreground">{t("table.status")}</dt>
 							<dd className="font-medium">
 								{formatStatus(selectedDay.status)}
 							</dd>
 						</div>
 						<div className="rounded-md border bg-muted/40 p-2">
-							<dt className="text-muted-foreground">Recommended</dt>
+							<dt className="text-muted-foreground">
+								{t("editor.recommended")}
+							</dt>
 							<dd className="font-medium tabular-nums">
 								{formatMoney(selectedDay.recommendedPrice)}
 							</dd>
 						</div>
 						<div className="rounded-md border bg-muted/40 p-2">
-							<dt className="text-muted-foreground">Variance</dt>
+							<dt className="text-muted-foreground">{t("editor.variance")}</dt>
 							<dd className="font-medium tabular-nums">
 								{selectedDay.variance?.label ?? "—"}
 							</dd>
@@ -655,13 +667,15 @@ export function App() {
 							updatePrice.mutate({
 								date: selectedDay.date,
 								price: Number(formData.get("price")),
-								reason: String(formData.get("reason") ?? "Manual override"),
+								reason: String(
+									formData.get("reason") ?? t("editor.defaultReason"),
+								),
 								roomId: activeRoomId,
 							});
 						}}
 					>
 						<label className="grid gap-2 text-sm" htmlFor="edit-price">
-							<span>Price</span>
+							<span>{t("editor.price")}</span>
 							<Input
 								autoComplete="off"
 								defaultValue={selectedDay.price ?? ""}
@@ -675,13 +689,13 @@ export function App() {
 							/>
 						</label>
 						<label className="grid gap-2 text-sm" htmlFor="edit-reason">
-							<span>Reason</span>
+							<span>{t("editor.reason")}</span>
 							<Input
 								autoComplete="off"
-								defaultValue="Manual override"
+								defaultValue={t("editor.defaultReason")}
 								id="edit-reason"
 								name="reason"
-								placeholder="e.g. Peak demand…"
+								placeholder={t("editor.reasonPlaceholder")}
 							/>
 						</label>
 						<div className="flex justify-end gap-2">
@@ -690,7 +704,7 @@ export function App() {
 								type="button"
 								variant="outline"
 							>
-								Cancel
+								{t("editor.cancel")}
 							</Button>
 							<Button
 								disabled={
@@ -700,14 +714,13 @@ export function App() {
 								}
 								type="submit"
 							>
-								{updatePrice.isPending ? "Saving…" : "Save Manual Price"}
+								{updatePrice.isPending ? t("editor.saving") : t("editor.save")}
 							</Button>
 						</div>
 					</form>
 					{!canUpdate ? (
 						<p className="mt-4 text-sm text-muted-foreground">
-							This fixture day has no canonical update response. Choose a day
-							with one to try a write.
+							{t("editor.noWrite")}
 						</p>
 					) : null}
 					{updatePrice.isError ? (
@@ -717,20 +730,22 @@ export function App() {
 					) : null}
 					{updatePrice.data ? (
 						<p className="mt-4 text-sm" role="status">
-							Backend accepted {formatMoney(updatePrice.data.day.price)} with
-							status {formatStatus(updatePrice.data.day.status)}.
+							{t("editor.accepted", {
+								price: formatMoney(updatePrice.data.day.price),
+								status: formatStatus(updatePrice.data.day.status),
+							})}
 						</p>
 					) : null}
 				</dialog>
 			) : null}
 
 			<footer className="mt-8 text-sm text-muted-foreground">
-				All values come from the fixture response. See the{" "}
+				{t("footer.note")}{" "}
 				<a
 					className="underline underline-offset-4 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
 					href="/docs"
 				>
-					OpenAPI Reference
+					{t("footer.reference")}
 				</a>
 				.
 			</footer>

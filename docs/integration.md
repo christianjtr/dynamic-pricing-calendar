@@ -22,6 +22,24 @@ The demo uses explicit static fixtures, visibly labelled as fixture data. They d
 
 The header switch toggles dark and light tokens and stores the choice locally. It is a user preference, not shared URL state. Swagger UI keeps its own styles on `/docs`. An in-app FAQ at `/faq` explains navigation, selection versus editing, URL parameters and saving a manual price intent.
 
+## Calendar locale
+
+The calendar ships with an English message registry and stable keys. There is no runtime i18n dependency and no repository-authored translation bundle. The integrator supplies locale data before the app boots, either inline or from a same-host JSON file:
+
+```html
+<script>
+	window.pricingCalendarI18n = {
+		locale: "fr-FR",
+		title: "Calendrier des tarifs",
+		messagesUrl: "/i18n/pricing-calendar.fr.json",
+	};
+</script>
+```
+
+The JSON file is a flat map of the published keys, for example `{ "calendar.title": "…", "empty.body": "…" }`. Inline `messages` are supported as well. `messagesUrl` must stay on the same origin; cross-origin URLs are ignored. Missing keys fall back to English, unknown keys are ignored, and the app waits for the file before the first render so translated users never see an English flash. `locale` sets `<html lang>` and `title` overrides `document.title`.
+
+The scope is the calendar UI only: `/faq` body copy, Swagger UI on `/docs`, and shared chrome such as the site header and theme switch remain owned by the integrator. Contract enums use registry keys (`status.*`, `availability.*`) when translated and fall back to the raw value otherwise. Open-ended backend strings — room names and descriptions, restrictions, error messages, currencies — are shown verbatim and marked `translate="no"` where appropriate.
+
 ## API documentation
 
 Swagger UI at `/docs` in the demo app renders the canonical OpenAPI file and offers a download link for the YAML. The docs chunk is loaded only on that route. Implementing the contract does not by itself prove that a backend is conformant; that requires testing against a real implementation.

@@ -1,6 +1,6 @@
 # Memory
 
-Last updated: pivot complete at `1816ec3`; date-range navigation merged at `0c62bea`; day editor merged at `bf2c20c`; theme switch merged at `d1dba31`; separate edit action merged at `273ebe7`; FAQ route merged at `20f33c6`; shared site header merged at `db3150c`; theme toggle icon merged at `6f4d032`; condensed table merged at `e7fd711`; fixture indicator ready on `feat/fixture-indicator`. See ADR-0012.
+Last updated: pivot complete at `1816ec3`; date-range navigation merged at `0c62bea`; day editor merged at `bf2c20c`; theme switch merged at `d1dba31`; separate edit action merged at `273ebe7`; FAQ route merged at `20f33c6`; shared site header merged at `db3150c`; theme toggle icon merged at `6f4d032`; condensed table merged at `e7fd711`; fixture indicator merged at `cf95388`; in-house locale ready on `feat/in-house-locale`. See ADR-0012.
 
 ## Project goal
 
@@ -115,7 +115,8 @@ Important contract rules:
 | P11 | `refactor/shared-site-header` | Single header with Calendar, How to use, API Docs and one theme switch | Complete, merged at `db3150c` |
 | P12 | `feat/theme-toggle-icon` | Theme button shows the next mode with a matching Sun/Moon icon | Complete, merged at `6f4d032` |
 | P13 | `feat/condensed-pricing-table` | Condensed numeric table, per-row editor, semantic statuses and Intl formatting | Complete, merged at `e7fd711` |
-| P14 | `feat/fixture-indicator` | Warning-style fixture indicator, emphasized metadata, room descriptions, dynamic room count, clearer card hierarchy, Today button and calendar blank state | Ready for commit |
+| P14 | `feat/fixture-indicator` | Warning-style fixture indicator, emphasized metadata, room descriptions, dynamic room count, clearer card hierarchy, Today button and calendar blank state | Complete, merged at `cf95388` |
+| P15 | `feat/in-house-locale` | Calendar-only key registry with integrator messages via inline config or same-host JSON | Ready for commit |
 
 ## ADR index
 
