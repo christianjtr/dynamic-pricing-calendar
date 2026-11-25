@@ -20,6 +20,8 @@ The frontend renders the returned fields and never recalculates a displayed pric
 
 The demo uses explicit static fixtures, visibly labelled as fixture data. They demonstrate the contract and the UI flow; they are not an integration with a real backend and do not derive business rules. The selected room, date, visible `?from=`/`?to=` range and `?edit=1` editor state are encoded in the URL for sharing; periods outside the fixture range show an explicit empty state. A day's editor is a native dialog anchored to its row, with a bottom-sheet layout on narrow screens.
 
+The header switch toggles dark and light tokens and stores the choice locally. It is a user preference, not shared URL state. Swagger UI keeps its own styles on `/docs`.
+
 ## API documentation
 
 Swagger UI at `/docs` in the demo app renders the canonical OpenAPI file and offers a download link for the YAML. The docs chunk is loaded only on that route. Implementing the contract does not by itself prove that a backend is conformant; that requires testing against a real implementation.

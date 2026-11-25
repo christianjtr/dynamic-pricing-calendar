@@ -17,6 +17,22 @@
 	--radius: 0.75rem;
 }
 
+:root[data-theme="light"] {
+	--background: #f7f9fc;
+	--foreground: #111827;
+	--card: #ffffff;
+	--card-foreground: #111827;
+	--muted: #e8edf5;
+	--muted-foreground: #52627a;
+	--border: #d5deeb;
+	--primary: #1d4ed8;
+	--primary-foreground: #ffffff;
+	--secondary: #e8edf5;
+	--secondary-foreground: #111827;
+	--destructive: #a4262c;
+	--ring: #1d4ed8;
+}
+
 @theme inline {
 	--color-background: var(--background);
 	--color-foreground: var(--foreground);
@@ -37,6 +53,10 @@
 @layer base {
 	html {
 		color-scheme: dark;
+	}
+
+	html[data-theme="light"] {
+		color-scheme: light;
 	}
 
 	* {
@@ -77,6 +97,10 @@
 
 .day-edit-dialog::backdrop {
 	background: rgb(3 8 18 / 65%);
+}
+
+:root[data-theme="light"] .day-edit-dialog::backdrop {
+	background: rgb(15 23 42 / 35%);
 }
 
 @media (max-width: 640px) {

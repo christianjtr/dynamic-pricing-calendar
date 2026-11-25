@@ -1,6 +1,6 @@
 # Memory
 
-Last updated: pivot complete at `1816ec3`; date-range navigation merged at `0c62bea`; day editor ready on `feat/day-edit-popover`. See ADR-0012.
+Last updated: pivot complete at `1816ec3`; date-range navigation merged at `0c62bea`; day editor merged at `bf2c20c`; theme switch ready on `feat/theme-switch`. See ADR-0012.
 
 ## Project goal
 
@@ -108,7 +108,8 @@ Important contract rules:
 | P4 | `refactor/remove-sdk-and-smoke-test` | Delete SDK, external-consumer template, tarball script and SDK tests | Complete, merged at `1fde34f` |
 | P5 | `chore/ux-and-quality-pass` | Web interface guidelines review, compact tests and CI, close docs | Complete, merged at `1816ec3` |
 | P6 | `feat/date-range-navigation` | URL-driven `from`/`to` range, month controls and explicit empty states | Complete, merged at `0c62bea` |
-| P7 | `feat/day-edit-popover` | Native dialog anchored to the day, `?edit=1` deep link and mobile bottom sheet | Ready for commit |
+| P7 | `feat/day-edit-popover` | Native dialog anchored to the day, `?edit=1` deep link and mobile bottom sheet | Complete, merged at `bf2c20c` |
+| P8 | `feat/theme-switch` | Dark/light theme switch, local persistence and no-flash startup | Ready for commit |
 
 ## ADR index
 

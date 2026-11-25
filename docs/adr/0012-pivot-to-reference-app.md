@@ -67,6 +67,7 @@ ADR-0001 and ADR-0010 remain accepted. The property-context rule from ADR-0009 i
 - Implementation branches remove the SDK, the Start playground and the smoke-test artifacts, then build a single Vite app.
 - `/docs` renders `packages/contracts/openapi.yaml` with Swagger UI.
 - The UI was reviewed against the pinned Web Interface Guidelines in `chore/ux-and-quality-pass`.
+- Dark and light themes use platform `color-scheme` and a local preference; ADR-0008 stays superseded and no Mantine token system was revived.
 
 ## Links
 

@@ -1,5 +1,6 @@
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -227,9 +228,12 @@ export function App() {
 						validates a price itself.
 					</p>
 				</div>
-				<Button asChild size="sm" variant="outline">
-					<a href="/docs">API documentation</a>
-				</Button>
+				<div className="flex flex-wrap items-center gap-2">
+					<Button asChild size="sm" variant="outline">
+						<a href="/docs">API documentation</a>
+					</Button>
+					<ThemeToggle />
+				</div>
 			</header>
 
 			{settings.data ? (
