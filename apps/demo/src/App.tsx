@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { fixtureDateRange, updateFixtures } from "@/fixtures/fixtures";
+import { readApiConfig } from "@/lib/apiConfig";
 import {
 	type DateRange,
 	dateRangeHref,
@@ -47,6 +48,7 @@ import { cn } from "@/lib/utils";
 import { usePricing } from "@/usePricing";
 
 export function App() {
+	const usingFixtures = !readApiConfig().baseUrl;
 	const initialSelection = readSelection(window.location.search);
 	const [roomId, setRoomId] = useState<string | null>(initialSelection.roomId);
 	const [selectedDate, setSelectedDate] = useState<string | null>(
@@ -237,22 +239,40 @@ export function App() {
 		>
 			<header className="mb-8">
 				<div className="mb-3 flex flex-wrap items-center gap-2">
-					<Badge className="gap-1.5 border-warning bg-warning/10 text-foreground">
+					<Badge
+						className={cn(
+							"gap-1.5 border-warning bg-warning/10 text-foreground",
+							!usingFixtures && "border-border bg-muted text-foreground",
+						)}
+					>
 						<span
 							aria-hidden="true"
-							className="size-1.5 rounded-full bg-warning"
+							className={cn(
+								"size-1.5 rounded-full bg-warning",
+								!usingFixtures && "bg-foreground",
+							)}
 						/>
-						{t("calendar.fixtureBadge")}
+						{t(
+							usingFixtures ? "calendar.fixtureBadge" : "calendar.backendBadge",
+						)}
 					</Badge>
-					<span className="text-sm text-muted-foreground">
-						{t("calendar.noBackend")}
-					</span>
+					{usingFixtures ? (
+						<span className="text-sm text-muted-foreground">
+							{t("calendar.noBackend")}
+						</span>
+					) : null}
+					<a
+						className="text-sm text-muted-foreground underline underline-offset-4 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+						href="/integrate"
+					>
+						{t("calendar.integrateLink")}
+					</a>
 				</div>
 				<h1 className="text-balance text-3xl font-semibold tracking-tight sm:text-4xl">
 					{t("calendar.title")}
 				</h1>
 				<p className="mt-2 max-w-2xl text-muted-foreground">
-					{t("calendar.intro")}
+					{t(usingFixtures ? "calendar.intro" : "calendar.introLive")}
 				</p>
 				{settings.data ? (
 					<dl className="mt-3 flex flex-wrap gap-2 text-xs">

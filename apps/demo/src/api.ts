@@ -15,19 +15,23 @@ import {
 	UpdatePriceResponseSchema,
 } from "@hpc/contracts";
 import { fixtureFetch } from "./fixtureFetch";
+import { readApiConfig } from "./lib/apiConfig";
 
-const propertyId = "demo-property";
+const config = readApiConfig();
 
-// shortcut: the demo calls its own fixture router; swap this fetch for a real backend when one exists.
 async function requestJson(path: string, init: RequestInit): Promise<unknown> {
-	const response = await fixtureFetch(`/api${path}`, {
+	const url = config.baseUrl ? `${config.baseUrl}${path}` : `/api${path}`;
+	const options: RequestInit = {
 		...init,
 		headers: {
 			Accept: "application/json",
-			"x-property-id": propertyId,
+			"x-property-id": config.propertyId,
 			...init.headers,
 		},
-	});
+	};
+	const response = config.baseUrl
+		? await fetch(url, options)
+		: await fixtureFetch(url, options);
 
 	if (!response.ok) {
 		const payload: unknown = await response.json().catch(() => null);
@@ -44,7 +48,7 @@ async function requestJson(path: string, init: RequestInit): Promise<unknown> {
 }
 
 export const pricingClient = {
-	propertyId,
+	propertyId: config.propertyId,
 	async getSettings(signal?: AbortSignal): Promise<SettingsResponse> {
 		const json = await requestJson(apiPaths.settings, {
 			method: "GET",

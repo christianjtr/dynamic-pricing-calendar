@@ -8,6 +8,10 @@ export const englishMessages = {
 	"calendar.title": "Pricing Calendar",
 	"calendar.intro":
 		"A reference UI for prices computed by an external backend. This demo renders static fixtures and never calculates, recommends or validates a price itself.",
+	"calendar.introLive":
+		"A reference UI for prices computed by an external backend. Values come from the configured backend; the UI never calculates, recommends or validates a price itself.",
+	"calendar.backendBadge": "Backend connected",
+	"calendar.integrateLink": "How to integrate",
 	"calendar.timezone": "Timezone",
 	"calendar.locale": "Locale",
 	"calendar.roomsLabel": "Rooms",

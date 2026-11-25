@@ -31,7 +31,22 @@ pnpm install
 pnpm dev
 ```
 
-The demo runs on Vite. A usage FAQ is served at `/faq` and linked from the calendar header; interactive API documentation is served at `/docs` inside the same app. The room selector lists every room returned by the backend and shows the active room's optional description; the selected room and date are reflected in `?room=` and `?date=`; the visible range uses `?from=` and `?to=`, with month controls and a **Today** button to shift it. Selecting a day highlights it; the pencil action in that row opens a native dialog anchored to the button. `?edit=1` shares the open editor. The condensed table groups In PMS under Price, variance under Recommended and occupancy under Availability; currency appears once in the card header and numbers use `Intl`. Ranges without fixture data show a blank state with a shortcut back to the fixture range. The header switches between dark and light themes using the platform `color-scheme` and saves the choice locally. Calendar copy uses a small built-in key registry; integrators supply translations via `window.pricingCalendarI18n` (inline `messages` or a same-host `messagesUrl`), with no runtime i18n dependency. See `docs/integration.md`.
+The demo runs on Vite. A usage FAQ is served at `/faq`, a developer guide at `/integrate`, and interactive API documentation at `/docs`; all three are linked from the calendar header. The room selector follows the backend's rooms, the visible range uses `?from=` and `?to=`, and the selected room and date are reflected in `?room=` and `?date=`. Selecting a day highlights it; the pencil action opens an anchored native dialog, and `?edit=1` shares it. The header switches themes and saves the choice locally.
+
+## Integrate your backend
+
+The demo uses labelled fixtures until you configure a base URL. Add this before the app script in `apps/demo/index.html`:
+
+```html
+<script>
+  window.pricingCalendarApi = {
+    baseUrl: "https://pricing.example.com/api",
+    propertyId: "hotel-42",
+  };
+</script>
+```
+
+Your backend implements `GET /settings`, `GET /prices` and `PATCH /prices/{roomId}/{date}` from [`packages/contracts/openapi.yaml`](packages/contracts/openapi.yaml), sends `x-property-id`, and owns every pricing decision. No SDK is published. The full step-by-step guide, JSON examples, conformance checklist and failure modes are in [`docs/integration.md`](docs/integration.md); the same essentials are available inside the app at `/integrate`. Calendar copy can be supplied through `window.pricingCalendarI18n` with no runtime i18n dependency.
 
 ## Available scripts
 

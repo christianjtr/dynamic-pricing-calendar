@@ -4,6 +4,7 @@ import { createRoot } from "react-dom/client";
 import { App } from "@/App";
 import { SiteHeader } from "@/components/SiteHeader";
 import { Faq } from "@/Faq";
+import { Integrate } from "@/Integrate";
 import { loadLocale } from "@/lib/i18n";
 import "./styles.css";
 
@@ -28,6 +29,7 @@ const queryClient = new QueryClient({
 const pathname = window.location.pathname.replace(/\/$/, "");
 const isDocsPage = pathname === "/docs";
 const isFaqPage = pathname === "/faq";
+const isIntegratePage = pathname === "/integrate";
 
 const page = isDocsPage ? (
 	<Suspense fallback={<p className="p-8">Loading API documentation…</p>}>
@@ -35,6 +37,8 @@ const page = isDocsPage ? (
 	</Suspense>
 ) : isFaqPage ? (
 	<Faq />
+) : isIntegratePage ? (
+	<Integrate />
 ) : (
 	<App />
 );
