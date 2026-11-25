@@ -66,7 +66,7 @@ ADR-0001 and ADR-0010 remain accepted. The property-context rule from ADR-0009 i
 - Documentation describes only the target above; SDK language is removed or marked superseded.
 - Implementation branches remove the SDK, the Start playground and the smoke-test artifacts, then build a single Vite app.
 - `/docs` renders `packages/contracts/openapi.yaml` with Swagger UI.
-- The UI is reviewed against the pinned Web Interface Guidelines before the pivot is closed.
+- The UI was reviewed against the pinned Web Interface Guidelines in `chore/ux-and-quality-pass`.
 
 ## Links
 

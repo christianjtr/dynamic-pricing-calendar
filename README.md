@@ -2,8 +2,6 @@
 
 A reference implementation of a calendar that displays prices computed by an external backend. This repository owns the HTTP contract, interactive API documentation and one demo application. It does not compute prices, ship an SDK, or claim that a conforming external backend exists.
 
-> The repository is being migrated to the layout below. See [ADR-0012](docs/adr/0012-pivot-to-reference-app.md) for the pivot decision.
-
 ## Repository layout
 
 ```text
@@ -33,7 +31,7 @@ pnpm install
 pnpm dev
 ```
 
-The demo runs on Vite. Interactive API documentation is served at `/docs` inside the same app.
+The demo runs on Vite. Interactive API documentation is served at `/docs` inside the same app. The selected room and date are reflected in `?room=` and `?date=`, so a view can be shared by URL.
 
 ## Available scripts
 

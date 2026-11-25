@@ -4,6 +4,8 @@
 - **Date**: 2026-11-23
 - **Deciders**: project owner, implementation agent
 
+> Scope note: ADR-0012 keeps the headless boundary but drops the published SDK. The demo app now owns the client and presentation.
+
 ## Context and problem statement
 
 The repository currently contains a single React application that combines three responsibilities: a mock API that generates prices at request time, API client hooks that fetch and project data, and a Mantine UI that also computes business rules (the 4% variance threshold in `client/src/features/OptimizedRates/services/rateComputations.ts`). The product direction calls for an embeddable, white-label pricing calendar whose backend is an external service: all pricing, availability and validation decisions are computed there. The client must therefore become a thin integration layer and a replaceable presentation.

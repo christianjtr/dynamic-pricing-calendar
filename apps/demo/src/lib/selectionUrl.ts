@@ -1,0 +1,34 @@
+export interface Selection {
+	roomId: string | null;
+	date: string | null;
+}
+
+export interface PageLocation {
+	pathname: string;
+	search: string;
+	hash: string;
+}
+
+export function readSelection(search: string): Selection {
+	const params = new URLSearchParams(search);
+	return { roomId: params.get("room"), date: params.get("date") };
+}
+
+export function selectionHref(
+	location: PageLocation,
+	{ roomId, date }: Selection,
+): string {
+	const params = new URLSearchParams(location.search);
+	if (roomId) {
+		params.set("room", roomId);
+	} else {
+		params.delete("room");
+	}
+	if (date) {
+		params.set("date", date);
+	} else {
+		params.delete("date");
+	}
+	const query = params.toString();
+	return `${location.pathname}${query ? `?${query}` : ""}${location.hash}`;
+}

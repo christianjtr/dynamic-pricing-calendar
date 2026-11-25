@@ -19,14 +19,18 @@ import {
 	formatStatus,
 	getDayIndicators,
 } from "@/lib/format";
+import { readSelection, selectionHref } from "@/lib/selectionUrl";
 import { cn } from "@/lib/utils";
 import { usePricing } from "@/usePricing";
 
 const RANGE = { from: "2026-11-23", to: "2026-11-29" } as const;
 
 export function App() {
-	const [roomId, setRoomId] = useState<string | null>(null);
-	const [selectedDate, setSelectedDate] = useState<string | null>(null);
+	const initialSelection = readSelection(window.location.search);
+	const [roomId, setRoomId] = useState<string | null>(initialSelection.roomId);
+	const [selectedDate, setSelectedDate] = useState<string | null>(
+		initialSelection.date,
+	);
 	const dates = useMemo(() => buildDateRange(RANGE.from, RANGE.to), []);
 	const { settings, prices, rooms, activeRoomId, days, updatePrice } =
 		usePricing({ from: RANGE.from, to: RANGE.to }, roomId);
@@ -42,6 +46,11 @@ export function App() {
 	const selectDay = (date: string) => {
 		setSelectedDate(date);
 		updatePrice.reset();
+		window.history.replaceState(
+			null,
+			"",
+			selectionHref(window.location, { roomId: activeRoomId, date }),
+		);
 	};
 
 	const moveDay = (delta: number) => {
@@ -53,7 +62,11 @@ export function App() {
 
 	if (settings.isPending || prices.isPending) {
 		return (
-			<main className="mx-auto max-w-6xl px-4 py-16">
+			<main
+				className="mx-auto max-w-6xl scroll-mt-4 px-4 py-16"
+				id="main-content"
+				tabIndex={-1}
+			>
 				<Card role="status">
 					<CardContent className="p-6">
 						Loading fixture-backed pricing data…
@@ -66,11 +79,17 @@ export function App() {
 	const loadError = settings.error ?? prices.error;
 	if (loadError) {
 		return (
-			<main className="mx-auto max-w-6xl px-4 py-16">
+			<main
+				className="mx-auto max-w-6xl scroll-mt-4 px-4 py-16"
+				id="main-content"
+				tabIndex={-1}
+			>
 				<Card role="alert">
 					<CardHeader>
 						<CardTitle>Unable to load pricing data</CardTitle>
-						<CardDescription>{loadError.message}</CardDescription>
+						<CardDescription>
+							{loadError.message} Check the fixture response and try again.
+						</CardDescription>
 					</CardHeader>
 					<CardContent>
 						<Button
@@ -88,7 +107,11 @@ export function App() {
 	}
 
 	return (
-		<main className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
+		<main
+			className="mx-auto max-w-6xl scroll-mt-4 px-4 py-10 sm:px-6 lg:px-8"
+			id="main-content"
+			tabIndex={-1}
+		>
 			<header className="mb-8 flex flex-wrap items-start justify-between gap-4">
 				<div>
 					<div className="mb-3 flex flex-wrap items-center gap-2">
@@ -97,8 +120,8 @@ export function App() {
 							No live backend connected
 						</span>
 					</div>
-					<h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">
-						Pricing calendar
+					<h1 className="text-balance text-3xl font-semibold tracking-tight sm:text-4xl">
+						Pricing Calendar
 					</h1>
 					<p className="mt-2 max-w-2xl text-muted-foreground">
 						A reference UI for prices computed by an external backend. This demo
@@ -137,6 +160,14 @@ export function App() {
 							setRoomId(room.id);
 							setSelectedDate(null);
 							updatePrice.reset();
+							window.history.replaceState(
+								null,
+								"",
+								selectionHref(window.location, {
+									roomId: room.id,
+									date: null,
+								}),
+							);
 						}}
 						variant={room.id === activeRoomId ? "default" : "outline"}
 					>
@@ -157,7 +188,7 @@ export function App() {
 						</div>
 						<div className="flex items-center gap-2">
 							<Button
-								aria-label="Previous day"
+								aria-label="Previous Day"
 								disabled={selectedIndex <= 0}
 								onClick={() => moveDay(-1)}
 								size="icon"
@@ -167,12 +198,12 @@ export function App() {
 							</Button>
 							<span
 								aria-live="polite"
-								className="min-w-32 text-center text-sm font-medium"
+								className="min-w-32 text-center text-sm font-medium tabular-nums"
 							>
 								{selectedDay ? formatDate(selectedDay.date) : "No day"}
 							</span>
 							<Button
-								aria-label="Next day"
+								aria-label="Next Day"
 								disabled={selectedIndex < 0 || selectedIndex >= days.length - 1}
 								onClick={() => moveDay(1)}
 								size="icon"
@@ -232,28 +263,30 @@ export function App() {
 										<th className="px-3 py-2 text-left font-medium" scope="row">
 											<button
 												aria-pressed={day.date === selectedDay?.date}
-												className="rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+												className="rounded hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
 												onClick={() => selectDay(day.date)}
 												type="button"
 											>
 												{formatDate(day.date)}
 											</button>
 										</th>
-										<td className="px-3 py-2 font-medium">
+										<td className="px-3 py-2 font-medium tabular-nums">
 											{formatMoney(day.price, day.currency)}
 										</td>
 										<td className="px-3 py-2">{formatStatus(day.status)}</td>
-										<td className="px-3 py-2">
+										<td className="px-3 py-2 tabular-nums">
 											{formatMoney(day.priceInPms, day.currency)}
 										</td>
-										<td className="px-3 py-2">
+										<td className="px-3 py-2 tabular-nums">
 											{formatMoney(day.recommendedPrice, day.currency)}
 										</td>
-										<td className="px-3 py-2">{day.variance?.label ?? "—"}</td>
+										<td className="px-3 py-2 tabular-nums">
+											{day.variance?.label ?? "—"}
+										</td>
 										<td className="px-3 py-2">
 											{formatAvailability(day.availability)}
 										</td>
-										<td className="px-3 py-2">
+										<td className="px-3 py-2 tabular-nums">
 											{day.occupancy === null
 												? "—"
 												: `${Math.round(day.occupancy * 100)}%`}
@@ -292,7 +325,7 @@ export function App() {
 			{selectedDay && activeRoomId ? (
 				<Card className="mt-6">
 					<CardHeader>
-						<CardTitle>Manual price intent</CardTitle>
+						<CardTitle>Manual Price Intent</CardTitle>
 						<CardDescription>
 							{formatDate(selectedDay.date)} in {roomName}. The backend response
 							is the only canonical value after a write.
@@ -316,8 +349,10 @@ export function App() {
 							<label className="grid gap-2 text-sm" htmlFor="price">
 								<span>Price</span>
 								<Input
+									autoComplete="off"
 									defaultValue={selectedDay.price ?? ""}
 									id="price"
+									inputMode="decimal"
 									min="0"
 									name="price"
 									required
@@ -328,10 +363,11 @@ export function App() {
 							<label className="grid gap-2 text-sm" htmlFor="reason">
 								<span>Reason</span>
 								<Input
+									autoComplete="off"
 									defaultValue="Manual override"
 									id="reason"
 									name="reason"
-									placeholder="Manual override"
+									placeholder="e.g. Peak demand…"
 								/>
 							</label>
 							<Button
@@ -342,7 +378,7 @@ export function App() {
 								}
 								type="submit"
 							>
-								{updatePrice.isPending ? "Saving…" : "Save manual price"}
+								{updatePrice.isPending ? "Saving…" : "Save Manual Price"}
 							</Button>
 						</form>
 						{!canUpdate ? (
@@ -373,10 +409,10 @@ export function App() {
 			<footer className="mt-8 text-sm text-muted-foreground">
 				All values come from the fixture response. See the{" "}
 				<a
-					className="underline underline-offset-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+					className="underline underline-offset-4 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
 					href="/docs"
 				>
-					OpenAPI reference
+					OpenAPI Reference
 				</a>
 				.
 			</footer>

@@ -2,8 +2,6 @@
 
 This repository is a reference implementation, not a published SDK. A backend implements the OpenAPI contract; the demo app renders the responses. No pricing logic lives in this repository.
 
-> The code is being migrated to this shape. See [ADR-0012](adr/0012-pivot-to-reference-app.md) for the pivot decision.
-
 ## Contract
 
 The canonical artifact is [`packages/contracts/openapi.yaml`](../packages/contracts/openapi.yaml), OpenAPI 3.1.1. It defines `GET /settings`, `GET /prices` and `PATCH /prices/{roomId}/{date}`, with query parameters, headers, bodies, responses and errors. Generated Zod validators in `@hpc/contracts` keep the demo and its tests aligned with that artifact.
@@ -20,7 +18,7 @@ The frontend renders the returned fields and never recalculates a displayed pric
 
 ## Demo data
 
-The demo uses explicit static fixtures, visibly labelled as fixture data. They demonstrate the contract and the UI flow; they are not an integration with a real backend and do not derive business rules.
+The demo uses explicit static fixtures, visibly labelled as fixture data. They demonstrate the contract and the UI flow; they are not an integration with a real backend and do not derive business rules. The selected room and date are encoded in the URL for sharing.
 
 ## API documentation
 
@@ -36,4 +34,4 @@ pnpm test:run
 pnpm build
 ```
 
-The UI is reviewed against the pinned Web Interface Guidelines before the pivot is closed.
+The UI was reviewed against the pinned Web Interface Guidelines during the final quality pass.

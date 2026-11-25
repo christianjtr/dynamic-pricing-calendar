@@ -1,6 +1,6 @@
 # Memory
 
-Last updated: Pivot branch `docs/pivot-decision` in progress; Stage 16 merged to `main` at `0986721`. See ADR-0012.
+Last updated: pivot implementation complete on `chore/ux-and-quality-pass` (uncommitted at review); Stage 16 merged to `main` at `0986721`. See ADR-0012.
 
 ## Project goal
 
@@ -27,53 +27,41 @@ The pivot in ADR-0012 supersedes the SDK-era decisions. The remaining constraint
 
 - Node: `v26.13.1` via `pnpm runtime set node 26 -g -y`. There is no nvm-managed Node in this shell. `pnpm shim add node` failed with `ERR_PNPM_SHIM_BIN_CONFLICT`, but the runtime works and `pnpm` selects Node 26.
 - pnpm: `12.9.1`. Workspace config lives in `pnpm-workspace.yaml`; the `pnpm` field in `package.json` is ignored by pnpm 12.
-- pnpm config: `allowBuilds` permits Biome, Parcel watcher, esbuild and `vue-demi` (Scalar's Vue compatibility setup); `minimumReleaseAgeExclude` contains TanStack entries.
-- Versions installed: React `19.3.1`, Vite `8.3.8`, Mantine `9.8.2`, TypeScript `7.0.2`, TanStack Query `5.108.4`, Zod `4.6.7`, date-fns `4.4.0`, Biome `2.6.8`, Vitest `5.1.1`.
-- `vite: ^8.3.8` is pinned via pnpm overrides and drives both app builds.
+- pnpm config: `allowBuilds` permits Biome, Parcel watcher, esbuild and `vue-demi`, and explicitly denies Swagger/Orval transitive build scripts; `minimumReleaseAgeExclude` contains TanStack entries.
+- Versions installed: React `19.3.1`, Vite `8.3.8`, TypeScript `7.0.2`, TanStack Query `5.108.4`, Zod `4.6.7`, Tailwind `4.3.5`, Swagger UI React `5.36.0`, Biome `2.6.8`, Vitest `5.1.1`.
+- `vite: ^8.3.8` is pinned via pnpm overrides and drives the single app build.
 - Orval `8.48.0` generates Zod schemas and operation parameter validators from `packages/contracts/openapi.yaml`; `check:generated` detects drift.
-- Scalar API Reference React `0.9.96` is used only by the playground docs route and is mounted after hydration.
-- Installed Start packages: `@tanstack/react-start 1.169.7`, `@tanstack/react-router 1.170.46`, `@tanstack/react-router-ssr-query 1.167.3`.
+- Swagger UI React renders the canonical YAML at `/docs` in the demo; its chunk is lazy-loaded only on that route.
 - TypeScript 7 checks CSS side-effect imports by default; `declare module "*.css" {}` is required in each TS project that imports stylesheets.
 - Biome 2: `organizeImports` moved under `assist`; Markdown files are excluded from Biome with `!**/*.md`.
-- Vitest 5 uses jsdom, `vitest.setup.ts` and no path alias; build/generated directories are excluded.
+- Vitest 5 uses the `node` environment with no setup file; build/generated directories are excluded.
 - `package.json` has `"type": "module"` and a `test:run` script (`vitest run`).
 
 ## Repository structure target
 
 ```text
 apps/
-  playground/          # TanStack Start reference app, SSR, per-request QueryClient, fixture routes
-  headless-demo/       # Vite SPA, independent tokens, no Mantine/Start
+  demo/                # Single Vite app: fixtures, calendar UI, Swagger UI at /docs
 packages/
-  contracts/           # Zod schemas + inferred types for external API
-  react/               # Public package: src/client, src/headless, src/ui
+  contracts/           # OpenAPI 3.1.1 plus generated Zod validators
 docs/adr/              # Decision records
-```
-
-Final public exports:
-
-```text
-@hpc/pricing-calendar           # provider, client, hooks, types
-@hpc/pricing-calendar/headless  # logic-only primitives
-@hpc/pricing-calendar/ui        # Mantine UI components
-@hpc/pricing-calendar/contracts # re-exported contract types
 ```
 
 Notes:
 - No package named `roompricegenie`, `rpg`, pricing-calendar-ui or similar.
-- Workspace package name for contracts: `@hpc/contracts`.
-- Client injects base URL, credentials and property context. No credentials live in this repo.
+- Workspace package name for contracts: `@hpc/contracts`; it exports `./openapi.yaml` for the docs route.
+- The demo client calls the canonical paths and validates responses with generated Zod. No credentials live in this repo.
 
 ## External API contract (canonical OpenAPI; runtime schemas generated in Stage 12)
 
-Canonical source: `packages/contracts/openapi.yaml` (OpenAPI 3.1.1). Orval 8.48.0 writes Zod runtime schemas into `packages/contracts/src/generated/`; `src/common.ts`, `src/prices.ts` and `src/settings.ts` preserve the existing SDK-facing exports and `apiPaths`.
+Canonical source: `packages/contracts/openapi.yaml` (OpenAPI 3.1.1). Orval 8.48.0 writes Zod runtime schemas into `packages/contracts/src/generated/`; `src/common.ts`, `src/prices.ts` and `src/settings.ts` preserve the demo-facing exports and `apiPaths`.
 
 ```text
 openapi.yaml                     Public, language-neutral wire contract
 orval.config.ts                  Reproducible OpenAPI → Zod generation
 src/generated/                   Generated component and operation schemas
 src/common.ts                    parseContract and validation error wrapper
-src/{settings,prices}.ts          Stable aliases, SDK query shape and apiPaths
+src/{settings,prices}.ts          Stable aliases, query shape and apiPaths
 src/contracts.test.ts            Contract and parameter validation tests
 ```
 
@@ -114,11 +102,11 @@ Important contract rules:
 
 | Orden | Rama | Alcance | Estado |
 |---|---|---|---|
-| P1 | `docs/pivot-decision` | ADR-0012, deprecate SDK-era ADRs, rewrite README and integration guide | In progress |
-| P2 | `feat/consolidate-demo-app` | Rename the demo app, add shadcn/ui + Tailwind, migrate UI and date navigation | Planned |
-| P3 | `feat/swap-docs-to-swagger-ui` | Remove Start playground and Scalar, serve Swagger UI at `/docs` | Planned |
-| P4 | `refactor/remove-sdk-and-smoke-test` | Delete SDK, external-consumer template, tarball script and SDK tests | Planned |
-| P5 | `chore/ux-and-quality-pass` | Web interface guidelines review, compact tests and CI, close docs | Planned |
+| P1 | `docs/pivot-decision` | ADR-0012, deprecate SDK-era ADRs, rewrite README and integration guide | Complete, merged at `32407a3` |
+| P2 | `feat/consolidate-demo-app` | Rename the demo app, add shadcn/ui + Tailwind, migrate UI and date navigation | Complete, merged at `caf478a` |
+| P3 | `feat/swap-docs-to-swagger-ui` | Remove Start playground and Scalar, serve Swagger UI at `/docs` | Complete, merged at `c9dc5a2` |
+| P4 | `refactor/remove-sdk-and-smoke-test` | Delete SDK, external-consumer template, tarball script and SDK tests | Complete, merged at `1fde34f` |
+| P5 | `chore/ux-and-quality-pass` | Web interface guidelines review, compact tests and CI, close docs | Implementation complete; commit pending |
 
 ## ADR index
 
