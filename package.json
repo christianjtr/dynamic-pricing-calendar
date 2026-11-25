@@ -9,14 +9,14 @@
 		"lint": "biome check .",
 		"lint:fix": "biome check --write .",
 		"test:external-consumer": "node scripts/test-external-consumer.mjs",
-		"typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p apps/playground/tsconfig.json && tsc --noEmit -p apps/demo/tsconfig.json",
+		"typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p apps/demo/tsconfig.json",
 		"test": "vitest",
 		"test:run": "vitest run"
 	},
 	"author": "Christian Torrealba",
 	"packageManager": "pnpm@12.9.1",
 	"license": "MIT",
-	"description": "Headless pricing calendar SDK with a Start SSR playground and an independent Vite demo, driven by an external pricing backend.",
+	"description": "Contract-first pricing calendar reference app with interactive API docs and a Vite demo.",
 	"engines": {
 		"node": ">=26.0.0 <27.0.0",
 		"pnpm": ">=12.9.1 <13.0.0"

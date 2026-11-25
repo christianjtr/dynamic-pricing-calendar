@@ -1,8 +1,10 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { StrictMode } from "react";
+import { lazy, StrictMode, Suspense } from "react";
 import { createRoot } from "react-dom/client";
 import { App } from "@/App";
 import "./styles.css";
+
+const Docs = lazy(() => import("@/Docs"));
 
 const container = document.getElementById("root");
 
@@ -20,10 +22,19 @@ const queryClient = new QueryClient({
 	},
 });
 
+const isDocsPage = window.location.pathname.replace(/\/$/, "") === "/docs";
+
+const page = isDocsPage ? (
+	<Suspense fallback={<p className="p-8">Loading API documentation…</p>}>
+		<Docs />
+	</Suspense>
+) : (
+	<App />
+);
+
+// Swagger UI uses legacy lifecycles that warn under StrictMode.
 createRoot(container).render(
-	<StrictMode>
-		<QueryClientProvider client={queryClient}>
-			<App />
-		</QueryClientProvider>
-	</StrictMode>,
+	<QueryClientProvider client={queryClient}>
+		{isDocsPage ? page : <StrictMode>{page}</StrictMode>}
+	</QueryClientProvider>,
 );

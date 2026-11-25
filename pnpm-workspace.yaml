@@ -10,7 +10,12 @@ overrides:
 allowBuilds:
   "@biomejs/biome": true
   "@parcel/watcher": true
+  "@scarf/scarf": false
+  "@tree-sitter-grammars/tree-sitter-yaml": false
+  core-js-pure: false
   esbuild: true
+  tree-sitter: false
+  tree-sitter-json: false
   vue-demi: true
 
 minimumReleaseAgeExclude:

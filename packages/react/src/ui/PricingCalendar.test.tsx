@@ -5,7 +5,7 @@ import {
 	pricesFixture,
 	settingsFixture,
 	updateFixtures,
-} from "../../../../apps/playground/src/fixtures/fixtures";
+} from "../../../../apps/demo/src/fixtures/fixtures";
 import { PricingCalendarProvider } from "../client";
 import { PricingCalendar } from "./PricingCalendar";
 import { PricingCalendarUIProvider } from "./Provider";

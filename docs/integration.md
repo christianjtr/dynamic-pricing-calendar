@@ -24,7 +24,7 @@ The demo uses explicit static fixtures, visibly labelled as fixture data. They d
 
 ## API documentation
 
-Interactive documentation is served at `/docs` in the demo app and is generated from the same OpenAPI file. The YAML artifact is available for download from the app. Implementing the contract does not by itself prove that a backend is conformant; that requires testing against a real implementation.
+Swagger UI at `/docs` in the demo app renders the canonical OpenAPI file and offers a download link for the YAML. The docs chunk is loaded only on that route. Implementing the contract does not by itself prove that a backend is conformant; that requires testing against a real implementation.
 
 ## Verification
 
