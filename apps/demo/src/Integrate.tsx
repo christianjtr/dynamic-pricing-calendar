@@ -11,6 +11,9 @@ const configExample = `<script>
   };
 </script>`;
 
+const testBackendExample = `pnpm dev
+pnpm dev:test-backend`;
+
 const endpoints = [
 	{
 		method: "GET",
@@ -125,9 +128,29 @@ export function Integrate() {
 					<p className="mt-3 text-sm text-muted-foreground">
 						Every request carries <code>x-property-id</code>. It identifies
 						property context only — your backend performs its own authentication
-						and authorization. The badge in the calendar switches from{" "}
-						<strong>Fixture data</strong> to <strong>Backend connected</strong>{" "}
-						when <code>baseUrl</code> is set.
+						and authorization. The badge switches from{" "}
+						<strong>Fixture data</strong> to <strong>Backend configured</strong>{" "}
+						as soon as <code>baseUrl</code> is set; it is not a health check. On
+						first load the range comes from <code>settings.dateRange</code>{" "}
+						unless <code>?from</code> and <code>?to</code> are present.
+					</p>
+				</section>
+
+				<section className="rounded-card border bg-card p-5">
+					<h2 className="text-lg font-semibold">Try the configured path</h2>
+					<p className="mt-2 text-sm text-muted-foreground">
+						A dev-only test backend exercises real <code>fetch</code> and{" "}
+						<code>PATCH</code> calls. It is a static test double, not a
+						production backend and not a conformance certificate. Run both
+						processes in separate terminals, then open{" "}
+						<code>http://127.0.0.1:3001/test-backend.html</code>.
+					</p>
+					<pre className={`${codeClass} mt-3`}>
+						<code>{testBackendExample}</code>
+					</pre>
+					<p className="mt-3 text-sm text-muted-foreground">
+						The calendar starts on the backend's own date range and lets the
+						backend accept or reject each save.
 					</p>
 				</section>
 

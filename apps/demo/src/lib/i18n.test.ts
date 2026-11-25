@@ -25,7 +25,7 @@ describe("in-house locale registry", () => {
 		expect(t("calendar.days", { count: 7 })).toBe("7 days");
 		expect(t("table.occupied", { percent: "55%" })).toBe("55% occupied");
 		expect(t("empty.body")).toBe(
-			"No fixture data for this period. Choose another range to see the demo prices.",
+			"No prices returned for this period. Choose another range to see the data.",
 		);
 	});
 

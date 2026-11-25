@@ -23,16 +23,24 @@ function isIsoDate(value: string | null): value is string {
 	);
 }
 
-export function readDateRange(search: string, fallback: DateRange): DateRange {
+function readExplicitDateRange(search: string): DateRange | null {
 	const params = new URLSearchParams(search);
 	const from = params.get("from");
 	const to = params.get("to");
 
 	if (!isIsoDate(from) || !isIsoDate(to) || from > to) {
-		return { ...fallback };
+		return null;
 	}
 
 	return { from, to };
+}
+
+export function hasExplicitDateRange(search: string): boolean {
+	return readExplicitDateRange(search) !== null;
+}
+
+export function readDateRange(search: string, fallback: DateRange): DateRange {
+	return readExplicitDateRange(search) ?? { ...fallback };
 }
 
 export function dateRangeHref(

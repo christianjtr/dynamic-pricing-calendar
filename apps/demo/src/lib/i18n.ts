@@ -1,16 +1,16 @@
 export const englishMessages = {
-	"calendar.loading": "Loading fixture-backed pricing data…",
+	"calendar.loading": "Loading pricing data…",
 	"calendar.errorTitle": "Unable to load pricing data",
-	"calendar.errorBody": "{message} Check the fixture response and try again.",
+	"calendar.errorBody": "{message} Check the response and try again.",
 	"calendar.retry": "Retry",
 	"calendar.fixtureBadge": "Fixture data",
-	"calendar.noBackend": "No live backend connected",
+	"calendar.noBackend": "No backend configured",
 	"calendar.title": "Pricing Calendar",
 	"calendar.intro":
 		"A reference UI for prices computed by an external backend. This demo renders static fixtures and never calculates, recommends or validates a price itself.",
 	"calendar.introLive":
-		"A reference UI for prices computed by an external backend. Values come from the configured backend; the UI never calculates, recommends or validates a price itself.",
-	"calendar.backendBadge": "Backend connected",
+		"A reference UI for prices computed by an external backend. Values come from the configured backend; configuring it does not verify the service, and the UI never calculates or validates a price itself.",
+	"calendar.backendBadge": "Backend configured",
 	"calendar.integrateLink": "How to integrate",
 	"calendar.timezone": "Timezone",
 	"calendar.locale": "Locale",
@@ -67,9 +67,9 @@ export const englishMessages = {
 	"editor.defaultReason": "Manual override",
 	"empty.title": "No prices in this range",
 	"empty.body":
-		"No fixture data for this period. Choose another range to see the demo prices.",
-	"empty.action": "Show fixture range",
-	"footer.note": "All values come from the fixture response. See the",
+		"No prices returned for this period. Choose another range to see the data.",
+	"empty.action": "Show default range",
+	"footer.note": "All values come from the pricing response. See the",
 	"footer.reference": "OpenAPI Reference",
 } as const;
 

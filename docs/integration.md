@@ -1,6 +1,6 @@
 # Integration guide
 
-This repository is a reference implementation, not a published SDK and not a backend. A backend implements one small HTTP contract; the demo renders those responses, using labelled fixtures by default and a live `baseUrl` when configured. No pricing logic lives in this repository.
+This is a contract-first reference application with a configurable demo — not a published SDK, not a backend, not a pricing engine, and not evidence of a production integration. A backend implements one small HTTP contract; the demo renders those responses, using labelled fixtures by default and a configured `baseUrl` when supplied. No pricing logic lives in this repository.
 
 ## Who owns what
 
@@ -200,7 +200,9 @@ The demo calls its own fixture router by default. Set `window.pricingCalendarApi
 </script>
 ```
 
-`baseUrl` may be relative (`"/api"`) or absolute. Trailing slashes are ignored. `propertyId` defaults to `"demo-property"`. With a `baseUrl`, the fixture badge becomes **Backend connected**, the intro describes the live source, and the same Zod validation and error handling stay in place. Without it, nothing changes: the demo remains explicit static fixtures.
+`baseUrl` may be relative (`"/api"`) or absolute. Trailing slashes are ignored. `propertyId` defaults to `"demo-property"`. With a `baseUrl`, the badge reads **Backend configured**; that only means a URL was set, not that the service responded successfully. Without it, the demo remains explicit static fixtures. In both modes the same Zod validation and error handling stay in place.
+
+On first load the visible range comes from `settings.dateRange`. A valid `?from=` and `?to=` pair in the URL overrides it. The editor submits every returned day to `PATCH` in configured mode; in fixture mode it stays limited to the days that have a published canonical response.
 
 ```bash
 pnpm install
@@ -208,6 +210,17 @@ pnpm dev
 ```
 
 A cross-origin `baseUrl` needs CORS headers on your backend for the demo origin, including the `x-property-id` request header. There is no proxy in this repository.
+
+### Run the configured path with the test backend
+
+A dev-only test double is included so the real `fetch` and `PATCH` flow can be reproduced without inventing a production backend. It returns static, contract-shaped values on a different date range from the fixtures, accepts ordinary manual overrides, and rejects one date with an error envelope.
+
+```bash
+pnpm dev            # Vite demo on http://127.0.0.1:3001
+pnpm dev:test-backend  # test double on http://127.0.0.1:3002/api
+```
+
+Open <http://127.0.0.1:3001/test-backend.html>. That HTML entry sets `window.pricingCalendarApi` before loading the app and is not part of the production build. Expect one room, the backend's own date range, the **Backend configured** badge, a successful save on `2026-12-01`, and the backend's rejection message on `2026-12-02`. The test double proves the transport and intent semantics only; it is not a conformance implementation and computes no prices.
 
 ## 3. Check your integration
 
@@ -222,6 +235,8 @@ A cross-origin `baseUrl` needs CORS headers on your backend for the demo origin,
 | Symptom | Likely cause | Fix |
 | --- | --- | --- |
 | Calendar still shows fixture data | `baseUrl` not set | Add the config before the app script |
+| Badge says configured but data never loads | URL set, service unreachable | Check the network tab; the badge is not a health check |
+| First range is empty or unexpected | Explicit `?from=` / `?to=` wins over settings | Remove those parameters or return a useful `settings.dateRange` |
 | Browser CORS error | Backend does not allow the demo origin | Allow the origin and `x-property-id`, or use a relative `baseUrl` |
 | "Pricing API request failed…" | Status outside 2xx | Check the response code and error envelope |
 | Validation error after fetch | Response does not match the schema | Compare with `/docs` and the examples above |
@@ -248,7 +263,7 @@ The scope is the calendar UI only: `/faq`, `/integrate`, Swagger UI on `/docs`, 
 
 ## Demo behavior
 
-The room selector follows the backend's `rooms` array without a hard-coded count and shows the active room's optional description. The **Today** button resolves the current date in the hotel's timezone and selects it, shifting the `?from=`/`?to=` range when needed. The selected room, date, visible range and `?edit=1` editor state are encoded in the URL for sharing; periods outside the returned range show a blank state with a shortcut back to the demo range. Selecting a day only changes the selection; the pencil action in that row opens a native dialog anchored to the button, with a bottom-sheet layout on narrow screens. Currency is shown once in the card header and numbers use `Intl` so separators follow the active locale. The header switch toggles dark and light tokens and stores the choice locally.
+The room selector follows the backend's `rooms` array without a hard-coded count and shows the active room's optional description. The **Today** button resolves the current date in the hotel's timezone and selects it, shifting the `?from=`/`?to=` range when needed. The selected room, date, visible range and `?edit=1` editor state are encoded in the URL for sharing; periods outside the returned range show a blank state with a shortcut back to the default range (backend settings when configured, fixtures otherwise). Selecting a day only changes the selection; the pencil action in that row opens a native dialog anchored to the button, with a bottom-sheet layout on narrow screens. Currency is shown once in the card header and numbers use `Intl` so separators follow the active locale. The header switch toggles dark and light tokens and stores the choice locally.
 
 ## API documentation
 
@@ -257,7 +272,7 @@ Swagger UI at `/docs` in the demo app renders the canonical OpenAPI file and off
 ## Limitations
 
 - Zod validation confirms shape, types and enums. It does not prove business correctness or conformance of a real backend; that needs end-to-end testing against your implementation.
-- No backend, SDK, proxy, authentication UI or backend persistence is provided. `x-property-id` is sent as data and must be authorized server-side; it is fixed at boot, so there is no runtime property switcher.
+- No production backend, SDK, proxy, authentication UI or backend persistence is provided. A dev-only static test backend exists solely to exercise the configured path; it is not a conformance implementation. `x-property-id` is sent as data and must be authorized server-side; it is fixed at boot, so there is no runtime property switcher. Setting a `baseUrl` does not verify that the service is reachable.
 - A cross-origin backend must allow the demo origin and the `x-property-id` header through CORS.
 - The demo caps a visible range at 366 days and has no realtime refresh or offline mode.
 - Calendar locale is an English key registry with simple `{name}` interpolation: no plural rules and no bundled translations. `messagesUrl` is same-origin and waits at most three seconds. `/faq`, `/integrate`, `/docs` and shared chrome are not translated.

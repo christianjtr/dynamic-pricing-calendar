@@ -1,0 +1,39 @@
+<!doctype html>
+<!-- Dev-only entry: points the app at apps/demo/test-backend.mjs. Not part of the production build. -->
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<meta name="theme-color" content="#0b1220" />
+		<script>
+			(() => {
+				var stored = null;
+				try {
+					stored = localStorage.getItem("pricing-calendar-theme");
+				} catch {}
+				var light =
+					stored === "light" ||
+					(stored !== "dark" &&
+						window.matchMedia("(prefers-color-scheme: light)").matches);
+				var theme = light ? "light" : "dark";
+				document.documentElement.dataset.theme = theme;
+				document.documentElement.style.colorScheme = theme;
+				document
+					.querySelector('meta[name="theme-color"]')
+					.setAttribute("content", light ? "#f7f9fc" : "#0b1220");
+			})();
+		</script>
+		<script>
+			window.pricingCalendarApi = {
+				baseUrl: "http://127.0.0.1:3002/api",
+				propertyId: "test-property",
+			};
+		</script>
+		<link rel="icon" href="data:," />
+		<title>Pricing Calendar Reference — Test Backend</title>
+	</head>
+	<body>
+		<div id="root"></div>
+		<script type="module" src="/src/main.tsx"></script>
+	</body>
+</html>

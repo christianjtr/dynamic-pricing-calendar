@@ -4,6 +4,7 @@
 	"type": "module",
 	"scripts": {
 		"dev": "pnpm --filter @hpc/demo dev",
+		"dev:test-backend": "node apps/demo/test-backend.mjs",
 		"build": "pnpm --filter \"./apps/*\" build",
 		"start": "pnpm --filter @hpc/demo start",
 		"lint": "biome check .",

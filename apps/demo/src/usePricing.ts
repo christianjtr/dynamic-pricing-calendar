@@ -28,15 +28,26 @@ function replaceDay(prices: PricesResponse, day: DayPrice): PricesResponse {
 	};
 }
 
-export function usePricing(query: PricesQuery, roomId: string | null) {
+export function usePricing(query: PricesQuery | null, roomId: string | null) {
 	const queryClient = useQueryClient();
 	const settings = useQuery({
 		queryKey: settingsKey,
 		queryFn: ({ signal }) => pricingClient.getSettings(signal),
 	});
 	const prices = useQuery({
-		queryKey: [...pricesKey, query.from, query.to, query.rooms ?? []],
-		queryFn: ({ signal }) => pricingClient.getPrices(query, signal),
+		queryKey: [
+			...pricesKey,
+			query?.from ?? null,
+			query?.to ?? null,
+			query?.rooms ?? [],
+		],
+		enabled: query !== null,
+		queryFn: ({ signal }) => {
+			if (!query) {
+				throw new Error("Missing price range");
+			}
+			return pricingClient.getPrices(query, signal);
+		},
 	});
 	const activeRoomId =
 		roomId ??

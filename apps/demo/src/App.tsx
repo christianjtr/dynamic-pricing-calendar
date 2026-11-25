@@ -5,7 +5,7 @@ import {
 	ChevronRight,
 	Pencil,
 } from "lucide-react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -21,6 +21,7 @@ import { readApiConfig } from "@/lib/apiConfig";
 import {
 	type DateRange,
 	dateRangeHref,
+	hasExplicitDateRange,
 	rangeAroundDay,
 	readDateRange,
 	shiftMonth,
@@ -45,6 +46,7 @@ import {
 	selectionHref,
 } from "@/lib/selectionUrl";
 import { cn } from "@/lib/utils";
+import { canWriteDay } from "@/lib/writePolicy";
 import { usePricing } from "@/usePricing";
 
 export function App() {
@@ -54,8 +56,13 @@ export function App() {
 	const [selectedDate, setSelectedDate] = useState<string | null>(
 		initialSelection.date,
 	);
-	const [range, setRange] = useState(() =>
-		readDateRange(window.location.search, fixtureDateRange),
+	const [hasUrlRange] = useState(() =>
+		hasExplicitDateRange(window.location.search),
+	);
+	const [range, setRange] = useState<DateRange | null>(() =>
+		hasUrlRange
+			? readDateRange(window.location.search, fixtureDateRange)
+			: null,
 	);
 	const [editing, setEditing] = useState(() =>
 		readEdit(window.location.search),
@@ -63,8 +70,8 @@ export function App() {
 	const [anchorRect, setAnchorRect] = useState<Bounds | null>(null);
 	const dialogRef = useRef<HTMLDialogElement>(null);
 	const dates = useMemo(
-		() => buildDateRange(range.from, range.to),
-		[range.from, range.to],
+		() => (range ? buildDateRange(range.from, range.to) : []),
+		[range],
 	);
 	const { settings, prices, rooms, activeRoomId, days, updatePrice } =
 		usePricing(range, roomId);
@@ -77,46 +84,38 @@ export function App() {
 	const currencies = [...new Set(days.map((day) => day.currency))];
 	const mixedCurrencies = currencies.length > 1;
 	const headerCurrency = mixedCurrencies ? null : (currencies[0] ?? currency);
-	const canUpdate = Boolean(
-		updateFixtures[`${activeRoomId}:${selectedDay?.date}`],
+	const canUpdate = canWriteDay(
+		usingFixtures,
+		Boolean(updateFixtures[`${activeRoomId}:${selectedDay?.date}`]),
 	);
 
-	const syncUrl = (
-		selection: Selection,
-		nextRange: DateRange,
-		edit = selection.edit === true,
-	) => {
-		const ranged = new URL(
-			dateRangeHref(window.location, nextRange),
-			window.location.origin,
-		);
-		window.history.replaceState(
-			null,
-			"",
-			selectionHref(ranged, { ...selection, edit }),
-		);
-	};
+	const syncUrl = useCallback(
+		(
+			selection: Selection,
+			nextRange: DateRange,
+			edit = selection.edit === true,
+		) => {
+			const ranged = new URL(
+				dateRangeHref(window.location, nextRange),
+				window.location.origin,
+			);
+			window.history.replaceState(
+				null,
+				"",
+				selectionHref(ranged, { ...selection, edit }),
+			);
+		},
+		[],
+	);
 
-	const selectDay = (date: string) => {
-		setSelectedDate(date);
-		updatePrice.reset();
-		syncUrl({ roomId: activeRoomId, date }, range);
-	};
-
-	const openEditor = (date: string, anchor: Bounds) => {
-		setAnchorRect(anchor);
-		setSelectedDate(date);
-		setEditing(true);
-		updatePrice.reset();
-		syncUrl({ roomId: activeRoomId, date, edit: true }, range);
-	};
-
-	const closeEditor = () => {
-		setEditing(false);
-		setAnchorRect(null);
-		updatePrice.reset();
-		syncUrl({ roomId: activeRoomId, date: selectedDay?.date ?? null }, range);
-	};
+	useEffect(() => {
+		if (range !== null || !settings.data) {
+			return;
+		}
+		const nextRange = { ...settings.data.dateRange };
+		setRange(nextRange);
+		syncUrl({ roomId: activeRoomId, date: selectedDate }, nextRange);
+	}, [range, settings.data, activeRoomId, selectedDate, syncUrl]);
 
 	useEffect(() => {
 		const dialog = dialogRef.current;
@@ -155,39 +154,7 @@ export function App() {
 		dialog.querySelector<HTMLInputElement>("#edit-price")?.focus();
 	}, [editing, anchorRect, selectedDay?.date]);
 
-	const applyRange = (nextRange: DateRange) => {
-		const nextDate =
-			selectedDate &&
-			selectedDate >= nextRange.from &&
-			selectedDate <= nextRange.to
-				? selectedDate
-				: null;
-		setRange(nextRange);
-		setSelectedDate(nextDate);
-		updatePrice.reset();
-		syncUrl({ roomId: activeRoomId, date: nextDate }, nextRange);
-	};
-
-	const moveDay = (delta: number) => {
-		const next = days[selectedIndex + delta];
-		if (next) {
-			selectDay(next.date);
-		}
-	};
-
-	const goToToday = () => {
-		const today = todayInTimeZone(settings.data?.hotel.timezone ?? "UTC");
-		const nextRange =
-			today >= range.from && today <= range.to ? range : rangeAroundDay(today);
-		setEditing(false);
-		setAnchorRect(null);
-		setRange(nextRange);
-		setSelectedDate(today);
-		updatePrice.reset();
-		syncUrl({ roomId: activeRoomId, date: today }, nextRange);
-	};
-
-	if (settings.isPending || prices.isPending) {
+	if (!range || settings.isPending || prices.isPending) {
 		return (
 			<main
 				className="mx-auto max-w-6xl scroll-mt-4 px-4 py-16"
@@ -230,6 +197,59 @@ export function App() {
 			</main>
 		);
 	}
+
+	const selectDay = (date: string) => {
+		setSelectedDate(date);
+		updatePrice.reset();
+		syncUrl({ roomId: activeRoomId, date }, range);
+	};
+
+	const openEditor = (date: string, anchor: Bounds) => {
+		setAnchorRect(anchor);
+		setSelectedDate(date);
+		setEditing(true);
+		updatePrice.reset();
+		syncUrl({ roomId: activeRoomId, date, edit: true }, range);
+	};
+
+	const closeEditor = () => {
+		setEditing(false);
+		setAnchorRect(null);
+		updatePrice.reset();
+		syncUrl({ roomId: activeRoomId, date: selectedDay?.date ?? null }, range);
+	};
+
+	const applyRange = (nextRange: DateRange) => {
+		const nextDate =
+			selectedDate &&
+			selectedDate >= nextRange.from &&
+			selectedDate <= nextRange.to
+				? selectedDate
+				: null;
+		setRange(nextRange);
+		setSelectedDate(nextDate);
+		updatePrice.reset();
+		syncUrl({ roomId: activeRoomId, date: nextDate }, nextRange);
+	};
+
+	const moveDay = (delta: number) => {
+		const next = days[selectedIndex + delta];
+		if (next) {
+			selectDay(next.date);
+		}
+	};
+
+	const goToToday = () => {
+		const today = todayInTimeZone(settings.data?.hotel.timezone ?? "UTC");
+		const nextRange =
+			today >= range.from && today <= range.to ? range : rangeAroundDay(today);
+		setEditing(false);
+		setAnchorRect(null);
+		setRange(nextRange);
+		setSelectedDate(today);
+		updatePrice.reset();
+		syncUrl({ roomId: activeRoomId, date: today }, nextRange);
+	};
 
 	return (
 		<main
@@ -449,7 +469,11 @@ export function App() {
 							</p>
 							<Button
 								className="mt-4"
-								onClick={() => applyRange({ ...fixtureDateRange })}
+								onClick={() =>
+									applyRange({
+										...(settings.data?.dateRange ?? fixtureDateRange),
+									})
+								}
 								size="sm"
 								variant="outline"
 							>

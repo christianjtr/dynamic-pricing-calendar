@@ -1,21 +1,22 @@
 # Pricing Calendar Reference App
 
-A reference implementation of a calendar that displays prices computed by an external backend. This repository owns the HTTP contract, interactive API documentation and one demo application. It does not compute prices, ship an SDK, or claim that a conforming external backend exists.
+A contract-first reference application: a calendar that displays prices computed by an external backend. This repository owns the HTTP contract, interactive API documentation and one configurable demo. It does not compute prices, ship an SDK, provide a production backend, or claim that a conforming external backend exists.
 
 ## The promise
 
 - One canonical [OpenAPI 3.1.1 contract](packages/contracts/openapi.yaml) with three operations: `GET /settings`, `GET /prices` and `PATCH /prices/{roomId}/{date}`.
-- One Vite demo that renders the fields returned by a backend. Static labelled fixtures are the default; a `baseUrl` config switches it to a live backend.
+- One Vite demo that renders the fields returned by a backend. Static labelled fixtures are the default; a `baseUrl` config switches it to a configured backend. The badge reports configuration, not connectivity.
 - Interactive API reference at `/docs`, a user FAQ at `/faq` and a developer guide at `/integrate`, all linked from the app header.
 - Generated Zod validators that keep the demo and its tests aligned with the contract.
 
-This is **not** an SDK, a backend, a pricing engine, a persistence layer, or a conformance certificate for any external implementation.
+This is **not** an SDK, a production backend, a pricing engine, a persistence layer, or a conformance certificate for any external implementation.
 
 ## Repository layout
 
 ```text
 apps/
   demo/                Vite app: calendar, /faq and /integrate guides, Swagger UI at /docs
+                       test-backend.mjs + test-backend.html: dev-only configured-backend double
 packages/
   contracts/           Canonical OpenAPI contract and generated Zod validators
 docs/
@@ -29,7 +30,7 @@ The language-neutral wire contract is [`packages/contracts/openapi.yaml`](packag
 
 A backend implements that contract; `x-property-id` identifies the request context and the backend authorizes it. No SDK package is published and no backend conforming to the contract is asserted here.
 
-By default the demo uses explicit, static fixtures, visibly labelled as such. When a `baseUrl` is configured it renders live backend responses instead. Prices, recommendations, variance, availability, occupancy, restrictions, currency and business validation always come from the response, never from local calculations.
+By default the demo uses explicit, static fixtures, visibly labelled as such. When a `baseUrl` is configured it renders responses from that backend instead; the badge reports configuration, not connectivity. Prices, recommendations, variance, availability, occupancy, restrictions, currency and business validation always come from the response, never from local calculations.
 
 ## Running the demo
 
@@ -52,7 +53,11 @@ The demo runs on Vite. A usage FAQ is served at `/faq`, a developer guide at `/i
 | --- | --- |
 | [![Native day editor dialog](docs/screenshots/day-editor.png)](docs/screenshots/day-editor.png) | [![In-app integration guide](docs/screenshots/integrate.png)](docs/screenshots/integrate.png) |
 
-Captured from the demo running on its static fixtures; they show the reference UI, not a live backend. Click an image to open it at full size.
+| Configured path — dev test backend |
+| --- |
+| [![Backend configured with an accepted and a rejected PATCH](docs/screenshots/backend-test.png)](docs/screenshots/backend-test.png) |
+
+The first four images were captured from the static fixtures. The last one shows the configured path against the dev-only test backend, including a backend rejection. None shows a production integration. Click an image to open it at full size.
 
 ## Integrate your backend
 
@@ -67,13 +72,16 @@ The demo uses labelled fixtures until you configure a base URL. Add this before 
 </script>
 ```
 
-Your backend implements `GET /settings`, `GET /prices` and `PATCH /prices/{roomId}/{date}` from [`packages/contracts/openapi.yaml`](packages/contracts/openapi.yaml), sends `x-property-id`, and owns every pricing decision. No SDK is published. The full step-by-step guide, JSON examples, conformance checklist and failure modes are in [`docs/integration.md`](docs/integration.md); the same essentials are available inside the app at `/integrate`. Calendar copy can be supplied through `window.pricingCalendarI18n` with no runtime i18n dependency.
+Your backend implements `GET /settings`, `GET /prices` and `PATCH /prices/{roomId}/{date}` from [`packages/contracts/openapi.yaml`](packages/contracts/openapi.yaml), sends `x-property-id`, and owns every pricing decision. No SDK is published. The first visible range comes from `settings.dateRange` unless `?from=` and `?to=` are supplied; the **Backend configured** badge does not imply a successful health check. The full step-by-step guide, JSON examples, conformance checklist and failure modes are in [`docs/integration.md`](docs/integration.md); the same essentials are available inside the app at `/integrate`. Calendar copy can be supplied through `window.pricingCalendarI18n` with no runtime i18n dependency.
+
+To exercise the real `fetch` and `PATCH` flow without a production backend, run `pnpm dev` and `pnpm dev:test-backend` in separate terminals, then open <http://127.0.0.1:3001/test-backend.html>. The dev-only test double uses static values on its own date range, accepts ordinary saves and rejects one date with an error envelope; it is not a conformance implementation.
 
 ## Available scripts
 
 | Script | Description |
 |---|---|
 | `pnpm dev` | Start the Vite demo |
+| `pnpm dev:test-backend` | Start the dev-only configured-backend test double |
 | `pnpm build` | Build the demo |
 | `pnpm start` | Preview the demo build |
 | `pnpm lint` | Run Biome checks |
@@ -112,10 +120,10 @@ The same commands run in CI on pushes and pull requests to `main`.
 ## Limitations
 
 - No SDK or distributable package is published. Integration is the HTTP contract plus the `window.pricingCalendarApi` config.
-- No backend ships here. Fixtures are static and only demonstrate the wire shape; they are not a conformance test.
+- No production backend ships here. Fixtures are static and only demonstrate the wire shape; the dev-only test backend does the same for the configured path. Neither is a conformance test.
 - This repo computes no prices, recommendations, variance or validation. Zod checks response shape, not whether a backend's business rules are correct.
 - A cross-origin backend must allow the demo origin and the `x-property-id` header. There is no proxy or authentication UI.
-- The property id is fixed at boot; there is no runtime property switcher. The backend must authorize each request.
+- The property id is fixed at boot; there is no runtime property switcher. The backend must authorize each request. The badge reflects `baseUrl` configuration, not backend availability.
 - Visible ranges are capped at 366 days; reversed ranges return no days.
 - Locale support is an English key registry with simple `{name}` interpolation: no plural rules and no bundled translations. `/faq`, `/integrate`, `/docs` and shared chrome stay in English.
 - No realtime updates, offline mode or backend persistence; only the theme choice is stored locally. URL parameters carry selection and editor state.

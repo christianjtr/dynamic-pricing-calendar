@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
 	dateRangeHref,
+	hasExplicitDateRange,
 	rangeAroundDay,
 	readDateRange,
 	shiftMonth,
@@ -21,6 +22,13 @@ describe("date range URL", () => {
 		expect(readDateRange("?from=2026-02-30&to=2026-12-01", fallback)).toEqual(
 			fallback,
 		);
+	});
+
+	it("detects only complete, valid URL ranges", () => {
+		expect(hasExplicitDateRange("?from=2026-12-01&to=2026-12-31")).toBe(true);
+		expect(hasExplicitDateRange("?from=2026-12-01")).toBe(false);
+		expect(hasExplicitDateRange("")).toBe(false);
+		expect(hasExplicitDateRange("?from=2026-12-31&to=2026-12-01")).toBe(false);
 	});
 
 	it("writes the range while preserving other parameters and the hash", () => {
