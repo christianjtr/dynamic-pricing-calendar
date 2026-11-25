@@ -135,17 +135,6 @@ MIT — see [LICENSE](LICENSE).
 
 ## From the RoomPriceGenie assessment to this repository
 
-The starting point was the RoomPriceGenie assessment snapshot preserved in [the repository audit](docs/repository-audit.md) at `55fcc29`: one Vinxi/React 18 SPA using Mantine 7, with a `/api` handler that generated 365 days × 3 rooms with `Math.random()`, hardcoded rooms and settings, client-only Zod types that drifted from the wire (`price_in_pms` / `error_reason` vs `priceInPms` / `errorReason`), and business rules such as the 4% variance threshold living in React. There was no write operation, no property context, no authentication, no lockfile and no CI. The audit also recorded duplicated calendar state and bugs in error-day handling, weekday labels, currency and timezone.
+It started as a RoomPriceGenie assessment SPA: prices and pricing rules were generated locally, with no real contract, writes or backend ownership. [The audit](docs/repository-audit.md) records that starting point.
 
-| Assessment snapshot | This repository |
-| --- | --- |
-| Prices generated locally, partly at random | Backend owns every value; the demo only renders responses |
-| Plain TypeScript types plus client-only validation | OpenAPI 3.1.1 contract with generated Zod validators checked against the YAML |
-| Hardcoded property and no writes | `x-property-id` on every request and `PATCH` as an intent returning the canonical day |
-| Mantine components, duplicated hooks, no shared chrome | One Vite app with shadcn/ui + Tailwind, shared header, accessible non-color indicators and URL-backed state |
-| Unpinned toolchain, no lockfile, no CI, three misleading tests | Pinned Node and pnpm, committed lockfile, CI running schema checks, lint, typecheck, tests and build |
-| A distributable SDK, two apps and docs were the planned scope | [ADR-0012](docs/adr/0012-pivot-to-reference-app.md) intentionally reduced that to one contract, one demo and one honest promise |
-
-The intermediate branches did build the contracts package, fixture router, SDK, second app and API docs; those decisions remain in `docs/adr/` and `Memory.md` as history. The pivot kept the useful parts and removed the packaging work that a reader could not verify. The dev-only test backend came last to demonstrate the configured path without turning the repository into a production integration.
-
-This is a historical bridge, not a new capability claim: the limits listed above still apply.
+It is now a contract-first reference app: one OpenAPI contract, generated Zod validators, one Vite demo that renders backend responses, and a dev-only test backend for the configured path. The SDK and multi-app plan were dropped in [ADR-0012](docs/adr/0012-pivot-to-reference-app.md). Historical context only; the limitations above still apply.
