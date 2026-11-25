@@ -1,6 +1,6 @@
 # Integration guide
 
-This repository is a reference implementation, not a published SDK. A backend implements one small HTTP contract; the demo app renders the responses. No pricing logic lives in this repository.
+This repository is a reference implementation, not a published SDK and not a backend. A backend implements one small HTTP contract; the demo renders those responses, using labelled fixtures by default and a live `baseUrl` when configured. No pricing logic lives in this repository.
 
 ## Who owns what
 
@@ -253,6 +253,16 @@ The room selector follows the backend's `rooms` array without a hard-coded count
 ## API documentation
 
 Swagger UI at `/docs` in the demo app renders the canonical OpenAPI file and offers a download link for the YAML. The docs chunk is loaded only on that route. Implementing the contract does not by itself prove that a backend is conformant; that requires testing against a real implementation.
+
+## Limitations
+
+- Zod validation confirms shape, types and enums. It does not prove business correctness or conformance of a real backend; that needs end-to-end testing against your implementation.
+- No backend, SDK, proxy, authentication UI or backend persistence is provided. `x-property-id` is sent as data and must be authorized server-side; it is fixed at boot, so there is no runtime property switcher.
+- A cross-origin backend must allow the demo origin and the `x-property-id` header through CORS.
+- The demo caps a visible range at 366 days and has no realtime refresh or offline mode.
+- Calendar locale is an English key registry with simple `{name}` interpolation: no plural rules and no bundled translations. `messagesUrl` is same-origin and waits at most three seconds. `/faq`, `/integrate`, `/docs` and shared chrome are not translated.
+- `PATCH` is an intent: the backend decides whether to accept it, and the UI shows only the canonical day returned. There is no optimistic price.
+- The contract is version `0.1.0`. Breaking changes require a version bump, regenerated validators and a new review of the demo.
 
 ## Verification
 

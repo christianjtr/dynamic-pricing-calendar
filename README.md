@@ -2,11 +2,20 @@
 
 A reference implementation of a calendar that displays prices computed by an external backend. This repository owns the HTTP contract, interactive API documentation and one demo application. It does not compute prices, ship an SDK, or claim that a conforming external backend exists.
 
+## The promise
+
+- One canonical [OpenAPI 3.1.1 contract](packages/contracts/openapi.yaml) with three operations: `GET /settings`, `GET /prices` and `PATCH /prices/{roomId}/{date}`.
+- One Vite demo that renders the fields returned by a backend. Static labelled fixtures are the default; a `baseUrl` config switches it to a live backend.
+- Interactive API reference at `/docs`, a user FAQ at `/faq` and a developer guide at `/integrate`, all linked from the app header.
+- Generated Zod validators that keep the demo and its tests aligned with the contract.
+
+This is **not** an SDK, a backend, a pricing engine, a persistence layer, or a conformance certificate for any external implementation.
+
 ## Repository layout
 
 ```text
 apps/
-  demo/                Vite app: fixture-driven calendar, /faq guide, Swagger UI at /docs
+  demo/                Vite app: calendar, /faq and /integrate guides, Swagger UI at /docs
 packages/
   contracts/           Canonical OpenAPI contract and generated Zod validators
 docs/
@@ -20,7 +29,7 @@ The language-neutral wire contract is [`packages/contracts/openapi.yaml`](packag
 
 A backend implements that contract; `x-property-id` identifies the request context and the backend authorizes it. No SDK package is published and no backend conforming to the contract is asserted here.
 
-The demo uses explicit, static fixtures. Prices, recommendations, variance, availability, occupancy, restrictions, currency and business validation always come from the backend response.
+By default the demo uses explicit, static fixtures, visibly labelled as such. When a `baseUrl` is configured it renders live backend responses instead. Prices, recommendations, variance, availability, occupancy, restrictions, currency and business validation always come from the response, never from local calculations.
 
 ## Running the demo
 
@@ -79,6 +88,7 @@ The same commands run in CI on pushes and pull requests to `main`.
 
 - [Integration guide](docs/integration.md)
 - In-app usage guide: `/faq` in the demo app
+- In-app developer guide: `/integrate` in the demo app
 - [OpenAPI contract](packages/contracts/openapi.yaml)
 - Interactive API reference: `/docs` in the demo app
 - [ADR-0012 — Pivot to a contract-first reference app](docs/adr/0012-pivot-to-reference-app.md)
@@ -87,6 +97,18 @@ The same commands run in CI on pushes and pull requests to `main`.
 - [Repository audit](docs/repository-audit.md) — historical pre-migration snapshot
 - ADRs marked superseded by ADR-0012 describe the retired SDK/Start/Mantine architecture and are kept for history only.
 
+## Limitations
+
+- No SDK or distributable package is published. Integration is the HTTP contract plus the `window.pricingCalendarApi` config.
+- No backend ships here. Fixtures are static and only demonstrate the wire shape; they are not a conformance test.
+- This repo computes no prices, recommendations, variance or validation. Zod checks response shape, not whether a backend's business rules are correct.
+- A cross-origin backend must allow the demo origin and the `x-property-id` header. There is no proxy or authentication UI.
+- The property id is fixed at boot; there is no runtime property switcher. The backend must authorize each request.
+- Visible ranges are capped at 366 days; reversed ranges return no days.
+- Locale support is an English key registry with simple `{name}` interpolation: no plural rules and no bundled translations. `/faq`, `/integrate`, `/docs` and shared chrome stay in English.
+- No realtime updates, offline mode or backend persistence; only the theme choice is stored locally. URL parameters carry selection and editor state.
+- Writes are intents: the backend may reject them, and the UI always shows the returned canonical day instead of an optimistic value.
+
 ## License
 
-MIT — Christian Torrealba
+MIT — see [LICENSE](LICENSE).

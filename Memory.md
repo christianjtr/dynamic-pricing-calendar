@@ -1,6 +1,6 @@
 # Memory
 
-Last updated: pivot complete at `1816ec3`; date-range navigation merged at `0c62bea`; day editor merged at `bf2c20c`; theme switch merged at `d1dba31`; separate edit action merged at `273ebe7`; FAQ route merged at `20f33c6`; shared site header merged at `db3150c`; theme toggle icon merged at `6f4d032`; condensed table merged at `e7fd711`; fixture indicator merged at `cf95388`; in-house locale merged at `081e91a`; locale fetch timeout merged at `08e8c53`; developer integration docs ready on `docs/developer-integration`. See ADR-0012.
+Last updated: pivot complete at `1816ec3`; date-range navigation merged at `0c62bea`; day editor merged at `bf2c20c`; theme switch merged at `d1dba31`; separate edit action merged at `273ebe7`; FAQ route merged at `20f33c6`; shared site header merged at `db3150c`; theme toggle icon merged at `6f4d032`; condensed table merged at `e7fd711`; fixture indicator merged at `cf95388`; in-house locale merged at `081e91a`; locale fetch timeout merged at `08e8c53`; developer integration docs merged at `829abbf`; final integrity and docs alignment ready on `docs/final-integrity-pass`. See ADR-0012.
 
 ## Project goal
 
@@ -118,7 +118,8 @@ Important contract rules:
 | P14 | `feat/fixture-indicator` | Warning-style fixture indicator, emphasized metadata, room descriptions, dynamic room count, clearer card hierarchy, Today button and calendar blank state | Complete, merged at `cf95388` |
 | P15 | `feat/in-house-locale` | Calendar-only key registry with integrator messages via inline config or same-host JSON | Complete, merged at `081e91a` |
 | P16 | `fix/locale-fetch-timeout` | Bound the same-host messages fetch to 3s with English fallback so a stalled file cannot block the first render | Complete, merged at `08e8c53` |
-| P17 | `docs/developer-integration` | Configurable backend base URL, step-by-step integration guide and in-app `/integrate` developer page | Ready for commit |
+| P17 | `docs/developer-integration` | Configurable backend base URL, step-by-step integration guide and in-app `/integrate` developer page | Complete, merged at `829abbf` |
+| P18 | `docs/final-integrity-pass` | Full verification, promise alignment across README/docs, explicit limitations and LICENSE check | Ready for commit |
 
 ## ADR index
 
