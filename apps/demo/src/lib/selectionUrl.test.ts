@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { readSelection, selectionHref } from "./selectionUrl";
+import { readEdit, readSelection, selectionHref } from "./selectionUrl";
 
 const location = { pathname: "/", search: "", hash: "" };
 
@@ -31,5 +31,23 @@ describe("selection URL", () => {
 			{ roomId: null, date: null },
 		);
 		expect(href).toBe("/");
+	});
+
+	it("reads and writes the edit deep link", () => {
+		expect(readEdit("?edit=1")).toBe(true);
+		expect(readEdit("?edit=0")).toBe(false);
+		expect(
+			selectionHref(location, {
+				roomId: "1001",
+				date: "2026-11-23",
+				edit: true,
+			}),
+		).toBe("/?room=1001&date=2026-11-23&edit=1");
+		expect(
+			selectionHref(
+				{ pathname: "/", search: "?edit=1", hash: "" },
+				{ roomId: "1001", date: null, edit: false },
+			),
+		).toBe("/?room=1001");
 	});
 });

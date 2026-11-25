@@ -1,6 +1,7 @@
 export interface Selection {
 	roomId: string | null;
 	date: string | null;
+	edit?: boolean;
 }
 
 export interface PageLocation {
@@ -14,9 +15,13 @@ export function readSelection(search: string): Selection {
 	return { roomId: params.get("room"), date: params.get("date") };
 }
 
+export function readEdit(search: string): boolean {
+	return new URLSearchParams(search).get("edit") === "1";
+}
+
 export function selectionHref(
 	location: PageLocation,
-	{ roomId, date }: Selection,
+	{ roomId, date, edit }: Selection,
 ): string {
 	const params = new URLSearchParams(location.search);
 	if (roomId) {
@@ -28,6 +33,11 @@ export function selectionHref(
 		params.set("date", date);
 	} else {
 		params.delete("date");
+	}
+	if (edit) {
+		params.set("edit", "1");
+	} else {
+		params.delete("edit");
 	}
 	const query = params.toString();
 	return `${location.pathname}${query ? `?${query}` : ""}${location.hash}`;

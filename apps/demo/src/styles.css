@@ -59,6 +59,39 @@
 	}
 }
 
+.day-edit-dialog {
+	max-height: calc(100vh - 1.5rem);
+	max-width: none;
+	margin: 0;
+	overflow-y: auto;
+	position: fixed;
+	left: var(--dialog-left, 50%);
+	top: var(--dialog-top, 50%);
+	width: var(--dialog-width, 24rem);
+	transform: translate(-50%, -50%);
+}
+
+.day-edit-dialog--anchored {
+	transform: none;
+}
+
+.day-edit-dialog::backdrop {
+	background: rgb(3 8 18 / 65%);
+}
+
+@media (max-width: 640px) {
+	.day-edit-dialog {
+		bottom: 0;
+		left: 0;
+		max-height: 85vh;
+		right: 0;
+		top: auto;
+		transform: none;
+		width: 100%;
+		border-radius: 1rem 1rem 0 0;
+	}
+}
+
 @media (prefers-reduced-motion: reduce) {
 	*,
 	*::before,

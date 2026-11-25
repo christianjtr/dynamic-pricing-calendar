@@ -1,5 +1,5 @@
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -17,6 +17,7 @@ import {
 	readDateRange,
 	shiftMonth,
 } from "@/lib/dateRange";
+import { anchoredPosition, type Bounds } from "@/lib/dialogPosition";
 import {
 	buildDateRange,
 	formatAvailability,
@@ -26,6 +27,7 @@ import {
 	getDayIndicators,
 } from "@/lib/format";
 import {
+	readEdit,
 	readSelection,
 	type Selection,
 	selectionHref,
@@ -42,6 +44,11 @@ export function App() {
 	const [range, setRange] = useState(() =>
 		readDateRange(window.location.search, fixtureDateRange),
 	);
+	const [editing, setEditing] = useState(() =>
+		readEdit(window.location.search),
+	);
+	const [anchorRect, setAnchorRect] = useState<Bounds | null>(null);
+	const dialogRef = useRef<HTMLDialogElement>(null);
 	const dates = useMemo(
 		() => buildDateRange(range.from, range.to),
 		[range.from, range.to],
@@ -57,12 +64,20 @@ export function App() {
 		updateFixtures[`${activeRoomId}:${selectedDay?.date}`],
 	);
 
-	const syncUrl = (selection: Selection, nextRange: DateRange) => {
+	const syncUrl = (
+		selection: Selection,
+		nextRange: DateRange,
+		edit = selection.edit === true,
+	) => {
 		const ranged = new URL(
 			dateRangeHref(window.location, nextRange),
 			window.location.origin,
 		);
-		window.history.replaceState(null, "", selectionHref(ranged, selection));
+		window.history.replaceState(
+			null,
+			"",
+			selectionHref(ranged, { ...selection, edit }),
+		);
 	};
 
 	const selectDay = (date: string) => {
@@ -70,6 +85,58 @@ export function App() {
 		updatePrice.reset();
 		syncUrl({ roomId: activeRoomId, date }, range);
 	};
+
+	const openEditor = (date: string, anchor: Bounds) => {
+		setAnchorRect(anchor);
+		setSelectedDate(date);
+		setEditing(true);
+		updatePrice.reset();
+		syncUrl({ roomId: activeRoomId, date, edit: true }, range);
+	};
+
+	const closeEditor = () => {
+		setEditing(false);
+		setAnchorRect(null);
+		updatePrice.reset();
+		syncUrl({ roomId: activeRoomId, date: selectedDay?.date ?? null }, range);
+	};
+
+	useEffect(() => {
+		const dialog = dialogRef.current;
+		if (!dialog || !selectedDay?.date) {
+			return;
+		}
+
+		if (!editing) {
+			if (dialog.open) {
+				dialog.close();
+			}
+			return;
+		}
+
+		if (dialog.open) {
+			return;
+		}
+
+		dialog.style.visibility = "hidden";
+		dialog.showModal();
+		if (anchorRect) {
+			const panel = dialog.getBoundingClientRect();
+			const position = anchoredPosition(anchorRect, panel, {
+				width: window.innerWidth,
+				height: window.innerHeight,
+			});
+			dialog.style.setProperty("--dialog-left", `${position.left}px`);
+			dialog.style.setProperty("--dialog-top", `${position.top}px`);
+			dialog.style.setProperty("--dialog-width", `${position.width}px`);
+		} else {
+			dialog.style.removeProperty("--dialog-left");
+			dialog.style.removeProperty("--dialog-top");
+			dialog.style.removeProperty("--dialog-width");
+		}
+		dialog.style.visibility = "";
+		dialog.querySelector<HTMLInputElement>("#edit-price")?.focus();
+	}, [editing, anchorRect, selectedDay?.date]);
 
 	const applyRange = (nextRange: DateRange) => {
 		const nextDate =
@@ -342,9 +409,15 @@ export function App() {
 									>
 										<th className="px-3 py-2 text-left font-medium" scope="row">
 											<button
+												aria-haspopup="dialog"
 												aria-pressed={day.date === selectedDay?.date}
 												className="rounded hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
-												onClick={() => selectDay(day.date)}
+												onClick={(event) =>
+													openEditor(
+														day.date,
+														event.currentTarget.getBoundingClientRect(),
+													)
+												}
 												type="button"
 											>
 												{formatDate(day.date)}
@@ -404,53 +477,116 @@ export function App() {
 			</Card>
 
 			{selectedDay && activeRoomId ? (
-				<Card className="mt-6">
-					<CardHeader>
-						<CardTitle>Manual Price Intent</CardTitle>
-						<CardDescription>
-							{formatDate(selectedDay.date)} in {roomName}. The backend response
-							is the only canonical value after a write.
-						</CardDescription>
-					</CardHeader>
-					<CardContent>
-						<form
-							className="grid gap-4 sm:grid-cols-[12rem_minmax(0,1fr)_auto] sm:items-end"
-							key={`${activeRoomId}:${selectedDay.date}`}
-							onSubmit={(event) => {
-								event.preventDefault();
-								const formData = new FormData(event.currentTarget);
-								updatePrice.mutate({
-									date: selectedDay.date,
-									price: Number(formData.get("price")),
-									reason: String(formData.get("reason") ?? "Manual override"),
-									roomId: activeRoomId,
-								});
-							}}
+				<dialog
+					aria-describedby="day-edit-description"
+					aria-labelledby="day-edit-title"
+					className={cn(
+						"day-edit-dialog rounded-card border bg-card p-5 text-card-foreground shadow-xl",
+						anchorRect && "day-edit-dialog--anchored",
+					)}
+					onClose={closeEditor}
+					ref={dialogRef}
+				>
+					<div className="mb-4 flex items-start justify-between gap-3">
+						<div>
+							<h2
+								className="text-balance text-lg font-semibold"
+								id="day-edit-title"
+							>
+								{roomName} · {formatDate(selectedDay.date)}
+							</h2>
+							<p
+								className="mt-1 text-sm text-muted-foreground"
+								id="day-edit-description"
+							>
+								Backend values stay read-only. Save submits a manual price
+								intent.
+							</p>
+						</div>
+						<Button
+							aria-label="Close editor"
+							onClick={() => dialogRef.current?.close()}
+							size="icon"
+							variant="ghost"
 						>
-							<label className="grid gap-2 text-sm" htmlFor="price">
-								<span>Price</span>
-								<Input
-									autoComplete="off"
-									defaultValue={selectedDay.price ?? ""}
-									id="price"
-									inputMode="decimal"
-									min="0"
-									name="price"
-									required
-									step="0.01"
-									type="number"
-								/>
-							</label>
-							<label className="grid gap-2 text-sm" htmlFor="reason">
-								<span>Reason</span>
-								<Input
-									autoComplete="off"
-									defaultValue="Manual override"
-									id="reason"
-									name="reason"
-									placeholder="e.g. Peak demand…"
-								/>
-							</label>
+							<span aria-hidden="true">×</span>
+						</Button>
+					</div>
+					<dl className="mb-4 grid grid-cols-2 gap-2 text-sm">
+						<div className="rounded-md border bg-muted/40 p-2">
+							<dt className="text-muted-foreground">Backend price</dt>
+							<dd className="font-medium tabular-nums">
+								{formatMoney(selectedDay.price, selectedDay.currency)}
+							</dd>
+						</div>
+						<div className="rounded-md border bg-muted/40 p-2">
+							<dt className="text-muted-foreground">Status</dt>
+							<dd className="font-medium">
+								{formatStatus(selectedDay.status)}
+							</dd>
+						</div>
+						<div className="rounded-md border bg-muted/40 p-2">
+							<dt className="text-muted-foreground">Recommended</dt>
+							<dd className="font-medium tabular-nums">
+								{formatMoney(
+									selectedDay.recommendedPrice,
+									selectedDay.currency,
+								)}
+							</dd>
+						</div>
+						<div className="rounded-md border bg-muted/40 p-2">
+							<dt className="text-muted-foreground">Variance</dt>
+							<dd className="font-medium tabular-nums">
+								{selectedDay.variance?.label ?? "—"}
+							</dd>
+						</div>
+					</dl>
+					<form
+						className="grid gap-4"
+						key={`${activeRoomId}:${selectedDay.date}:${selectedDay.price}`}
+						onSubmit={(event) => {
+							event.preventDefault();
+							const formData = new FormData(event.currentTarget);
+							updatePrice.mutate({
+								date: selectedDay.date,
+								price: Number(formData.get("price")),
+								reason: String(formData.get("reason") ?? "Manual override"),
+								roomId: activeRoomId,
+							});
+						}}
+					>
+						<label className="grid gap-2 text-sm" htmlFor="edit-price">
+							<span>Price</span>
+							<Input
+								autoComplete="off"
+								defaultValue={selectedDay.price ?? ""}
+								id="edit-price"
+								inputMode="decimal"
+								min="0"
+								name="price"
+								required
+								step="0.01"
+								type="number"
+							/>
+						</label>
+						<label className="grid gap-2 text-sm" htmlFor="edit-reason">
+							<span>Reason</span>
+							<Input
+								autoComplete="off"
+								defaultValue="Manual override"
+								id="edit-reason"
+								name="reason"
+								placeholder="e.g. Peak demand…"
+							/>
+						</label>
+						<div className="flex justify-end gap-2">
+							<Button
+								onClick={() => dialogRef.current?.close()}
+								type="button"
+								variant="outline"
+							>
+								Cancel
+							</Button>
 							<Button
 								disabled={
 									updatePrice.isPending ||
@@ -461,30 +597,30 @@ export function App() {
 							>
 								{updatePrice.isPending ? "Saving…" : "Save Manual Price"}
 							</Button>
-						</form>
-						{!canUpdate ? (
-							<p className="mt-4 text-sm text-muted-foreground">
-								This fixture day has no canonical update response. Select the
-								first day of a room to try a write.
-							</p>
-						) : null}
-						{updatePrice.isError ? (
-							<p className="mt-4 text-sm text-destructive" role="alert">
-								{updatePrice.error.message}
-							</p>
-						) : null}
-						{updatePrice.data ? (
-							<p className="mt-4 text-sm" role="status">
-								Backend accepted{" "}
-								{formatMoney(
-									updatePrice.data.day.price,
-									updatePrice.data.day.currency,
-								)}{" "}
-								with status {formatStatus(updatePrice.data.day.status)}.
-							</p>
-						) : null}
-					</CardContent>
-				</Card>
+						</div>
+					</form>
+					{!canUpdate ? (
+						<p className="mt-4 text-sm text-muted-foreground">
+							This fixture day has no canonical update response. Choose a day
+							with one to try a write.
+						</p>
+					) : null}
+					{updatePrice.isError ? (
+						<p className="mt-4 text-sm text-destructive" role="alert">
+							{updatePrice.error.message}
+						</p>
+					) : null}
+					{updatePrice.data ? (
+						<p className="mt-4 text-sm" role="status">
+							Backend accepted{" "}
+							{formatMoney(
+								updatePrice.data.day.price,
+								updatePrice.data.day.currency,
+							)}{" "}
+							with status {formatStatus(updatePrice.data.day.status)}.
+						</p>
+					) : null}
+				</dialog>
 			) : null}
 
 			<footer className="mt-8 text-sm text-muted-foreground">
