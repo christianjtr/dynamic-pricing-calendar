@@ -42,6 +42,18 @@ pnpm dev
 
 The demo runs on Vite. A usage FAQ is served at `/faq`, a developer guide at `/integrate`, and interactive API documentation at `/docs`; all three are linked from the calendar header. The room selector follows the backend's rooms, the visible range uses `?from=` and `?to=`, and the selected room and date are reflected in `?room=` and `?date=`. Selecting a day highlights it; the pencil action opens an anchored native dialog, and `?edit=1` shares it. The header switches themes and saves the choice locally.
 
+## Screenshots
+
+| Calendar — light | Calendar — dark |
+| --- | --- |
+| [![Pricing calendar in light mode](docs/screenshots/calendar-light.png)](docs/screenshots/calendar-light.png) | [![Pricing calendar in dark mode](docs/screenshots/calendar-dark.png)](docs/screenshots/calendar-dark.png) |
+
+| Day editor | Developer guide |
+| --- | --- |
+| [![Native day editor dialog](docs/screenshots/day-editor.png)](docs/screenshots/day-editor.png) | [![In-app integration guide](docs/screenshots/integrate.png)](docs/screenshots/integrate.png) |
+
+Captured from the demo running on its static fixtures; they show the reference UI, not a live backend. Click an image to open it at full size.
+
 ## Integrate your backend
 
 The demo uses labelled fixtures until you configure a base URL. Add this before the app script in `apps/demo/index.html`:
