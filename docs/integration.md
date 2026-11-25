@@ -18,7 +18,7 @@ The frontend renders the returned fields and never recalculates a displayed pric
 
 ## Demo data
 
-The demo uses explicit static fixtures, visibly labelled as fixture data. They demonstrate the contract and the UI flow; they are not an integration with a real backend and do not derive business rules. The selected room, date, visible `?from=`/`?to=` range and `?edit=1` editor state are encoded in the URL for sharing; periods outside the fixture range show an explicit empty state. A day's editor is a native dialog anchored to its row, with a bottom-sheet layout on narrow screens.
+The demo uses explicit static fixtures, visibly labelled as fixture data. They demonstrate the contract and the UI flow; they are not an integration with a real backend and do not derive business rules. The selected room, date, visible `?from=`/`?to=` range and `?edit=1` editor state are encoded in the URL for sharing; periods outside the fixture range show an explicit empty state. Selecting a day only changes the selection; the header's **Edit selected day** action opens a native dialog anchored to that button, with a bottom-sheet layout on narrow screens.
 
 The header switch toggles dark and light tokens and stores the choice locally. It is a user preference, not shared URL state. Swagger UI keeps its own styles on `/docs`.
 

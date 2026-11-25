@@ -306,6 +306,19 @@ export function App() {
 							>
 								<ChevronRight aria-hidden="true" className="size-4" />
 							</Button>
+							<Button
+								aria-haspopup="dialog"
+								disabled={!selectedDay}
+								onClick={(event) =>
+									openEditor(
+										selectedDay?.date ?? "",
+										event.currentTarget.getBoundingClientRect(),
+									)
+								}
+								size="sm"
+							>
+								Edit selected day
+							</Button>
 						</div>
 					</div>
 				</CardHeader>
@@ -413,15 +426,9 @@ export function App() {
 									>
 										<th className="px-3 py-2 text-left font-medium" scope="row">
 											<button
-												aria-haspopup="dialog"
 												aria-pressed={day.date === selectedDay?.date}
 												className="rounded hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
-												onClick={(event) =>
-													openEditor(
-														day.date,
-														event.currentTarget.getBoundingClientRect(),
-													)
-												}
+												onClick={() => selectDay(day.date)}
 												type="button"
 											>
 												{formatDate(day.date)}

@@ -31,7 +31,7 @@ pnpm install
 pnpm dev
 ```
 
-The demo runs on Vite. Interactive API documentation is served at `/docs` inside the same app. The selected room and date are reflected in `?room=` and `?date=`; the visible range uses `?from=` and `?to=`, with month controls to shift it. Selecting a day opens a native dialog anchored to that day; `?edit=1` shares the open editor. Ranges without fixture data show an explicit empty state. The header switches between dark and light themes using the platform `color-scheme` and saves the choice locally.
+The demo runs on Vite. Interactive API documentation is served at `/docs` inside the same app. The selected room and date are reflected in `?room=` and `?date=`; the visible range uses `?from=` and `?to=`, with month controls to shift it. Selecting a day highlights it; the **Edit selected day** button opens a native dialog anchored to that button. `?edit=1` shares the open editor. Ranges without fixture data show an explicit empty state. The header switches between dark and light themes using the platform `color-scheme` and saves the choice locally.
 
 ## Available scripts
 
