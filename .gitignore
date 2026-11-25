@@ -39,3 +39,6 @@ yarn-error.log*
 .Spotlight-V100
 .Trashes
 ehthumbs.db
+
+# Development tools
+.opencode/
