@@ -2,6 +2,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { lazy, StrictMode, Suspense } from "react";
 import { createRoot } from "react-dom/client";
 import { App } from "@/App";
+import { Faq } from "@/Faq";
 import "./styles.css";
 
 const Docs = lazy(() => import("@/Docs"));
@@ -22,12 +23,16 @@ const queryClient = new QueryClient({
 	},
 });
 
-const isDocsPage = window.location.pathname.replace(/\/$/, "") === "/docs";
+const pathname = window.location.pathname.replace(/\/$/, "");
+const isDocsPage = pathname === "/docs";
+const isFaqPage = pathname === "/faq";
 
 const page = isDocsPage ? (
 	<Suspense fallback={<p className="p-8">Loading API documentation…</p>}>
 		<Docs />
 	</Suspense>
+) : isFaqPage ? (
+	<Faq />
 ) : (
 	<App />
 );

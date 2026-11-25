@@ -6,7 +6,7 @@ A reference implementation of a calendar that displays prices computed by an ext
 
 ```text
 apps/
-  demo/                Vite app: fixture-driven calendar, date navigation, Swagger UI at /docs
+  demo/                Vite app: fixture-driven calendar, /faq guide, Swagger UI at /docs
 packages/
   contracts/           Canonical OpenAPI contract and generated Zod validators
 docs/
@@ -31,7 +31,7 @@ pnpm install
 pnpm dev
 ```
 
-The demo runs on Vite. Interactive API documentation is served at `/docs` inside the same app. The selected room and date are reflected in `?room=` and `?date=`; the visible range uses `?from=` and `?to=`, with month controls to shift it. Selecting a day highlights it; the **Edit selected day** button opens a native dialog anchored to that button. `?edit=1` shares the open editor. Ranges without fixture data show an explicit empty state. The header switches between dark and light themes using the platform `color-scheme` and saves the choice locally.
+The demo runs on Vite. A usage FAQ is served at `/faq` and linked from the calendar header; interactive API documentation is served at `/docs` inside the same app. The selected room and date are reflected in `?room=` and `?date=`; the visible range uses `?from=` and `?to=`, with month controls to shift it. Selecting a day highlights it; the **Edit selected day** button opens a native dialog anchored to that button. `?edit=1` shares the open editor. Ranges without fixture data show an explicit empty state. The header switches between dark and light themes using the platform `color-scheme` and saves the choice locally.
 
 ## Available scripts
 
@@ -63,6 +63,7 @@ The same commands run in CI on pushes and pull requests to `main`.
 ## Documentation
 
 - [Integration guide](docs/integration.md)
+- In-app usage guide: `/faq` in the demo app
 - [OpenAPI contract](packages/contracts/openapi.yaml)
 - Interactive API reference: `/docs` in the demo app
 - [ADR-0012 — Pivot to a contract-first reference app](docs/adr/0012-pivot-to-reference-app.md)

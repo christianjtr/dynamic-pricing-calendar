@@ -230,6 +230,9 @@ export function App() {
 				</div>
 				<div className="flex flex-wrap items-center gap-2">
 					<Button asChild size="sm" variant="outline">
+						<a href="/faq">How to use</a>
+					</Button>
+					<Button asChild size="sm" variant="outline">
 						<a href="/docs">API documentation</a>
 					</Button>
 					<ThemeToggle />
