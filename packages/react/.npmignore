@@ -1,8 +1,0 @@
-tsconfig.json
-src/client/client.test.ts
-src/client/hooks.test.tsx
-src/headless/selectors.test.ts
-src/ui/DayIndicators.test.ts
-src/ui/PricingCalendar.test.tsx
-src/ui/dateRange.test.ts
-src/ui/format.test.ts
