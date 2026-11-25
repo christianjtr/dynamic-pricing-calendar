@@ -122,9 +122,9 @@ export function Faq() {
 				<section className="rounded-card border bg-card p-5">
 					<h2 className="text-lg font-semibold">How do I change the theme?</h2>
 					<p className="mt-2 text-sm text-muted-foreground">
-						Use the Light mode switch in the header. The first visit follows
-						your system preference; after that the choice is saved in this
-						browser.
+						Use the theme switch in the header; it shows the mode it will switch
+						to. The first visit follows your system preference; after that the
+						choice is saved in this browser.
 					</p>
 				</section>
 			</div>

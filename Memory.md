@@ -1,6 +1,6 @@
 # Memory
 
-Last updated: pivot complete at `1816ec3`; date-range navigation merged at `0c62bea`; day editor merged at `bf2c20c`; theme switch merged at `d1dba31`; separate edit action merged at `273ebe7`; FAQ route merged at `20f33c6`; shared site header ready on `refactor/shared-site-header`. See ADR-0012.
+Last updated: pivot complete at `1816ec3`; date-range navigation merged at `0c62bea`; day editor merged at `bf2c20c`; theme switch merged at `d1dba31`; separate edit action merged at `273ebe7`; FAQ route merged at `20f33c6`; shared site header merged at `db3150c`; theme toggle icon ready on `feat/theme-toggle-icon`. See ADR-0012.
 
 ## Project goal
 
@@ -112,7 +112,8 @@ Important contract rules:
 | P8 | `feat/theme-switch` | Dark/light theme switch, local persistence and no-flash startup | Complete, merged at `d1dba31` |
 | P9 | `refactor/separate-edit-action` | Day cell selects only; header button opens the anchored editor | Complete, merged at `273ebe7` |
 | P10 | `docs/faq-route` | Dedicated `/faq` usage guide linked from the calendar header | Complete, merged at `20f33c6` |
-| P11 | `refactor/shared-site-header` | Single header with Calendar, How to use, API Docs and one theme switch | Ready for commit |
+| P11 | `refactor/shared-site-header` | Single header with Calendar, How to use, API Docs and one theme switch | Complete, merged at `db3150c` |
+| P12 | `feat/theme-toggle-icon` | Theme button shows the next mode with a matching Sun/Moon icon | Ready for commit |
 
 ## ADR index
 

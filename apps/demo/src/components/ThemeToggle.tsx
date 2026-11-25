@@ -1,4 +1,4 @@
-import { Sun } from "lucide-react";
+import { Moon, Sun } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -20,28 +20,23 @@ export function ThemeToggle() {
 	const [theme, setTheme] = useState<Theme>(
 		() => parseTheme(document.documentElement.dataset.theme) ?? "dark",
 	);
+	const nextTheme = theme === "dark" ? "light" : "dark";
+	const NextIcon = nextTheme === "light" ? Sun : Moon;
 
 	const toggle = () => {
-		const next = theme === "dark" ? "light" : "dark";
-		setTheme(next);
-		applyTheme(next);
+		setTheme(nextTheme);
+		applyTheme(nextTheme);
 		try {
-			localStorage.setItem(THEME_STORAGE_KEY, next);
+			localStorage.setItem(THEME_STORAGE_KEY, nextTheme);
 		} catch {
 			// Private browsing can deny storage; the theme still applies for this page.
 		}
 	};
 
 	return (
-		<Button
-			aria-pressed={theme === "light"}
-			onClick={toggle}
-			size="sm"
-			type="button"
-			variant="outline"
-		>
-			<Sun aria-hidden="true" className="size-4" />
-			<span>Light mode</span>
+		<Button onClick={toggle} size="sm" type="button" variant="outline">
+			<NextIcon aria-hidden="true" className="size-4" />
+			<span>{nextTheme === "light" ? "Light mode" : "Dark mode"}</span>
 		</Button>
 	);
 }
