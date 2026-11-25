@@ -1,6 +1,6 @@
 # Memory
 
-Last updated: pivot complete at `1816ec3`; date-range navigation merged at `0c62bea`; day editor merged at `bf2c20c`; theme switch merged at `d1dba31`; separate edit action merged at `273ebe7`; FAQ route ready on `docs/faq-route`. See ADR-0012.
+Last updated: pivot complete at `1816ec3`; date-range navigation merged at `0c62bea`; day editor merged at `bf2c20c`; theme switch merged at `d1dba31`; separate edit action merged at `273ebe7`; FAQ route merged at `20f33c6`. See ADR-0012.
 
 ## Project goal
 
@@ -111,7 +111,7 @@ Important contract rules:
 | P7 | `feat/day-edit-popover` | Native dialog anchored to the day, `?edit=1` deep link and mobile bottom sheet | Complete, merged at `bf2c20c` |
 | P8 | `feat/theme-switch` | Dark/light theme switch, local persistence and no-flash startup | Complete, merged at `d1dba31` |
 | P9 | `refactor/separate-edit-action` | Day cell selects only; header button opens the anchored editor | Complete, merged at `273ebe7` |
-| P10 | `docs/faq-route` | Dedicated `/faq` usage guide linked from the calendar header | Ready for commit |
+| P10 | `docs/faq-route` | Dedicated `/faq` usage guide linked from the calendar header | Complete, merged at `20f33c6` |
 
 ## ADR index
 
