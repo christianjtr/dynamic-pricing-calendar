@@ -1,234 +1,385 @@
-import type { DayPrice } from "@hpc/contracts";
-import { usePricingCalendar } from "@hpc/pricing-calendar";
-import { useState } from "react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useMemo, useState } from "react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+	Card,
+	CardContent,
+	CardDescription,
+	CardHeader,
+	CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { updateFixtures } from "@/fixtures/fixtures";
+import {
+	buildDateRange,
+	formatAvailability,
+	formatDate,
+	formatMoney,
+	formatStatus,
+	getDayIndicators,
+} from "@/lib/format";
+import { cn } from "@/lib/utils";
+import { usePricing } from "@/usePricing";
 
-const DATE_RANGE = {
-	from: "2026-11-23",
-	to: "2026-11-29",
-} as const;
-
-const dateFormatter = new Intl.DateTimeFormat("en-NZ", {
-	day: "numeric",
-	month: "short",
-	timeZone: "UTC",
-	weekday: "short",
-});
-
-function formatDate(value: string) {
-	return dateFormatter.format(new Date(`${value}T00:00:00Z`));
-}
-
-function formatMoney(currency: string, value: number | null) {
-	if (value === null) {
-		return "—";
-	}
-
-	return new Intl.NumberFormat("en-NZ", {
-		currency,
-		style: "currency",
-	}).format(value);
-}
-
-function describeDay(day: DayPrice) {
-	return [day.variance?.label, ...day.restrictions, day.error?.message]
-		.filter((value): value is string => Boolean(value))
-		.join(" · ");
-}
+const RANGE = { from: "2026-11-23", to: "2026-11-29" } as const;
 
 export function App() {
-	const {
-		settings,
-		prices,
-		rooms,
-		activeRoomId,
-		setSelectedRoomId,
-		days,
-		updatePrice,
-	} = usePricingCalendar({ ...DATE_RANGE });
+	const [roomId, setRoomId] = useState<string | null>(null);
 	const [selectedDate, setSelectedDate] = useState<string | null>(null);
+	const dates = useMemo(() => buildDateRange(RANGE.from, RANGE.to), []);
+	const { settings, prices, rooms, activeRoomId, days, updatePrice } =
+		usePricing({ from: RANGE.from, to: RANGE.to }, roomId);
 	const selectedDay = days.find((day) => day.date === selectedDate) ?? days[0];
-	const selectedRoomName =
-		rooms.find((room) => room.id === activeRoomId)?.name ?? "room";
-	const currency =
-		settings.data?.hotel.currency ?? prices.data?.currency ?? "NZD";
-	const loadError = settings.error ?? prices.error;
+	const selectedIndex = days.findIndex((day) => day.date === selectedDay?.date);
+	const roomName =
+		rooms.find((room) => room.id === activeRoomId)?.name ?? "Room";
+	const currency = settings.data?.hotel.currency ?? "NZD";
+	const canUpdate = Boolean(
+		updateFixtures[`${activeRoomId}:${selectedDay?.date}`],
+	);
+
+	const selectDay = (date: string) => {
+		setSelectedDate(date);
+		updatePrice.reset();
+	};
+
+	const moveDay = (delta: number) => {
+		const next = days[selectedIndex + delta];
+		if (next) {
+			selectDay(next.date);
+		}
+	};
 
 	if (settings.isPending || prices.isPending) {
 		return (
-			<main className="demo-shell">
-				<p className="demo-status" role="status">
-					Loading backend-owned pricing data…
-				</p>
+			<main className="mx-auto max-w-6xl px-4 py-16">
+				<Card role="status">
+					<CardContent className="p-6">
+						Loading fixture-backed pricing data…
+					</CardContent>
+				</Card>
 			</main>
 		);
 	}
 
+	const loadError = settings.error ?? prices.error;
 	if (loadError) {
 		return (
-			<main className="demo-shell">
-				<p className="demo-status demo-status--error" role="alert">
-					{loadError.message}
-				</p>
+			<main className="mx-auto max-w-6xl px-4 py-16">
+				<Card role="alert">
+					<CardHeader>
+						<CardTitle>Unable to load pricing data</CardTitle>
+						<CardDescription>{loadError.message}</CardDescription>
+					</CardHeader>
+					<CardContent>
+						<Button
+							onClick={() => {
+								void settings.refetch();
+								void prices.refetch();
+							}}
+						>
+							Retry
+						</Button>
+					</CardContent>
+				</Card>
 			</main>
 		);
 	}
 
 	return (
-		<main className="demo-shell">
-			<header className="demo-header">
-				<p className="demo-eyebrow">Independent consumer</p>
-				<h1>Headless Pricing Calendar</h1>
-				<p className="demo-lede">
-					Own presentation, own tokens, and no UI kit dependency. Every value
-					below comes from the external-style pricing API through the public
-					SDK.
-				</p>
-				{settings.data ? (
-					<dl className="demo-meta">
-						<div>
-							<dt>Hotel</dt>
-							<dd>{settings.data.hotel.timezone}</dd>
-						</div>
-						<div>
-							<dt>Locale</dt>
-							<dd>{settings.data.hotel.locale}</dd>
-						</div>
-						<div>
-							<dt>Currency</dt>
-							<dd>{currency}</dd>
-						</div>
-					</dl>
-				) : null}
+		<main className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
+			<header className="mb-8 flex flex-wrap items-start justify-between gap-4">
+				<div>
+					<div className="mb-3 flex flex-wrap items-center gap-2">
+						<Badge variant="outline">Fixture data</Badge>
+						<span className="text-sm text-muted-foreground">
+							No live backend connected
+						</span>
+					</div>
+					<h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">
+						Pricing calendar
+					</h1>
+					<p className="mt-2 max-w-2xl text-muted-foreground">
+						A reference UI for prices computed by an external backend. This demo
+						renders static fixtures and never calculates, recommends or
+						validates a price itself.
+					</p>
+				</div>
+				<Button asChild size="sm" variant="outline">
+					<a href="/docs">API documentation</a>
+				</Button>
 			</header>
 
-			<nav aria-label="Rooms" className="demo-rooms">
+			{settings.data ? (
+				<dl className="mb-6 grid gap-3 text-sm sm:grid-cols-3">
+					<div className="rounded-card border bg-card p-3">
+						<dt className="text-muted-foreground">Timezone</dt>
+						<dd className="font-medium">{settings.data.hotel.timezone}</dd>
+					</div>
+					<div className="rounded-card border bg-card p-3">
+						<dt className="text-muted-foreground">Locale</dt>
+						<dd className="font-medium">{settings.data.hotel.locale}</dd>
+					</div>
+					<div className="rounded-card border bg-card p-3">
+						<dt className="text-muted-foreground">Currency</dt>
+						<dd className="font-medium">{currency}</dd>
+					</div>
+				</dl>
+			) : null}
+
+			<nav aria-label="Rooms" className="mb-6 flex flex-wrap gap-2">
 				{rooms.map((room) => (
-					<button
+					<Button
 						aria-pressed={room.id === activeRoomId}
-						className="demo-room"
 						key={room.id}
 						onClick={() => {
-							setSelectedRoomId(room.id);
+							setRoomId(room.id);
 							setSelectedDate(null);
 							updatePrice.reset();
 						}}
-						type="button"
+						variant={room.id === activeRoomId ? "default" : "outline"}
 					>
 						{room.name}
-					</button>
+					</Button>
 				))}
 			</nav>
 
-			{activeRoomId ? (
-				<section aria-label="Prices" className="demo-table-wrap">
-					<table className="demo-table">
-						<caption>
-							{selectedRoomName} · {formatDate(DATE_RANGE.from)} –{" "}
-							{formatDate(DATE_RANGE.to)}
-						</caption>
-						<thead>
-							<tr>
-								<th scope="col">Date</th>
-								<th scope="col">Price</th>
-								<th scope="col">Status</th>
-								<th scope="col">In PMS</th>
-								<th scope="col">Recommended</th>
-								<th scope="col">Variance</th>
-								<th scope="col">Availability</th>
-								<th scope="col">Occupancy</th>
-								<th scope="col">Backend notes</th>
-							</tr>
-						</thead>
-						<tbody>
-							{days.map((day) => (
-								<tr
-									className={
-										day.date === selectedDay?.date
-											? "demo-row demo-row--selected"
-											: "demo-row"
-									}
-									key={day.date}
-								>
-									<th scope="row">
-										<button
-											className="demo-day-button"
-											onClick={() => {
-												setSelectedDate(day.date);
-												updatePrice.reset();
-											}}
-											type="button"
-										>
-											{formatDate(day.date)}
-										</button>
+			<Card>
+				<CardHeader>
+					<div className="flex flex-wrap items-center justify-between gap-4">
+						<div>
+							<CardTitle>{roomName}</CardTitle>
+							<CardDescription>
+								{formatDate(RANGE.from)} – {formatDate(RANGE.to)} ·{" "}
+								{dates.length} days
+							</CardDescription>
+						</div>
+						<div className="flex items-center gap-2">
+							<Button
+								aria-label="Previous day"
+								disabled={selectedIndex <= 0}
+								onClick={() => moveDay(-1)}
+								size="icon"
+								variant="outline"
+							>
+								<ChevronLeft aria-hidden="true" className="size-4" />
+							</Button>
+							<span
+								aria-live="polite"
+								className="min-w-32 text-center text-sm font-medium"
+							>
+								{selectedDay ? formatDate(selectedDay.date) : "No day"}
+							</span>
+							<Button
+								aria-label="Next day"
+								disabled={selectedIndex < 0 || selectedIndex >= days.length - 1}
+								onClick={() => moveDay(1)}
+								size="icon"
+								variant="outline"
+							>
+								<ChevronRight aria-hidden="true" className="size-4" />
+							</Button>
+						</div>
+					</div>
+				</CardHeader>
+				<CardContent>
+					<div className="overflow-x-auto">
+						<table className="w-full min-w-[64rem] border-collapse text-sm">
+							<caption className="sr-only">
+								Backend-provided prices for {roomName}
+							</caption>
+							<thead>
+								<tr className="text-left text-muted-foreground">
+									<th className="px-3 py-2 font-medium" scope="col">
+										Date
 									</th>
-									<td>{formatMoney(currency, day.price)}</td>
-									<td>{day.status}</td>
-									<td>{formatMoney(currency, day.priceInPms)}</td>
-									<td>{formatMoney(currency, day.recommendedPrice)}</td>
-									<td>{day.variance?.label ?? "—"}</td>
-									<td>{day.availability}</td>
-									<td>
-										{day.occupancy === null
-											? "—"
-											: `${Math.round(day.occupancy * 100)}%`}
-									</td>
-									<td>{describeDay(day) || "—"}</td>
+									<th className="px-3 py-2 font-medium" scope="col">
+										Price
+									</th>
+									<th className="px-3 py-2 font-medium" scope="col">
+										Status
+									</th>
+									<th className="px-3 py-2 font-medium" scope="col">
+										In PMS
+									</th>
+									<th className="px-3 py-2 font-medium" scope="col">
+										Recommended
+									</th>
+									<th className="px-3 py-2 font-medium" scope="col">
+										Variance
+									</th>
+									<th className="px-3 py-2 font-medium" scope="col">
+										Availability
+									</th>
+									<th className="px-3 py-2 font-medium" scope="col">
+										Occupancy
+									</th>
+									<th className="px-3 py-2 font-medium" scope="col">
+										Backend indicators
+									</th>
 								</tr>
-							))}
-						</tbody>
-					</table>
-				</section>
+							</thead>
+							<tbody>
+								{days.map((day) => (
+									<tr
+										className={cn(
+											"border-t",
+											day.date === selectedDay?.date && "bg-muted/60",
+										)}
+										key={day.date}
+									>
+										<th className="px-3 py-2 text-left font-medium" scope="row">
+											<button
+												aria-pressed={day.date === selectedDay?.date}
+												className="rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+												onClick={() => selectDay(day.date)}
+												type="button"
+											>
+												{formatDate(day.date)}
+											</button>
+										</th>
+										<td className="px-3 py-2 font-medium">
+											{formatMoney(day.price, day.currency)}
+										</td>
+										<td className="px-3 py-2">{formatStatus(day.status)}</td>
+										<td className="px-3 py-2">
+											{formatMoney(day.priceInPms, day.currency)}
+										</td>
+										<td className="px-3 py-2">
+											{formatMoney(day.recommendedPrice, day.currency)}
+										</td>
+										<td className="px-3 py-2">{day.variance?.label ?? "—"}</td>
+										<td className="px-3 py-2">
+											{formatAvailability(day.availability)}
+										</td>
+										<td className="px-3 py-2">
+											{day.occupancy === null
+												? "—"
+												: `${Math.round(day.occupancy * 100)}%`}
+										</td>
+										<td className="px-3 py-2">
+											<span className="flex flex-wrap gap-1">
+												{getDayIndicators(day).map((indicator) => (
+													<Badge
+														key={indicator.label}
+														variant={
+															indicator.tone === "danger"
+																? "destructive"
+																: indicator.tone === "accent"
+																	? "secondary"
+																	: "outline"
+														}
+													>
+														{indicator.label}
+													</Badge>
+												))}
+											</span>
+										</td>
+									</tr>
+								))}
+							</tbody>
+						</table>
+					</div>
+					{days.length === 0 ? (
+						<p className="py-6 text-sm text-muted-foreground" role="status">
+							No fixture prices for this period.
+						</p>
+					) : null}
+				</CardContent>
+			</Card>
+
+			{selectedDay && activeRoomId ? (
+				<Card className="mt-6">
+					<CardHeader>
+						<CardTitle>Manual price intent</CardTitle>
+						<CardDescription>
+							{formatDate(selectedDay.date)} in {roomName}. The backend response
+							is the only canonical value after a write.
+						</CardDescription>
+					</CardHeader>
+					<CardContent>
+						<form
+							className="grid gap-4 sm:grid-cols-[12rem_minmax(0,1fr)_auto] sm:items-end"
+							key={`${activeRoomId}:${selectedDay.date}`}
+							onSubmit={(event) => {
+								event.preventDefault();
+								const formData = new FormData(event.currentTarget);
+								updatePrice.mutate({
+									date: selectedDay.date,
+									price: Number(formData.get("price")),
+									reason: String(formData.get("reason") ?? "Manual override"),
+									roomId: activeRoomId,
+								});
+							}}
+						>
+							<label className="grid gap-2 text-sm" htmlFor="price">
+								<span>Price</span>
+								<Input
+									defaultValue={selectedDay.price ?? ""}
+									id="price"
+									min="0"
+									name="price"
+									required
+									step="0.01"
+									type="number"
+								/>
+							</label>
+							<label className="grid gap-2 text-sm" htmlFor="reason">
+								<span>Reason</span>
+								<Input
+									defaultValue="Manual override"
+									id="reason"
+									name="reason"
+									placeholder="Manual override"
+								/>
+							</label>
+							<Button
+								disabled={
+									updatePrice.isPending ||
+									selectedDay.status === "closed" ||
+									!canUpdate
+								}
+								type="submit"
+							>
+								{updatePrice.isPending ? "Saving…" : "Save manual price"}
+							</Button>
+						</form>
+						{!canUpdate ? (
+							<p className="mt-4 text-sm text-muted-foreground">
+								This fixture day has no canonical update response. Select the
+								first day of a room to try a write.
+							</p>
+						) : null}
+						{updatePrice.isError ? (
+							<p className="mt-4 text-sm text-destructive" role="alert">
+								{updatePrice.error.message}
+							</p>
+						) : null}
+						{updatePrice.data ? (
+							<p className="mt-4 text-sm" role="status">
+								Backend accepted{" "}
+								{formatMoney(
+									updatePrice.data.day.price,
+									updatePrice.data.day.currency,
+								)}{" "}
+								with status {formatStatus(updatePrice.data.day.status)}.
+							</p>
+						) : null}
+					</CardContent>
+				</Card>
 			) : null}
 
-			{activeRoomId && selectedDay ? (
-				<form
-					className="demo-editor"
-					key={`${activeRoomId}:${selectedDay.date}`}
-					onSubmit={(event) => {
-						event.preventDefault();
-						const formData = new FormData(event.currentTarget);
-						updatePrice.mutate({
-							date: selectedDay.date,
-							price: Number(formData.get("price")),
-							reason: "Headless demo override",
-							roomId: activeRoomId,
-						});
-					}}
+			<footer className="mt-8 text-sm text-muted-foreground">
+				All values come from the fixture response. See the{" "}
+				<a
+					className="underline underline-offset-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+					href="/docs"
 				>
-					<h2>Manual price</h2>
-					<p>
-						Send an override for {formatDate(selectedDay.date)} in{" "}
-						{selectedRoomName}. The backend response is the only source of
-						truth.
-					</p>
-					<label>
-						Price
-						<input
-							defaultValue={selectedDay.price ?? ""}
-							min="0"
-							name="price"
-							required
-							step="0.01"
-							type="number"
-						/>
-					</label>
-					<button disabled={updatePrice.isPending} type="submit">
-						{updatePrice.isPending ? "Saving…" : "Save manual price"}
-					</button>
-					{updatePrice.isError ? (
-						<p className="demo-message demo-message--error" role="alert">
-							{updatePrice.error.message}
-						</p>
-					) : null}
-					{updatePrice.data ? (
-						<p className="demo-message" role="status">
-							Backend accepted{" "}
-							{formatMoney(currency, updatePrice.data.day.price)} with status{" "}
-							{updatePrice.data.day.status}.
-						</p>
-					) : null}
-				</form>
-			) : null}
+					OpenAPI reference
+				</a>
+				.
+			</footer>
 		</main>
 	);
 }

@@ -1,5 +1,5 @@
-import { toFixtureResponse } from "../../playground/src/fixtures/response";
-import { handleFixtureRequest } from "../../playground/src/fixtures/router";
+import { toFixtureResponse } from "./fixtures/response";
+import { handleFixtureRequest } from "./fixtures/router";
 
 export const fixtureFetch: typeof fetch = (input, init) => {
 	const url = new URL(
