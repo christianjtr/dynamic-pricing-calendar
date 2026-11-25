@@ -1,12 +1,46 @@
 import type { DayPrice } from "@hpc/contracts";
 
-const currencyFormatters = new Map<string, Intl.NumberFormat>();
-const dayFormatter = new Intl.DateTimeFormat("en", {
-	day: "numeric",
-	month: "short",
-	timeZone: "UTC",
-	weekday: "short",
-});
+const dayFormatters = new Map<string, Intl.DateTimeFormat>();
+const numberFormatters = new Map<string, Intl.NumberFormat>();
+const percentFormatters = new Map<string, Intl.NumberFormat>();
+
+function getDayFormatter(locale: string): Intl.DateTimeFormat {
+	let formatter = dayFormatters.get(locale);
+	if (!formatter) {
+		formatter = new Intl.DateTimeFormat(locale, {
+			day: "numeric",
+			month: "short",
+			timeZone: "UTC",
+			weekday: "short",
+		});
+		dayFormatters.set(locale, formatter);
+	}
+	return formatter;
+}
+
+function getNumberFormatter(locale: string): Intl.NumberFormat {
+	let formatter = numberFormatters.get(locale);
+	if (!formatter) {
+		formatter = new Intl.NumberFormat(locale, {
+			maximumFractionDigits: 2,
+			useGrouping: true,
+		});
+		numberFormatters.set(locale, formatter);
+	}
+	return formatter;
+}
+
+function getPercentFormatter(locale: string): Intl.NumberFormat {
+	let formatter = percentFormatters.get(locale);
+	if (!formatter) {
+		formatter = new Intl.NumberFormat(locale, {
+			maximumFractionDigits: 0,
+			style: "percent",
+		});
+		percentFormatters.set(locale, formatter);
+	}
+	return formatter;
+}
 
 export function buildDateRange(from: string, to: string): string[] {
 	const dates: string[] = [];
@@ -25,26 +59,25 @@ export function buildDateRange(from: string, to: string): string[] {
 	return dates;
 }
 
-export function formatDate(date: string): string {
+export function formatDate(date: string, locale = "en"): string {
 	const parsed = new Date(`${date}T00:00:00Z`);
-	return Number.isNaN(parsed.getTime()) ? date : dayFormatter.format(parsed);
+	return Number.isNaN(parsed.getTime())
+		? date
+		: getDayFormatter(locale).format(parsed);
 }
 
-export function formatMoney(value: number | null, currency: string): string {
+export function formatMoney(value: number | null, locale = "en"): string {
 	if (value === null) {
 		return "—";
 	}
+	return getNumberFormatter(locale).format(value);
+}
 
-	let formatter = currencyFormatters.get(currency);
-	if (!formatter) {
-		formatter = new Intl.NumberFormat("en", {
-			currency,
-			maximumFractionDigits: 0,
-			style: "currency",
-		});
-		currencyFormatters.set(currency, formatter);
+export function formatPercent(value: number | null, locale = "en"): string {
+	if (value === null) {
+		return "—";
 	}
-	return formatter.format(value);
+	return getPercentFormatter(locale).format(value);
 }
 
 export function formatStatus(status: string): string {
@@ -67,38 +100,33 @@ export function formatAvailability(availability: string): string {
 	return labels[availability] ?? availability;
 }
 
-export interface DayIndicator {
-	label: string;
-	tone: "default" | "accent" | "danger";
+export type StatusTone = "default" | "secondary" | "outline" | "destructive";
+
+export function statusTone(status: string): StatusTone {
+	switch (status) {
+		case "auto":
+			return "default";
+		case "closed":
+			return "destructive";
+		case "manual":
+			return "secondary";
+		default:
+			return "outline";
+	}
 }
 
-export function getDayIndicators(day: DayPrice): DayIndicator[] {
-	const indicators: DayIndicator[] = [];
+export interface DayNote {
+	label: string;
+	tone: "default" | "danger";
+}
 
-	if (day.status === "closed" || day.isClosed) {
-		indicators.push({ label: "Closed date", tone: "danger" });
-	}
-	if (day.status === "manual") {
-		indicators.push({ label: "Manual price", tone: "accent" });
-	}
-	if (day.availability !== "available" && day.status !== "closed") {
-		indicators.push({
-			label: `Availability: ${formatAvailability(day.availability)}`,
-			tone: "default",
-		});
-	}
-	for (const restriction of day.restrictions) {
-		indicators.push({ label: `Restricted: ${restriction}`, tone: "default" });
-	}
-	if (day.occupancy !== null) {
-		indicators.push({
-			label: `Occupancy: ${Math.round(day.occupancy * 100)}%`,
-			tone: "default",
-		});
-	}
+export function getDayNotes(day: DayPrice): DayNote[] {
+	const notes: DayNote[] = day.restrictions.map((restriction) => ({
+		label: `Restricted: ${restriction}`,
+		tone: "default",
+	}));
 	if (day.error) {
-		indicators.push({ label: `Error: ${day.error.message}`, tone: "danger" });
+		notes.push({ label: `Error: ${day.error.message}`, tone: "danger" });
 	}
-
-	return indicators;
+	return notes;
 }

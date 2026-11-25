@@ -52,10 +52,10 @@ export function Faq() {
 					</h2>
 					<p className="mt-2 text-sm text-muted-foreground">
 						Clicking a date only selects it: the row is highlighted and{" "}
-						<code>?date=</code> changes. The <strong>Edit selected day</strong>{" "}
-						button opens a native dialog anchored to that button. On narrow
-						screens it becomes a bottom sheet. <kbd>Escape</kbd> or Cancel
-						closes it and returns focus to the button.
+						<code>?date=</code> changes. The pencil action in that row opens a
+						native dialog anchored to the button. On narrow screens it becomes a
+						bottom sheet. <kbd>Escape</kbd> or Cancel closes it and returns
+						focus to the pencil.
 					</p>
 				</section>
 

@@ -31,7 +31,7 @@ pnpm install
 pnpm dev
 ```
 
-The demo runs on Vite. A usage FAQ is served at `/faq` and linked from the calendar header; interactive API documentation is served at `/docs` inside the same app. The selected room and date are reflected in `?room=` and `?date=`; the visible range uses `?from=` and `?to=`, with month controls to shift it. Selecting a day highlights it; the **Edit selected day** button opens a native dialog anchored to that button. `?edit=1` shares the open editor. Ranges without fixture data show an explicit empty state. The header switches between dark and light themes using the platform `color-scheme` and saves the choice locally.
+The demo runs on Vite. A usage FAQ is served at `/faq` and linked from the calendar header; interactive API documentation is served at `/docs` inside the same app. The selected room and date are reflected in `?room=` and `?date=`; the visible range uses `?from=` and `?to=`, with month controls to shift it. Selecting a day highlights it; the pencil action in that row opens a native dialog anchored to the button. `?edit=1` shares the open editor. The condensed table groups In PMS under Price, variance under Recommended and occupancy under Availability; currency appears once in the card header and numbers use `Intl`. Ranges without fixture data show an explicit empty state. The header switches between dark and light themes using the platform `color-scheme` and saves the choice locally.
 
 ## Available scripts
 
