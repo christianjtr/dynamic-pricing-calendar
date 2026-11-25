@@ -1,4 +1,10 @@
-import { ChevronLeft, ChevronRight, Pencil } from "lucide-react";
+import {
+	CalendarDays,
+	CalendarOff,
+	ChevronLeft,
+	ChevronRight,
+	Pencil,
+} from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -14,8 +20,10 @@ import { fixtureDateRange, updateFixtures } from "@/fixtures/fixtures";
 import {
 	type DateRange,
 	dateRangeHref,
+	rangeAroundDay,
 	readDateRange,
 	shiftMonth,
+	todayInTimeZone,
 } from "@/lib/dateRange";
 import { anchoredPosition, type Bounds } from "@/lib/dialogPosition";
 import {
@@ -59,8 +67,9 @@ export function App() {
 		usePricing(range, roomId);
 	const selectedDay = days.find((day) => day.date === selectedDate) ?? days[0];
 	const selectedIndex = days.findIndex((day) => day.date === selectedDay?.date);
-	const roomName =
-		rooms.find((room) => room.id === activeRoomId)?.name ?? "Room";
+	const activeRoom = rooms.find((room) => room.id === activeRoomId);
+	const roomName = activeRoom?.name ?? "Room";
+	const roomDescription = activeRoom?.description;
 	const currency = settings.data?.hotel.currency ?? "NZD";
 	const currencies = [...new Set(days.map((day) => day.currency))];
 	const mixedCurrencies = currencies.length > 1;
@@ -163,6 +172,18 @@ export function App() {
 		}
 	};
 
+	const goToToday = () => {
+		const today = todayInTimeZone(settings.data?.hotel.timezone ?? "UTC");
+		const nextRange =
+			today >= range.from && today <= range.to ? range : rangeAroundDay(today);
+		setEditing(false);
+		setAnchorRect(null);
+		setRange(nextRange);
+		setSelectedDate(today);
+		updatePrice.reset();
+		syncUrl({ roomId: activeRoomId, date: today }, nextRange);
+	};
+
 	if (settings.isPending || prices.isPending) {
 		return (
 			<main
@@ -217,7 +238,13 @@ export function App() {
 		>
 			<header className="mb-8">
 				<div className="mb-3 flex flex-wrap items-center gap-2">
-					<Badge variant="outline">Fixture data</Badge>
+					<Badge className="gap-1.5 border-warning bg-warning/10 text-foreground">
+						<span
+							aria-hidden="true"
+							className="size-1.5 rounded-full bg-warning"
+						/>
+						Fixture data
+					</Badge>
 					<span className="text-sm text-muted-foreground">
 						No live backend connected
 					</span>
@@ -230,20 +257,23 @@ export function App() {
 					renders static fixtures and never calculates, recommends or validates
 					a price itself.
 				</p>
+				{settings.data ? (
+					<dl className="mt-3 flex flex-wrap gap-2 text-xs">
+						<div className="flex items-center gap-1.5 rounded-full border bg-muted/40 px-2.5 py-1">
+							<dt className="text-muted-foreground">Timezone</dt>
+							<dd className="font-semibold text-foreground" translate="no">
+								{settings.data.hotel.timezone}
+							</dd>
+						</div>
+						<div className="flex items-center gap-1.5 rounded-full border bg-muted/40 px-2.5 py-1">
+							<dt className="text-muted-foreground">Locale</dt>
+							<dd className="font-semibold text-foreground" translate="no">
+								{settings.data.hotel.locale}
+							</dd>
+						</div>
+					</dl>
+				) : null}
 			</header>
-
-			{settings.data ? (
-				<dl className="mb-6 grid gap-3 text-sm sm:grid-cols-2">
-					<div className="rounded-card border bg-card p-3">
-						<dt className="text-muted-foreground">Timezone</dt>
-						<dd className="font-medium">{settings.data.hotel.timezone}</dd>
-					</div>
-					<div className="rounded-card border bg-card p-3">
-						<dt className="text-muted-foreground">Locale</dt>
-						<dd className="font-medium">{settings.data.hotel.locale}</dd>
-					</div>
-				</dl>
-			) : null}
 
 			<nav aria-label="Rooms" className="mb-6 flex flex-wrap gap-2">
 				{rooms.map((room) => (
@@ -256,6 +286,7 @@ export function App() {
 							updatePrice.reset();
 							syncUrl({ roomId: room.id, date: null }, range);
 						}}
+						title={room.description}
 						variant={room.id === activeRoomId ? "default" : "outline"}
 					>
 						{room.name}
@@ -267,8 +298,13 @@ export function App() {
 				<CardHeader>
 					<div className="flex flex-wrap items-center justify-between gap-4">
 						<div>
-							<CardTitle>{roomName}</CardTitle>
-							<CardDescription>
+							<CardTitle className="text-xl">{roomName}</CardTitle>
+							{roomDescription ? (
+								<p className="mt-0.5 text-sm font-medium text-foreground">
+									{roomDescription}
+								</p>
+							) : null}
+							<CardDescription className="text-xs">
 								{formatDate(range.from)} – {formatDate(range.to)} ·{" "}
 								{dates.length} days · Prices in{" "}
 								{headerCurrency ? (
@@ -347,6 +383,10 @@ export function App() {
 							/>
 						</label>
 						<div className="flex items-center gap-2">
+							<Button onClick={goToToday} size="sm" variant="outline">
+								<CalendarDays aria-hidden="true" className="size-4" />
+								Today
+							</Button>
 							<Button
 								onClick={() => applyRange(shiftMonth(range, -1))}
 								size="sm"
@@ -365,149 +405,181 @@ export function App() {
 							</Button>
 						</div>
 					</div>
-					<div className="overflow-x-auto">
-						<table className="w-full min-w-[56rem] border-collapse text-sm">
-							<caption className="sr-only">
-								Backend-provided prices for {roomName}
-							</caption>
-							<thead>
-								<tr className="text-left text-muted-foreground">
-									<th
-										className="min-w-[7.5rem] whitespace-nowrap px-3 py-2 font-medium"
-										scope="col"
-									>
-										Date
-									</th>
-									<th className="px-3 py-2 text-right font-medium" scope="col">
-										Price
-									</th>
-									<th className="px-3 py-2 font-medium" scope="col">
-										Status
-									</th>
-									<th className="px-3 py-2 text-right font-medium" scope="col">
-										Recommended
-									</th>
-									<th className="px-3 py-2 text-right font-medium" scope="col">
-										Availability
-									</th>
-									<th className="px-3 py-2 font-medium" scope="col">
-										Notes
-									</th>
-									<th className="px-3 py-2 font-medium" scope="col">
-										Actions
-									</th>
-								</tr>
-							</thead>
-							<tbody>
-								{days.map((day) => {
-									const currencyPrefix = mixedCurrencies ? (
-										<span
-											className="font-normal text-muted-foreground"
-											translate="no"
-										>
-											{day.currency}{" "}
-										</span>
-									) : null;
-									return (
-										<tr
-											className={cn(
-												"border-t",
-												day.date === selectedDay?.date && "bg-muted/60",
-											)}
-											key={day.date}
-										>
-											<th
-												className="min-w-[7.5rem] whitespace-nowrap px-3 py-2 text-left font-medium"
-												scope="row"
-											>
-												<button
-													aria-pressed={day.date === selectedDay?.date}
-													className="rounded hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
-													onClick={() => selectDay(day.date)}
-													type="button"
-												>
-													{formatDate(day.date)}
-												</button>
-											</th>
-											<td className="px-3 py-2 text-right font-medium tabular-nums">
-												<div>
-													{currencyPrefix}
-													{formatMoney(day.price)}
-												</div>
-												<div className="text-xs font-normal text-muted-foreground">
-													In PMS: {currencyPrefix}
-													{formatMoney(day.priceInPms)}
-												</div>
-											</td>
-											<td className="px-3 py-2">
-												<Badge variant={statusTone(day.status)}>
-													{formatStatus(day.status)}
-												</Badge>
-											</td>
-											<td className="px-3 py-2 text-right tabular-nums">
-												<div>
-													{currencyPrefix}
-													{formatMoney(day.recommendedPrice)}
-												</div>
-												<div className="text-xs text-muted-foreground">
-													Variance:{" "}
-													<span translate="no">
-														{day.variance?.label ?? "—"}
-													</span>
-												</div>
-											</td>
-											<td className="px-3 py-2 text-right">
-												<div>{formatAvailability(day.availability)}</div>
-												{day.occupancy !== null ? (
-													<div className="text-xs text-muted-foreground tabular-nums">
-														{formatPercent(day.occupancy)} occupied
-													</div>
-												) : null}
-											</td>
-											<td className="px-3 py-2">
-												<span className="flex flex-wrap gap-1">
-													{getDayNotes(day).map((note) => (
-														<Badge
-															key={note.label}
-															variant={
-																note.tone === "danger"
-																	? "destructive"
-																	: "outline"
-															}
-														>
-															{note.label}
-														</Badge>
-													))}
-												</span>
-											</td>
-											<td className="px-3 py-2 text-right">
-												<Button
-													aria-haspopup="dialog"
-													aria-label={`Edit price for ${formatDate(day.date)}`}
-													onClick={(event) =>
-														openEditor(
-															day.date,
-															event.currentTarget.getBoundingClientRect(),
-														)
-													}
-													size="icon"
-													variant="ghost"
-												>
-													<Pencil aria-hidden="true" className="size-4" />
-												</Button>
-											</td>
-										</tr>
-									);
-								})}
-							</tbody>
-						</table>
-					</div>
 					{days.length === 0 ? (
-						<p className="py-6 text-sm text-muted-foreground" role="status">
-							No fixture data for this period. Choose another range to see the
-							demo prices.
-						</p>
-					) : null}
+						<div
+							className="flex flex-col items-center justify-center rounded-card border border-dashed bg-muted/30 px-6 py-12 text-center"
+							role="status"
+						>
+							<div className="mb-3 rounded-full border bg-background p-3">
+								<CalendarOff
+									aria-hidden="true"
+									className="size-5 text-muted-foreground"
+								/>
+							</div>
+							<p className="text-sm font-semibold text-foreground">
+								No prices in this range
+							</p>
+							<p className="mt-1 max-w-sm text-sm text-muted-foreground">
+								No fixture data for this period. Choose another range to see the
+								demo prices.
+							</p>
+							<Button
+								className="mt-4"
+								onClick={() => applyRange({ ...fixtureDateRange })}
+								size="sm"
+								variant="outline"
+							>
+								Show fixture range
+							</Button>
+						</div>
+					) : (
+						<div className="overflow-x-auto">
+							<table className="w-full min-w-[56rem] border-collapse text-sm">
+								<caption className="sr-only">
+									Backend-provided prices for {roomName}
+								</caption>
+								<thead>
+									<tr className="text-left text-muted-foreground">
+										<th
+											className="min-w-[7.5rem] whitespace-nowrap px-3 py-2 font-medium"
+											scope="col"
+										>
+											Date
+										</th>
+										<th
+											className="px-3 py-2 text-right font-medium"
+											scope="col"
+										>
+											Price
+										</th>
+										<th className="px-3 py-2 font-medium" scope="col">
+											Status
+										</th>
+										<th
+											className="px-3 py-2 text-right font-medium"
+											scope="col"
+										>
+											Recommended
+										</th>
+										<th
+											className="px-3 py-2 text-right font-medium"
+											scope="col"
+										>
+											Availability
+										</th>
+										<th className="px-3 py-2 font-medium" scope="col">
+											Notes
+										</th>
+										<th className="px-3 py-2 font-medium" scope="col">
+											Actions
+										</th>
+									</tr>
+								</thead>
+								<tbody>
+									{days.map((day) => {
+										const currencyPrefix = mixedCurrencies ? (
+											<span
+												className="font-normal text-muted-foreground"
+												translate="no"
+											>
+												{day.currency}{" "}
+											</span>
+										) : null;
+										return (
+											<tr
+												className={cn(
+													"border-t",
+													day.date === selectedDay?.date && "bg-muted/60",
+												)}
+												key={day.date}
+											>
+												<th
+													className="min-w-[7.5rem] whitespace-nowrap px-3 py-2 text-left font-medium"
+													scope="row"
+												>
+													<button
+														aria-pressed={day.date === selectedDay?.date}
+														className="rounded hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+														onClick={() => selectDay(day.date)}
+														type="button"
+													>
+														{formatDate(day.date)}
+													</button>
+												</th>
+												<td className="px-3 py-2 text-right font-medium tabular-nums">
+													<div>
+														{currencyPrefix}
+														{formatMoney(day.price)}
+													</div>
+													<div className="text-xs font-normal text-muted-foreground">
+														In PMS: {currencyPrefix}
+														{formatMoney(day.priceInPms)}
+													</div>
+												</td>
+												<td className="px-3 py-2">
+													<Badge variant={statusTone(day.status)}>
+														{formatStatus(day.status)}
+													</Badge>
+												</td>
+												<td className="px-3 py-2 text-right tabular-nums">
+													<div>
+														{currencyPrefix}
+														{formatMoney(day.recommendedPrice)}
+													</div>
+													<div className="text-xs text-muted-foreground">
+														Variance:{" "}
+														<span translate="no">
+															{day.variance?.label ?? "—"}
+														</span>
+													</div>
+												</td>
+												<td className="px-3 py-2 text-right">
+													<div>{formatAvailability(day.availability)}</div>
+													{day.occupancy !== null ? (
+														<div className="text-xs text-muted-foreground tabular-nums">
+															{formatPercent(day.occupancy)} occupied
+														</div>
+													) : null}
+												</td>
+												<td className="px-3 py-2">
+													<span className="flex flex-wrap gap-1">
+														{getDayNotes(day).map((note) => (
+															<Badge
+																key={note.label}
+																variant={
+																	note.tone === "danger"
+																		? "destructive"
+																		: "outline"
+																}
+															>
+																{note.label}
+															</Badge>
+														))}
+													</span>
+												</td>
+												<td className="px-3 py-2 text-right">
+													<Button
+														aria-haspopup="dialog"
+														aria-label={`Edit price for ${formatDate(day.date)}`}
+														onClick={(event) =>
+															openEditor(
+																day.date,
+																event.currentTarget.getBoundingClientRect(),
+															)
+														}
+														size="icon"
+														variant="ghost"
+													>
+														<Pencil aria-hidden="true" className="size-4" />
+													</Button>
+												</td>
+											</tr>
+										);
+									})}
+								</tbody>
+							</table>
+						</div>
+					)}
 				</CardContent>
 			</Card>
 

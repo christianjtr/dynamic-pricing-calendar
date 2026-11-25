@@ -1,5 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { dateRangeHref, readDateRange, shiftMonth } from "./dateRange";
+import {
+	dateRangeHref,
+	rangeAroundDay,
+	readDateRange,
+	shiftMonth,
+	todayInTimeZone,
+} from "./dateRange";
 
 const fallback = { from: "2026-11-23", to: "2026-11-29" };
 
@@ -44,6 +50,28 @@ describe("date range URL", () => {
 		expect(shiftMonth({ from: "2027-01-23", to: "2027-01-29" }, 1)).toEqual({
 			from: "2027-02-23",
 			to: "2027-02-28",
+		});
+	});
+});
+
+describe("today helpers", () => {
+	it("resolves today in the hotel timezone, not the browser timezone", () => {
+		expect(
+			todayInTimeZone("Pacific/Auckland", new Date("2026-11-25T12:00:00Z")),
+		).toBe("2026-11-26");
+		expect(
+			todayInTimeZone("Pacific/Auckland", new Date("2026-11-25T10:00:00Z")),
+		).toBe("2026-11-25");
+	});
+
+	it("builds a seven-day range centred on a day", () => {
+		expect(rangeAroundDay("2026-11-25")).toEqual({
+			from: "2026-11-22",
+			to: "2026-11-28",
+		});
+		expect(rangeAroundDay("2026-12-31")).toEqual({
+			from: "2026-12-28",
+			to: "2027-01-03",
 		});
 	});
 });

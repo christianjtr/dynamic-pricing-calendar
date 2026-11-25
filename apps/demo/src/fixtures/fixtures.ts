@@ -317,10 +317,125 @@ const familyDays: DayPrice[] = [
 	}),
 ];
 
+const twinDayOne = day("1004", "2026-11-23", {
+	status: "auto",
+	price: 149,
+	priceInPms: 145,
+	recommendedPrice: 154,
+	variance: { value: 3.1, direction: "up", severity: "medium", label: "+3.1%" },
+	availability: "available",
+	occupancy: 0.55,
+	restrictions: [],
+	isClosed: false,
+	error: null,
+});
+
+const twinDays: DayPrice[] = [
+	twinDayOne,
+	day("1004", "2026-11-24", {
+		status: "auto",
+		price: 147,
+		priceInPms: 145,
+		recommendedPrice: 150,
+		variance: { value: 1.9, direction: "up", severity: "low", label: "+1.9%" },
+		availability: "available",
+		occupancy: 0.51,
+		restrictions: [],
+		isClosed: false,
+		error: null,
+	}),
+	day("1004", "2026-11-25", {
+		status: "manual",
+		price: 152,
+		priceInPms: 145,
+		recommendedPrice: null,
+		variance: null,
+		availability: "restricted",
+		occupancy: 0.63,
+		restrictions: ["min-stay:2"],
+		isClosed: false,
+		error: null,
+	}),
+	day("1004", "2026-11-26", {
+		status: "auto",
+		price: 151,
+		priceInPms: 145,
+		recommendedPrice: 156,
+		variance: { value: 2.0, direction: "up", severity: "low", label: "+2.0%" },
+		availability: "available",
+		occupancy: 0.59,
+		restrictions: [],
+		isClosed: false,
+		error: null,
+	}),
+	day("1004", "2026-11-27", {
+		status: "closed",
+		price: null,
+		priceInPms: null,
+		recommendedPrice: null,
+		variance: null,
+		availability: "unavailable",
+		occupancy: null,
+		restrictions: ["closed"],
+		isClosed: true,
+		error: null,
+	}),
+	day("1004", "2026-11-28", {
+		status: "unavailable",
+		price: null,
+		priceInPms: null,
+		recommendedPrice: null,
+		variance: null,
+		availability: "sold_out",
+		occupancy: 0.94,
+		restrictions: [],
+		isClosed: false,
+		error: { code: "NO_INVENTORY", message: "No inventory available" },
+	}),
+	day("1004", "2026-11-29", {
+		status: "auto",
+		price: 155,
+		priceInPms: 145,
+		recommendedPrice: 161,
+		variance: {
+			value: 3.8,
+			direction: "up",
+			severity: "medium",
+			label: "+3.8%",
+		},
+		availability: "available",
+		occupancy: 0.71,
+		restrictions: [],
+		isClosed: false,
+		error: null,
+	}),
+];
+
 export const roomFixtures: Room[] = [
-	{ id: "1001", name: "Single Room", isReference: true },
-	{ id: "1002", name: "Double Room", isReference: false },
-	{ id: "1003", name: "Family Room", isReference: false },
+	{
+		id: "1001",
+		name: "Single Room",
+		description: "One guest, one queen bed, 18 m².",
+		isReference: true,
+	},
+	{
+		id: "1002",
+		name: "Double Room",
+		description: "Two guests, one queen bed, 24 m².",
+		isReference: false,
+	},
+	{
+		id: "1003",
+		name: "Family Room",
+		description: "Up to four guests, two beds, 32 m².",
+		isReference: false,
+	},
+	{
+		id: "1004",
+		name: "Twin Room",
+		description: "Two guests, two single beds, 22 m².",
+		isReference: false,
+	},
 ];
 
 export const fixtureDateRange = {
@@ -346,6 +461,7 @@ export const pricesFixture: PricesResponse = {
 		{ roomId: "1001", name: "Single Room", days: singleDays },
 		{ roomId: "1002", name: "Double Room", days: doubleDays },
 		{ roomId: "1003", name: "Family Room", days: familyDays },
+		{ roomId: "1004", name: "Twin Room", days: twinDays },
 	],
 };
 
@@ -373,6 +489,15 @@ export const updateFixtures: Record<string, UpdatePriceResponse> = {
 			...familyDayOne,
 			status: "manual",
 			price: 310,
+			variance: null,
+		},
+		acceptedAt: "2026-11-23T22:31:00.000Z",
+	},
+	"1004:2026-11-23": {
+		day: {
+			...twinDayOne,
+			status: "manual",
+			price: 159,
 			variance: null,
 		},
 		acceptedAt: "2026-11-23T22:31:00.000Z",

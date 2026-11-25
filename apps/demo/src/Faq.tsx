@@ -32,16 +32,19 @@ export function Faq() {
 					<h2 className="text-lg font-semibold">How do I navigate?</h2>
 					<ul className="mt-2 list-inside list-disc space-y-1 text-sm text-muted-foreground">
 						<li>
-							Use the room buttons to switch between the three fixture rooms.
+							Use the room buttons to switch between every room returned by the
+							backend. The active room's description appears below its name.
 						</li>
 						<li>
-							Change <code>From</code> and <code>To</code>, or use the previous
-							and next month buttons to shift the visible range.
+							Change <code>From</code> and <code>To</code>, use the previous and
+							next month buttons to shift the visible range, or choose{" "}
+							<strong>Today</strong> to jump to the current date in the hotel's
+							timezone.
 						</li>
 						<li>
 							Use the day arrows to move the selection one day at a time.
-							Periods without fixtures show an explicit empty state instead of
-							invented data.
+							Periods without fixtures show a blank state with a shortcut back
+							to the fixture range instead of invented data.
 						</li>
 					</ul>
 				</section>

@@ -15,9 +15,11 @@ import * as zod from 'zod';
 
 
 
+
 export const Room = zod.object({
   "id": zod.string().min(1),
   "name": zod.string().min(1),
+  "description": zod.string().min(1).optional().describe('Short human-readable description of the room type.'),
   "isReference": zod.boolean()
 });
 

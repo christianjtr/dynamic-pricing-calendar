@@ -13,6 +13,7 @@
 	--secondary: #17243a;
 	--secondary-foreground: #eef4ff;
 	--destructive: #ffb4a9;
+	--warning: #fbbf24;
 	--ring: #8ec5ff;
 	--radius: 0.75rem;
 }
@@ -30,6 +31,7 @@
 	--secondary: #e8edf5;
 	--secondary-foreground: #111827;
 	--destructive: #a4262c;
+	--warning: #b45309;
 	--ring: #1d4ed8;
 }
 
@@ -46,6 +48,7 @@
 	--color-secondary: var(--secondary);
 	--color-secondary-foreground: var(--secondary-foreground);
 	--color-destructive: var(--destructive);
+	--color-warning: var(--warning);
 	--color-ring: var(--ring);
 	--radius-card: var(--radius);
 }

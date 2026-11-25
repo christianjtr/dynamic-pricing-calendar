@@ -64,3 +64,40 @@ function shiftDate(date: string, delta: number): string {
 export function shiftMonth(range: DateRange, delta: number): DateRange {
 	return { from: shiftDate(range.from, delta), to: shiftDate(range.to, delta) };
 }
+
+export function todayInTimeZone(timeZone: string, now = new Date()): string {
+	try {
+		const parts = new Intl.DateTimeFormat("en-CA", {
+			day: "2-digit",
+			month: "2-digit",
+			timeZone,
+			year: "numeric",
+		}).formatToParts(now);
+		const part = (type: string) =>
+			parts.find((item) => item.type === type)?.value;
+		const year = part("year");
+		const month = part("month");
+		const day = part("day");
+		return year && month && day
+			? `${year}-${month}-${day}`
+			: now.toISOString().slice(0, 10);
+	} catch {
+		return now.toISOString().slice(0, 10);
+	}
+}
+
+export function rangeAroundDay(date: string): DateRange {
+	const parsed = new Date(`${date}T00:00:00Z`);
+	if (Number.isNaN(parsed.getTime())) {
+		return { from: date, to: date };
+	}
+
+	const from = new Date(parsed);
+	from.setUTCDate(from.getUTCDate() - 3);
+	const to = new Date(parsed);
+	to.setUTCDate(to.getUTCDate() + 3);
+	return {
+		from: from.toISOString().slice(0, 10),
+		to: to.toISOString().slice(0, 10),
+	};
+}
