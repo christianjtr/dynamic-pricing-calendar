@@ -10,7 +10,13 @@ import {
 	CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { updateFixtures } from "@/fixtures/fixtures";
+import { fixtureDateRange, updateFixtures } from "@/fixtures/fixtures";
+import {
+	type DateRange,
+	dateRangeHref,
+	readDateRange,
+	shiftMonth,
+} from "@/lib/dateRange";
 import {
 	buildDateRange,
 	formatAvailability,
@@ -19,11 +25,13 @@ import {
 	formatStatus,
 	getDayIndicators,
 } from "@/lib/format";
-import { readSelection, selectionHref } from "@/lib/selectionUrl";
+import {
+	readSelection,
+	type Selection,
+	selectionHref,
+} from "@/lib/selectionUrl";
 import { cn } from "@/lib/utils";
 import { usePricing } from "@/usePricing";
-
-const RANGE = { from: "2026-11-23", to: "2026-11-29" } as const;
 
 export function App() {
 	const initialSelection = readSelection(window.location.search);
@@ -31,9 +39,15 @@ export function App() {
 	const [selectedDate, setSelectedDate] = useState<string | null>(
 		initialSelection.date,
 	);
-	const dates = useMemo(() => buildDateRange(RANGE.from, RANGE.to), []);
+	const [range, setRange] = useState(() =>
+		readDateRange(window.location.search, fixtureDateRange),
+	);
+	const dates = useMemo(
+		() => buildDateRange(range.from, range.to),
+		[range.from, range.to],
+	);
 	const { settings, prices, rooms, activeRoomId, days, updatePrice } =
-		usePricing({ from: RANGE.from, to: RANGE.to }, roomId);
+		usePricing(range, roomId);
 	const selectedDay = days.find((day) => day.date === selectedDate) ?? days[0];
 	const selectedIndex = days.findIndex((day) => day.date === selectedDay?.date);
 	const roomName =
@@ -43,14 +57,31 @@ export function App() {
 		updateFixtures[`${activeRoomId}:${selectedDay?.date}`],
 	);
 
+	const syncUrl = (selection: Selection, nextRange: DateRange) => {
+		const ranged = new URL(
+			dateRangeHref(window.location, nextRange),
+			window.location.origin,
+		);
+		window.history.replaceState(null, "", selectionHref(ranged, selection));
+	};
+
 	const selectDay = (date: string) => {
 		setSelectedDate(date);
 		updatePrice.reset();
-		window.history.replaceState(
-			null,
-			"",
-			selectionHref(window.location, { roomId: activeRoomId, date }),
-		);
+		syncUrl({ roomId: activeRoomId, date }, range);
+	};
+
+	const applyRange = (nextRange: DateRange) => {
+		const nextDate =
+			selectedDate &&
+			selectedDate >= nextRange.from &&
+			selectedDate <= nextRange.to
+				? selectedDate
+				: null;
+		setRange(nextRange);
+		setSelectedDate(nextDate);
+		updatePrice.reset();
+		syncUrl({ roomId: activeRoomId, date: nextDate }, nextRange);
 	};
 
 	const moveDay = (delta: number) => {
@@ -160,14 +191,7 @@ export function App() {
 							setRoomId(room.id);
 							setSelectedDate(null);
 							updatePrice.reset();
-							window.history.replaceState(
-								null,
-								"",
-								selectionHref(window.location, {
-									roomId: room.id,
-									date: null,
-								}),
-							);
+							syncUrl({ roomId: room.id, date: null }, range);
 						}}
 						variant={room.id === activeRoomId ? "default" : "outline"}
 					>
@@ -182,7 +206,7 @@ export function App() {
 						<div>
 							<CardTitle>{roomName}</CardTitle>
 							<CardDescription>
-								{formatDate(RANGE.from)} – {formatDate(RANGE.to)} ·{" "}
+								{formatDate(range.from)} – {formatDate(range.to)} ·{" "}
 								{dates.length} days
 							</CardDescription>
 						</div>
@@ -215,6 +239,62 @@ export function App() {
 					</div>
 				</CardHeader>
 				<CardContent>
+					<div className="mb-4 flex flex-wrap items-end gap-3">
+						<label
+							className="grid gap-1 text-xs font-medium text-muted-foreground"
+							htmlFor="from"
+						>
+							From
+							<Input
+								id="from"
+								max={range.to}
+								onChange={(event) => {
+									const from = event.target.value;
+									if (from && from <= range.to) {
+										applyRange({ from, to: range.to });
+									}
+								}}
+								type="date"
+								value={range.from}
+							/>
+						</label>
+						<label
+							className="grid gap-1 text-xs font-medium text-muted-foreground"
+							htmlFor="to"
+						>
+							To
+							<Input
+								id="to"
+								min={range.from}
+								onChange={(event) => {
+									const to = event.target.value;
+									if (to && to >= range.from) {
+										applyRange({ from: range.from, to });
+									}
+								}}
+								type="date"
+								value={range.to}
+							/>
+						</label>
+						<div className="flex items-center gap-2">
+							<Button
+								onClick={() => applyRange(shiftMonth(range, -1))}
+								size="sm"
+								variant="outline"
+							>
+								<ChevronLeft aria-hidden="true" className="size-4" />
+								Previous month
+							</Button>
+							<Button
+								onClick={() => applyRange(shiftMonth(range, 1))}
+								size="sm"
+								variant="outline"
+							>
+								Next month
+								<ChevronRight aria-hidden="true" className="size-4" />
+							</Button>
+						</div>
+					</div>
 					<div className="overflow-x-auto">
 						<table className="w-full min-w-[64rem] border-collapse text-sm">
 							<caption className="sr-only">
@@ -316,7 +396,8 @@ export function App() {
 					</div>
 					{days.length === 0 ? (
 						<p className="py-6 text-sm text-muted-foreground" role="status">
-							No fixture prices for this period.
+							No fixture data for this period. Choose another range to see the
+							demo prices.
 						</p>
 					) : null}
 				</CardContent>

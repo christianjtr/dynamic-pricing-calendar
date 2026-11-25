@@ -18,7 +18,7 @@ The frontend renders the returned fields and never recalculates a displayed pric
 
 ## Demo data
 
-The demo uses explicit static fixtures, visibly labelled as fixture data. They demonstrate the contract and the UI flow; they are not an integration with a real backend and do not derive business rules. The selected room and date are encoded in the URL for sharing.
+The demo uses explicit static fixtures, visibly labelled as fixture data. They demonstrate the contract and the UI flow; they are not an integration with a real backend and do not derive business rules. The selected room, date and visible `?from=`/`?to=` range are encoded in the URL for sharing; periods outside the fixture range show an explicit empty state.
 
 ## API documentation
 

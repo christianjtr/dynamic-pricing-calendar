@@ -31,7 +31,7 @@ pnpm install
 pnpm dev
 ```
 
-The demo runs on Vite. Interactive API documentation is served at `/docs` inside the same app. The selected room and date are reflected in `?room=` and `?date=`, so a view can be shared by URL.
+The demo runs on Vite. Interactive API documentation is served at `/docs` inside the same app. The selected room and date are reflected in `?room=` and `?date=`; the visible range uses `?from=` and `?to=`, with month controls to shift it. Ranges without fixture data show an explicit empty state.
 
 ## Available scripts
 

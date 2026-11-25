@@ -1,6 +1,6 @@
 # Memory
 
-Last updated: pivot implementation complete on `chore/ux-and-quality-pass` (uncommitted at review); Stage 16 merged to `main` at `0986721`. See ADR-0012.
+Last updated: pivot complete at `1816ec3`; date-range navigation ready on `feat/date-range-navigation`. See ADR-0012.
 
 ## Project goal
 
@@ -106,7 +106,8 @@ Important contract rules:
 | P2 | `feat/consolidate-demo-app` | Rename the demo app, add shadcn/ui + Tailwind, migrate UI and date navigation | Complete, merged at `caf478a` |
 | P3 | `feat/swap-docs-to-swagger-ui` | Remove Start playground and Scalar, serve Swagger UI at `/docs` | Complete, merged at `c9dc5a2` |
 | P4 | `refactor/remove-sdk-and-smoke-test` | Delete SDK, external-consumer template, tarball script and SDK tests | Complete, merged at `1fde34f` |
-| P5 | `chore/ux-and-quality-pass` | Web interface guidelines review, compact tests and CI, close docs | Implementation complete; commit pending |
+| P5 | `chore/ux-and-quality-pass` | Web interface guidelines review, compact tests and CI, close docs | Complete, merged at `1816ec3` |
+| P6 | `feat/date-range-navigation` | URL-driven `from`/`to` range, month controls and explicit empty states | Ready for commit |
 
 ## ADR index
 
