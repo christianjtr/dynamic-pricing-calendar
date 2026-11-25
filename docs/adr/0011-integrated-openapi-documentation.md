@@ -1,6 +1,6 @@
 # ADR-0011: Integrated OpenAPI documentation
 
-- **Status**: Accepted
+- **Status**: Superseded by [ADR-0012](./0012-pivot-to-reference-app.md)
 - **Date**: 2026-11-25
 - **Deciders**: project owner, implementation agent
 

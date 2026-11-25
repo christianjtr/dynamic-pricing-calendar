@@ -1,6 +1,6 @@
 # ADR-0003: Toolchain compatibility and upgrade order
 
-- **Status**: Accepted
+- **Status**: Superseded by [ADR-0012](./0012-pivot-to-reference-app.md)
 - **Date**: 2026-11-23
 - **Deciders**: project owner, implementation agent
 

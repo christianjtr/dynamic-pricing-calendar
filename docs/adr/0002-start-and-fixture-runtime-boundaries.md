@@ -1,6 +1,6 @@
 # ADR-0002: TanStack Start in reference apps only; fixture server for local development
 
-- **Status**: Partially superseded by [ADR-0007](./0007-playground-start-ssr-and-query-boundaries.md) for the fixture runtime; otherwise Accepted
+- **Status**: Superseded by [ADR-0012](./0012-pivot-to-reference-app.md)
 - **Date**: 2026-11-23
 - **Deciders**: project owner, implementation agent
 

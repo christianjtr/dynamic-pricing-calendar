@@ -1,6 +1,6 @@
 # ADR-0007: Playground Start SSR and query boundaries
 
-- **Status**: Accepted
+- **Status**: Superseded by [ADR-0012](./0012-pivot-to-reference-app.md)
 - **Date**: 2026-11-23
 - **Deciders**: project owner, implementation agent
 

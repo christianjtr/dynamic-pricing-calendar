@@ -1,29 +1,27 @@
 # Memory
 
-Last updated: Stage 16 in progress on `feat/verify-external-sdk-consumption`; Stage 15 merged to `main` at `de19613`.
+Last updated: Pivot branch `docs/pivot-decision` in progress; Stage 16 merged to `main` at `0986721`. See ADR-0012.
 
 ## Project goal
 
-Transform `dynamic-pricing-calendar` into a **Headless Pricing Calendar**: a reusable React component library that displays prices computed by an external backend. This repository must not calculate prices, recommendations, variance, availability, occupancy, restrictions, closed dates, currency or business validation. It transports, structurally validates, caches and renders backend data.
+Keep `dynamic-pricing-calendar` as a **contract-first reference app**: one OpenAPI contract, interactive API docs and one Vite demo that displays prices computed by an external backend. This repository must not calculate prices, recommendations, variance, availability, occupancy, restrictions, closed dates, currency or business validation, and it does not publish an SDK. See ADR-0012.
 
 Backend author: project owner. Product owner instruction: “toda la lógica se computa en un backend externo, nuestro producto sólo muestra la información”. UI team focus: product and presentation layer.
 
 ## Locked decisions (do not revisit without explicit approval)
 
+The pivot in ADR-0012 supersedes the SDK-era decisions. The remaining constraints are:
+
 1. Backend is the single source of truth for pricing logic and values; `packages/contracts/openapi.yaml` is the canonical wire shape (ADR-0010).
 2. Frontend must not implement fallback pricing logic, random generation, business thresholds or optimistic local business decisions.
-3. Vinxi/Nitro has been removed; deterministic fixture endpoints live only in the Start playground server routes, ADR-0005 / ADR-0007.
-4. React SDK will be framework-agnostic; TanStack Start exists only in the playground, ADR-0002 / ADR-0007.
-5. `@tanstack/react-query` is the client cache/write layer.
-6. OpenAPI 3.1.1 is the language-neutral API contract; Orval 8.48.0 generates the SDK's Zod runtime validators, ADR-0010.
-7. Headless hooks and UI components must be in separate package exports, ADR-0006.
-8. Rooms × dates matrix is the base visualization; contextual panel edits one day.
-9. Manual prices, restrictions, closed dates and occupancy need non-color-only indicators from Stage 4 onward.
-10. Design tokens must be neutral (`--hpc-*`, not `--rpg-*`) and consumer-overridable, ADR-0008.
-11. Wallet/auth, tenant and property context are injected by the consuming app; `propertyId` identifies context but never authorizes. ADR-0009.
-12. Live docs, apps and code contain no legacy branding; historical ADRs and the pre-migration audit remain as decision records.
-13. Fixture server serves explicit static data and deterministic in-memory canonical updates only; it never derives prices or computes business rules, ADR-0005.
-14. The published SDK must consume the external backend directly through TanStack Query and `@hpc/contracts`; it must never call or depend on the local fixture endpoints.
+3. One Vite app is the reference runtime; fixtures are explicit static data inside it and never derive business rules.
+4. OpenAPI 3.1.1 is the language-neutral contract; Orval 8.48.0 generates Zod validators used by the demo and tests (ADR-0010).
+5. Rooms × dates matrix is the base visualization; contextual panel edits one day.
+6. Manual prices, restrictions, closed dates and occupancy need non-color-only indicators.
+7. UI lives in the demo app with shadcn/ui + Tailwind; no SDK package is published.
+8. `x-property-id` identifies request context; the backend authorizes. No client-side auth or tenant logic.
+9. Live docs, apps and code contain no legacy branding; historical ADRs and the pre-migration audit remain as decision records.
+10. Interactive API docs use Swagger UI in the demo app and are generated from the canonical YAML.
 
 ## Toolchain baseline
 
@@ -110,21 +108,32 @@ Important contract rules:
 | 13 | `feat/add-api-contract-docs` | Complete and merged to `main` (`ac8dd93`) | Scalar reference and YAML download use canonical OpenAPI; ADR-0011, ADR-0007 updated |
 | 14 | `chore/configure-import-aliases` | Complete and merged to `main` (`c28ae93`) | App-scoped `@/*` aliases resolved by TypeScript, Vite and Vitest; ADR-0003 updated |
 | 15 | `fix/resolve-mantine-overlap` | Complete and merged to `main` (`de19613`) | Constrain grid items/buttons to their tracks and wrap long backend indicators; browser-checked at 390px and desktop, with a long-label regression test; ADR-0008 updated |
-| 16 | `feat/verify-external-sdk-consumption` | In progress | Pack SDK and contract tarballs, type-check/build a clean Vite consumer without workspace links; this does not release packages to a registry |
+| 16 | `feat/verify-external-sdk-consumption` | Complete and merged to `main` (`0986721`) | Pack SDK and contract tarballs, type-check/build a clean Vite consumer without workspace links; this does not release packages to a registry |
+
+## Pivot branches — ADR-0012
+
+| Orden | Rama | Alcance | Estado |
+|---|---|---|---|
+| P1 | `docs/pivot-decision` | ADR-0012, deprecate SDK-era ADRs, rewrite README and integration guide | In progress |
+| P2 | `feat/consolidate-demo-app` | Rename the demo app, add shadcn/ui + Tailwind, migrate UI and date navigation | Planned |
+| P3 | `feat/swap-docs-to-swagger-ui` | Remove Start playground and Scalar, serve Swagger UI at `/docs` | Planned |
+| P4 | `refactor/remove-sdk-and-smoke-test` | Delete SDK, external-consumer template, tarball script and SDK tests | Planned |
+| P5 | `chore/ux-and-quality-pass` | Web interface guidelines review, compact tests and CI, close docs | Planned |
 
 ## ADR index
 
 - [ADR-0001](docs/adr/0001-headless-backend-driven-direction.md) — Headless backend-driven direction. Accepted.
-- [ADR-0002](docs/adr/0002-start-and-fixture-runtime-boundaries.md) — Start and fixture runtime boundaries. Accepted.
-- [ADR-0003](docs/adr/0003-toolchain-compatibility-and-upgrade-order.md) — Toolchain compatibility and upgrade order. Accepted.
-- [ADR-0004](docs/adr/0004-external-api-contracts.md) — External API domain contract. Superseded in part by ADR-0010 for source format.
-- [ADR-0005](docs/adr/0005-fixture-server-without-business-logic.md) — Fixture server without business logic. Accepted.
-- [ADR-0006](docs/adr/0006-public-sdk-and-headless-ui-separation.md) — Public SDK and headless/UI separation. Accepted.
-- [ADR-0007](docs/adr/0007-playground-start-ssr-and-query-boundaries.md) — Playground Start SSR and query boundaries. Accepted.
-- [ADR-0008](docs/adr/0008-neutral-and-overridable-ui-tokens.md) — Neutral and overridable UI tokens. Accepted.
-- [ADR-0009](docs/adr/0009-backend-and-property-context-injection.md) — Backend and property context injection. Accepted.
+- [ADR-0002](docs/adr/0002-start-and-fixture-runtime-boundaries.md) — Start and fixture runtime boundaries. Superseded by ADR-0012.
+- [ADR-0003](docs/adr/0003-toolchain-compatibility-and-upgrade-order.md) — Toolchain compatibility and upgrade order. Superseded by ADR-0012.
+- [ADR-0004](docs/adr/0004-external-api-contracts.md) — External API domain contract. Superseded by ADR-0012.
+- [ADR-0005](docs/adr/0005-fixture-server-without-business-logic.md) — Fixture server without business logic. Superseded by ADR-0012.
+- [ADR-0006](docs/adr/0006-public-sdk-and-headless-ui-separation.md) — Public SDK and headless/UI separation. Superseded by ADR-0012.
+- [ADR-0007](docs/adr/0007-playground-start-ssr-and-query-boundaries.md) — Playground Start SSR and query boundaries. Superseded by ADR-0012.
+- [ADR-0008](docs/adr/0008-neutral-and-overridable-ui-tokens.md) — Neutral and overridable UI tokens. Superseded by ADR-0012.
+- [ADR-0009](docs/adr/0009-backend-and-property-context-injection.md) — Backend and property context injection. Superseded by ADR-0012.
 - [ADR-0010](docs/adr/0010-openapi-canonical-api-contract.md) — OpenAPI as the canonical API contract. Accepted.
-- [ADR-0011](docs/adr/0011-integrated-openapi-documentation.md) — Integrated OpenAPI documentation. Accepted.
+- [ADR-0011](docs/adr/0011-integrated-openapi-documentation.md) — Integrated OpenAPI documentation. Superseded by ADR-0012.
+- [ADR-0012](docs/adr/0012-pivot-to-reference-app.md) — Pivot to a contract-first reference app. Accepted.
 
 ## Stage 4 recap — fixture server
 

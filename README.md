@@ -1,48 +1,30 @@
-# Headless Pricing Calendar
+# Pricing Calendar Reference App
 
-A React SDK for displaying prices computed by an external backend. This repository owns transport, structural contract validation, caching and presentation only. Pricing logic, recommendations, variance decisions, availability decisions, restrictions, currency and business validation belong to the backend.
+A reference implementation of a calendar that displays prices computed by an external backend. This repository owns the HTTP contract, interactive API documentation and one demo application. It does not compute prices, ship an SDK, or claim that a conforming external backend exists.
+
+> The repository is being migrated to the layout below. See [ADR-0012](docs/adr/0012-pivot-to-reference-app.md) for the pivot decision.
 
 ## Repository layout
 
 ```text
 apps/
-  playground/          TanStack Start SSR reference app with local fixture routes
-  headless-demo/       Plain Vite SPA with independent presentation and tokens
+  demo/                Vite app: fixture-driven calendar, date navigation, Swagger UI at /docs
 packages/
   contracts/           Canonical OpenAPI contract and generated Zod validators
-  react/               Public SDK: client, headless and UI entry points
 docs/
-  integration.md       Integration guide and code examples
+  integration.md       Integration guide for backend teams
   adr/                 Architecture decision records
 ```
 
-## Public entry points
+## Contract
 
-| Import | Purpose |
-|---|---|
-| `@hpc/pricing-calendar` | `PricingCalendarProvider`, `createPricingClient`, query hooks, `usePricingCalendar` |
-| `@hpc/pricing-calendar/headless` | Headless selectors and hook without UI dependencies |
-| `@hpc/pricing-calendar/ui` | Optional Mantine-based ready-to-use UI |
-| `@hpc/pricing-calendar/contracts` | Re-exported contract schemas and types |
+The language-neutral wire contract is [`packages/contracts/openapi.yaml`](packages/contracts/openapi.yaml), OpenAPI 3.1.1. It describes `GET /settings`, `GET /prices` and `PATCH /prices/{roomId}/{date}`, including query parameters, headers, bodies, responses and errors.
 
-`@hpc/contracts` is an internal workspace package. Consumers should import contract types from `@hpc/pricing-calendar/contracts`.
+A backend implements that contract; `x-property-id` identifies the request context and the backend authorizes it. No SDK package is published and no backend conforming to the contract is asserted here.
 
-The language-neutral wire contract is [`packages/contracts/openapi.yaml`](packages/contracts/openapi.yaml); OpenAPI is canonical, while the TypeScript package serves the React SDK.
+The demo uses explicit, static fixtures. Prices, recommendations, variance, availability, occupancy, restrictions, currency and business validation always come from the backend response.
 
-## Architecture
-
-```mermaid
-flowchart LR
-  B[External pricing backend] -->|contract HTTP API| S[@hpc/pricing-calendar]
-  S --> P[Start playground]
-  S --> H[Headless Vite demo]
-```
-
-The SDK never defaults to `/api`. Consumers inject `baseUrl`, `propertyId`, optional `fetch`, headers and credentials through `PricingCalendarProvider` or `createPricingClient`. The `/api` routes in `apps/playground` are a deterministic local stand-in for development only.
-
-See [the integration guide](docs/integration.md) for ready-made UI, headless and transport-only examples.
-
-## Getting started
+## Running the demo
 
 Prerequisites: Node 26 and pnpm 12.9.1.
 
@@ -51,35 +33,27 @@ pnpm install
 pnpm dev
 ```
 
-The Start playground runs on port `3000`. To run the independent headless SPA on port `3001`:
-
-```bash
-pnpm dev:demo
-```
+The demo runs on Vite. Interactive API documentation is served at `/docs` inside the same app.
 
 ## Available scripts
 
 | Script | Description |
 |---|---|
-| `pnpm dev` | Start the TanStack Start playground |
-| `pnpm dev:demo` | Start the headless Vite demo |
-| `pnpm build` | Build both apps |
-| `pnpm start` | Preview the playground build |
-| `pnpm start:demo` | Preview the headless demo build |
+| `pnpm dev` | Start the Vite demo |
+| `pnpm build` | Build the demo |
+| `pnpm start` | Preview the demo build |
 | `pnpm lint` | Run Biome checks |
 | `pnpm lint:fix` | Apply Biome fixes |
-| `pnpm typecheck` | Type-check the workspace and both apps |
+| `pnpm typecheck` | Type-check the workspace and the demo |
 | `pnpm test` | Run Vitest in watch mode |
 | `pnpm test:run` | Run Vitest once |
 | `pnpm --filter @hpc/contracts generate` | Generate runtime Zod schemas from OpenAPI |
 | `pnpm --filter @hpc/contracts check:generated` | Check generated schemas are current |
-| `pnpm test:external-consumer` | Pack, install, type-check and build a clean Vite consumer |
 
 ## Verification
 
 ```bash
 pnpm --filter @hpc/contracts check:generated
-pnpm test:external-consumer
 pnpm lint
 pnpm typecheck
 pnpm test:run
@@ -92,10 +66,10 @@ The same commands run in CI on pushes and pull requests to `main`.
 
 - [Integration guide](docs/integration.md)
 - [OpenAPI contract](packages/contracts/openapi.yaml)
-- Interactive API reference: `/docs/api` in the playground
-- [Architecture decision records](docs/adr/0001-headless-backend-driven-direction.md)
+- Interactive API reference: `/docs` in the demo app
+- [ADR-0012 — Pivot to a contract-first reference app](docs/adr/0012-pivot-to-reference-app.md)
+- [ADR-0001 — Headless backend-driven direction](docs/adr/0001-headless-backend-driven-direction.md)
 - [ADR-0010 — OpenAPI as the canonical API contract](docs/adr/0010-openapi-canonical-api-contract.md)
-- [ADR-0011 — Integrated OpenAPI documentation](docs/adr/0011-integrated-openapi-documentation.md)
 - [Repository audit](docs/repository-audit.md) — historical pre-migration snapshot
 
 ## License

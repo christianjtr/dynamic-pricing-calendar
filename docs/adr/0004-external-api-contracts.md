@@ -1,6 +1,6 @@
 # ADR-0004: External API contracts
 
-- **Status**: Superseded in part by [ADR-0010](./0010-openapi-canonical-api-contract.md) for the contract source format; domain shape remains accepted
+- **Status**: Superseded by [ADR-0012](./0012-pivot-to-reference-app.md); contract source format was already superseded by [ADR-0010](./0010-openapi-canonical-api-contract.md)
 - **Date**: 2026-11-23
 - **Deciders**: project owner, implementation agent
 

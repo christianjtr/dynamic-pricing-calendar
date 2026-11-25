@@ -1,6 +1,6 @@
 # ADR-0005: Fixture server without business logic
 
-- **Status**: Partially superseded by [ADR-0007](./0007-playground-start-ssr-and-query-boundaries.md) for runtime hosting; no-business-logic rule remains Accepted
+- **Status**: Superseded by [ADR-0012](./0012-pivot-to-reference-app.md); the no-business-logic rule is retained there
 - **Date**: 2026-11-23
 - **Deciders**: project owner, implementation agent
 
